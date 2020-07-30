@@ -1,0 +1,10 @@
+.Wave-icon {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 100%;
+    z-index: -1;
+}
+.Wave-icon > img {
+    vertical-align: bottom;
+}
