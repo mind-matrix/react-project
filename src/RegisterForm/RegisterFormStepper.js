@@ -8,6 +8,8 @@ import Typography from '@material-ui/core/Typography';
 import BasicDetails from './BasicDetails';
 import BusinessInfo from './BusinessInfo';
 import PaymentInfo from './PaymentInfo';
+import { Container } from '@material-ui/core';
+import ArrowForward from '@material-ui/icons/ArrowForward';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -15,6 +17,9 @@ const useStyles = makeStyles((theme) => ({
   },
   button: {
     marginRight: theme.spacing(1),
+    display: 'flex',
+    justifyContent: 'space-between',
+    textTransform: 'capitalize'
   },
   instructions: {
     marginTop: theme.spacing(1),
@@ -89,7 +94,7 @@ export default function RegisterFormStepper() {
 
   return (
     <div className={classes.root}>
-      <Stepper activeStep={activeStep}>
+      <Stepper activeStep={activeStep} alternativeLabel>
         {steps.map((label, index) => {
           const stepProps = {};
           const labelProps = {};
@@ -119,7 +124,7 @@ export default function RegisterFormStepper() {
         ) : (
           <div>
             <Typography className={classes.instructions}>{getStepContent(activeStep)}</Typography>
-            <div>
+            <Container>
               <Button disabled={activeStep === 0} onClick={handleBack} className={classes.button}>
                 Back
               </Button>
@@ -137,12 +142,16 @@ export default function RegisterFormStepper() {
               <Button
                 variant="contained"
                 color="primary"
+                size="large"
+                fullWidth
                 onClick={handleNext}
                 className={classes.button}
               >
+                <ArrowForward color='primary' />
                 {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
+                <ArrowForward style={{height: '1rem', width: 'auto'}}/>
               </Button>
-            </div>
+            </Container>
           </div>
         )}
       </div>

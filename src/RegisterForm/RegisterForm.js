@@ -8,7 +8,7 @@ import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 import AppIcon from '../AppIcon';
 import RegisterFormStepper from './RegisterFormStepper';
-import { CssBaseline } from '@material-ui/core';
+import { CssBaseline, Icon } from '@material-ui/core';
 
 const drawerWidth = 240;
 
@@ -49,6 +49,7 @@ const useStyles = makeStyles((theme) => ({
     },
     title: {
       flexGrow: 1,
+      fontWeight: 500
     },
     drawerPaper: {
       position: 'relative',
@@ -99,10 +100,11 @@ export default function ButtonAppBar() {
       <CssBaseline />
       <AppBar color="#fff" elevation={1} position="absolute">
         <Toolbar>
-            <AppIcon width={100} />
+            <AppIcon width={60} />
             <Typography variant="h6" className={classes.title}>
             Register
             </Typography>
+            <Icon style={{width: 60, color: 'white'}}>save</Icon>
         </Toolbar>
       </AppBar>
       <main className={classes.content}>

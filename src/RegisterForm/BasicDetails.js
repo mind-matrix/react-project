@@ -14,7 +14,7 @@ export default function BasicDetails() {
                 color="secondary"
                 label="Name"
                 name="name"
-                autoFocus
+                color="primary"
             />
             <TextField
                 variant="outlined"
@@ -25,7 +25,7 @@ export default function BasicDetails() {
                 color="secondary"
                 label="Email"
                 name="email"
-                autoFocus
+                color="primary"
             />
             <TextField
                 variant="outlined"
@@ -36,9 +36,9 @@ export default function BasicDetails() {
                 color="secondary"
                 label="Address"
                 name="address"
+                color="primary"
                 rows={4}
                 multiline
-                autoFocus
             />
         </Container>
     );
