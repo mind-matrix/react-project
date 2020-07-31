@@ -3,7 +3,9 @@ import { makeStyles } from '@material-ui/core/styles';
 import Stepper from '@material-ui/core/Stepper';
 import Step from '@material-ui/core/Step';
 import StepLabel from '@material-ui/core/StepLabel';
+import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
+import { ArrowForward } from '@material-ui/icons';
 import Typography from '@material-ui/core/Typography';
 import BasicDetails from './BasicDetails';
 import BusinessInfo from './BusinessInfo';
@@ -14,7 +16,9 @@ const useStyles = makeStyles((theme) => ({
     width: '100%',
   },
   button: {
-    marginRight: theme.spacing(1),
+    display: 'block',
+    margin: '0 auto',
+    maxWidth: 300
   },
   instructions: {
     marginTop: theme.spacing(1),
@@ -120,9 +124,6 @@ export default function RegisterFormStepper() {
           <div>
             <Typography className={classes.instructions}>{getStepContent(activeStep)}</Typography>
             <div>
-              <Button disabled={activeStep === 0} onClick={handleBack} className={classes.button}>
-                Back
-              </Button>
               {isStepOptional(activeStep) && (
                 <Button
                   variant="contained"
@@ -134,13 +135,23 @@ export default function RegisterFormStepper() {
                 </Button>
               )}
 
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={handleNext}
-                className={classes.button}
-              >
-                {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
+              <Box py={2}>
+                <Button
+                  fullWidth
+                  variant="contained"
+                  disableElevation
+                  color="primary"
+                  onClick={handleNext}
+                  className={classes.button}
+                >
+                  <Box py={1}>
+                    {activeStep === steps.length - 1 ? 'Register' : 'Next'}
+                    {activeStep === steps.length - 1 ? '' : <ArrowForward style={{ float: 'right' }} /> }
+                  </Box>
+                </Button>
+              </Box>
+              <Button fullWidth disabled={activeStep === 0} onClick={handleBack} className={classes.button}>
+                Back
               </Button>
             </div>
           </div>
