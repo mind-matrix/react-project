@@ -3,6 +3,17 @@ import TextField from '@material-ui/core/TextField';
 import Container from '@material-ui/core/Container';
 
 export default function BasicDetails() {
+
+    const [state, setState] = React.useState({
+        name: null,
+        email: null,
+        address: null
+    });
+
+    const handleChange = (event) => {
+        setState({value: event.target.value});
+    }
+
     return (
         <Container>
             <TextField
@@ -15,6 +26,9 @@ export default function BasicDetails() {
                 label="Name"
                 name="name"
                 color="primary"
+                value={state.name}
+                onChange={handleChange}
+                autoFocus
             />
             <TextField
                 variant="outlined"
@@ -26,6 +40,9 @@ export default function BasicDetails() {
                 label="Email"
                 name="email"
                 color="primary"
+                value={state.email}
+                onChange={handleChange}
+                autoFocus
             />
             <TextField
                 variant="outlined"
@@ -37,6 +54,8 @@ export default function BasicDetails() {
                 label="Address"
                 name="address"
                 color="primary"
+                value={state.address}
+                onChange={handleChange}
                 rows={4}
                 multiline
             />

@@ -92,7 +92,7 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-export default function ButtonAppBar() {
+export default function RegisterForm() {
   const classes = useStyles();
 
   return (
