@@ -8,10 +8,12 @@ import TextField from '@material-ui/core/TextField';
 import Container from '@material-ui/core/Container';
 import Box from '@material-ui/core/Box';
 import grey from '@material-ui/core/colors/grey';
+import ToggleOption from './ToggleOption';
 
 export default function PaymentInfo() {
     
     const [state, setState] = React.useState({
+        type: 0,
         bank: null,
         account: null,
         accountType: null,
@@ -33,9 +35,14 @@ export default function PaymentInfo() {
         setState({value: event.target.value});
     }
 
+    const handleToggle = (toggleState) => {
+        setState({ type: toggleState });
+    }
+
     return (
         <Container>
-            <Box fontSize={12} style={{float: 'left', color: grey[400]}}>Add Bank Details</Box>
+            <ToggleOption onToggle={handleToggle} value={state.type} />
+            <Box fontSize={12} py={2} style={{textAlign: 'left', color: grey[400]}}>Add Bank Details</Box>
             <FormControl required fullWidth variant="outlined">
                 <InputLabel htmlFor="outlined-age-native-simple">Bank Name</InputLabel>
                 <Select
