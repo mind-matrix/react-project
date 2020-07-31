@@ -42,14 +42,15 @@ export default function PaymentInfo() {
     return (
         <Container>
             <ToggleOption onToggle={handleToggle} value={state.type} />
-            <Box fontSize={12} py={2} style={{textAlign: 'left', color: grey[400]}}>Add Bank Details</Box>
+            <Box fontSize={12} mb={2} style={{textAlign: 'left', color: grey[400]}}>Add Bank Details</Box>
             <FormControl required fullWidth variant="outlined">
                 <InputLabel htmlFor="outlined-age-native-simple">Bank Name</InputLabel>
                 <Select
                     native
                     value={state.bank}
                     onChange={handleChange}
-                    label="Bank"
+                    label="Bank Name"
+                    color="primary"
                     inputProps={{
                         name: 'bank',
                         id: 'outlined-age-native-simple',
@@ -69,7 +70,7 @@ export default function PaymentInfo() {
                 required
                 fullWidth
                 id="account"
-                color="secondary"
+                color="primary"
                 label="Account Number"
                 name="account"
                 value={state.account}
@@ -82,6 +83,7 @@ export default function PaymentInfo() {
                     native
                     value={state.accountType}
                     onChange={handleChange}
+                    color="primary"
                     label="Account Type"
                     inputProps={{
                         name: 'accountType',
@@ -102,7 +104,7 @@ export default function PaymentInfo() {
                 required
                 fullWidth
                 id="ifsc"
-                color="secondary"
+                color="primary"
                 label="IFSC Code"
                 name="ifsc"
                 value={state.ifsc}
@@ -116,7 +118,7 @@ export default function PaymentInfo() {
                 required
                 fullWidth
                 id="upi"
-                color="secondary"
+                color="primary"
                 label="UPI Address"
                 name="upi"
                 value={state.upi}
