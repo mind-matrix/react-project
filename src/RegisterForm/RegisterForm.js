@@ -49,7 +49,8 @@ const useStyles = makeStyles((theme) => ({
     },
     title: {
       flexGrow: 1,
-      fontWeight: 500
+      fontWeight: 600,
+      color: '#35332B'
     },
     drawerPaper: {
       position: 'relative',
@@ -98,7 +99,7 @@ export default function RegisterForm() {
   return (
     <div className={classes.root}>
       <CssBaseline />
-      <AppBar color="#fff" elevation={1} position="absolute">
+      <AppBar elevation={1} position="absolute" style={{backgroundColor: 'white'}}>
         <Toolbar>
             <AppIcon width={60} />
             <Typography variant="h6" className={classes.title}>

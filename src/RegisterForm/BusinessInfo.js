@@ -34,7 +34,7 @@ export default function BusinessInfo() {
                 required
                 fullWidth
                 id="name"
-                color="secondary"
+                color="primary"
                 label="Business Name"
                 name="name"
                 value={state.name}
@@ -60,7 +60,7 @@ export default function BusinessInfo() {
                 required
                 fullWidth
                 id="address"
-                color="secondary"
+                color="primary"
                 label="Address"
                 name="address"
                 value={state.address}
@@ -75,7 +75,7 @@ export default function BusinessInfo() {
                 required
                 fullWidth
                 id="pan"
-                color="secondary"
+                color="primary"
                 label="PAN Number"
                 name="pan"
                 value={state.pan}
@@ -87,7 +87,7 @@ export default function BusinessInfo() {
                 margin="normal"
                 fullWidth
                 id="gst"
-                color="secondary"
+                color="primary"
                 label="GST Number"
                 name="gst"
                 value={state.gst}
@@ -101,7 +101,7 @@ export default function BusinessInfo() {
                 margin="normal"
                 fullWidth
                 id="tnc"
-                color="secondary"
+                color="primary"
                 label="Terms &amp; Conditions (To be added to Invoice)"
                 name="tnc"
                 value={state.tnc}
