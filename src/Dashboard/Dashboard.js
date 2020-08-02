@@ -79,6 +79,7 @@ const useStyles = makeStyles((theme) => ({
       flexGrow: 1,
       height: '100vh',
       overflow: 'auto',
+      paddingTop: '10px'
     },
     container: {
       paddingTop: theme.spacing(4),
@@ -118,12 +119,15 @@ export default function Dashboard() {
                     </Typography>
                     <Icon style={{width: 60, color: 'white'}}>save</Icon>
                 </Toolbar>
-                <Grid container spacing={3}>
+            </AppBar>
+            <main className={classes.content}>
+              <div className={classes.appBarSpacer} />
+              <Grid container spacing={3}>
                     <Grid item xs={12}>
                         <InvoiceCard total={100000} received={300000} pending={4500000}></InvoiceCard>
                     </Grid>
                 </Grid>
-            </AppBar>
+            </main>
         </div>
     )
 }
