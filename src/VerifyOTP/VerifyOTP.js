@@ -12,6 +12,8 @@ import AppIcon from '../AppIcon';
 import WaveSVG from '../wave.svg';
 import '../Wave.css';
 
+import history from '../history';
+
 function Wave() {
     return (
         <div className="Wave-icon">
@@ -72,6 +74,7 @@ export default function VerifyOTP() {
                 variant="contained"
                 color="primary"
                 className={classes.submit}
+                onClick={() => history.push('/register')}
             >
                 <Box py={1}>
                     Verify &amp; Login

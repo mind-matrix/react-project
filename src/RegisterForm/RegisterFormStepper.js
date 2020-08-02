@@ -12,6 +12,8 @@ import BusinessInfo from './BusinessInfo';
 import PaymentInfo from './PaymentInfo';
 import { Container } from '@material-ui/core';
 
+import history from '../history';
+
 const useStyles = makeStyles((theme) => ({
   root: {
     width: '100%',
@@ -48,7 +50,7 @@ function getStepContent(step) {
 
 export default function RegisterFormStepper() {
   const classes = useStyles();
-  const [activeStep, setActiveStep] = React.useState(2);
+  const [activeStep, setActiveStep] = React.useState(0);
   const [skipped, setSkipped] = React.useState(new Set());
   const steps = getSteps();
 
@@ -61,7 +63,13 @@ export default function RegisterFormStepper() {
   };
 
   const handleNext = () => {
+    if (activeStep === 2) {
+      history.push('/dashboard');
+      return;
+    }
+
     let newSkipped = skipped;
+
     if (isStepSkipped(activeStep)) {
       newSkipped = new Set(newSkipped.values());
       newSkipped.delete(activeStep);

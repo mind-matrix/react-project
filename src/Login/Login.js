@@ -1,9 +1,15 @@
 import React from 'react';
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Link,
+  useRouteMatch
+} from "react-router-dom";
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
-import Link from '@material-ui/core/Link';
 import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
 import { makeStyles } from '@material-ui/core/styles';
@@ -12,6 +18,8 @@ import Container from '@material-ui/core/Container';
 import AppIcon from '../AppIcon';
 import WaveSVG from '../wave.svg';
 import '../Wave.css';
+
+import history from '../history';
 
 function Wave() {
     return (
@@ -44,6 +52,8 @@ const useStyles = makeStyles((theme) => ({
 export default function Login() {
   const classes = useStyles();
 
+  const match = useRouteMatch();
+
   return (
     <Container component="main" maxWidth="xs">
         <Wave />
@@ -67,12 +77,13 @@ export default function Login() {
                 autoFocus
             />
             <Button
-                type="submit"
-                fullWidth
-                disableElevation
-                variant="contained"
-                color="primary"
-                className={classes.submit}
+              type="submit"
+              fullWidth
+              disableElevation
+              variant="contained"
+              color="primary"
+              className={classes.submit}
+              onClick={() => history.push('/verify')}
             >
                 <Box py={1}>
                     Login
