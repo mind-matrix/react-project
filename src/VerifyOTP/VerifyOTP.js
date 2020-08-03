@@ -38,6 +38,17 @@ const useStyles = makeStyles((theme) => ({
     width: '100%', // Fix IE 11 issue.
     marginTop: theme.spacing(1),
   },
+  otp: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    '& input': {
+      width: '4rem !important',
+      height: '3rem',
+      fontSize: '2rem',
+      border: '1px solid #DAD9D8',
+    }
+  },
   submit: {
     margin: theme.spacing(3, 0, 2),
   },
@@ -48,6 +59,14 @@ export default function VerifyOTP() {
   const [otp, setOtp] = useState();
 
   const otpChange = otp => setOtp(otp);
+
+  const [state, setState] = React.useState({
+    otp: null
+  });
+
+  const handleChange = (otp) => {
+    setState({ otp });
+  };
 
   return (
     <Container component="main" maxWidth="xs">
