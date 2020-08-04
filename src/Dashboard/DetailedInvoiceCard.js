@@ -68,6 +68,7 @@ const useStyles = makeStyles({
         color: '#2958C1',
         cursor: 'pointer',
         padding: '10px',
+        height: '100%',
         borderRight: '1pt solid rgba(53, 51, 43, 0.1)',
         '&:last-child': {
             borderRight: 0
@@ -101,7 +102,7 @@ export default function DetailedInvoiceCard(props) {
                     {props.date}
                 </Typography>
                 <Grid container alignItems="center">
-                    <Grid item xs={6}>
+                    <Grid item xs={5}>
                         <Typography className={classes.title} gutterBottom>
                             <div className={classes.number}>
                                 {props.name}
@@ -111,7 +112,7 @@ export default function DetailedInvoiceCard(props) {
                             </div>
                         </Typography>
                     </Grid>
-                    <Grid item xs={3}>
+                    <Grid item xs={4}>
                         <Typography className={classes.title} gutterBottom>
                             <div className={classes.number}>
                                 &#8377; {format(props.total)}

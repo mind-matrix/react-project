@@ -4,8 +4,8 @@ import { Card, CardContent, Grid, Divider, Typography, makeStyles } from '@mater
 const useStyles = makeStyles({
     root: {
         display: 'block',
-        width: 'fit-content',
         margin: '0 auto',
+        maxWidth: 420,
         backgroundColor: 'white'
     },
     header: {
@@ -16,28 +16,33 @@ const useStyles = makeStyles({
         lineHeight: '19px',
         marginBottom: '26px'
     },
+    item: {
+        '&:nth-child(1)': {
+            color: '#35332B',
+            borderRight: '1pt solid rgba(53, 51, 43, 0.1)'
+        },
+        '&:nth-child(2)': {
+            color: '#419945',
+            borderRight: '1pt solid rgba(53, 51, 43, 0.1)'
+        },
+        '&:nth-child(3)': {
+            color: '#E87716'
+        }
+    },
     title: {
         textAlign: 'center',
         fontSize: '18pt',
         lineHeight: '24px',
-        margin: '5px 13px',
-        '&:nth-child(1)': {
-            color: '#35332B'
-        },
-        '&:nth-child(3)': {
-            color: '#419945'
-        },
-        '&:nth-child(5)': {
-            color: '#E87716'
-        }
+        margin: '5px 8px'
     },
     number: {
         display: 'block',
-        fontSize: 24,
+        fontSize: 20,
         fontWeight: 'bolder',
     },
     name: {
-        fontSize: 12
+        fontSize: 12,
+        lineHeight: 1
     }
 });
 
@@ -63,32 +68,36 @@ export default function InvoiceCard(props) {
                     {props.header}
                 </Typography>
                 <Grid container alignItems="center">
-                    <Typography className={classes.title} gutterBottom>
-                        <div className={classes.number}>
-                            &#8377; {format(props.total)}
-                        </div>
-                        <div className={classes.name}>
-                            Total Amount
-                        </div>
-                    </Typography>
-                    <Divider orientation="vertical" flexItem />
-                    <Typography className={classes.title} gutterBottom>
-                        <div className={classes.number}>
-                            &#8377; {format(props.received)}
-                        </div>
-                        <div className={classes.name}>
-                            Amount Received
-                        </div>
-                    </Typography>
-                    <Divider orientation="vertical" flexItem />
-                    <Typography className={classes.title} gutterBottom>
-                        <div className={classes.number}>
-                            &#8377; {format(props.pending)}
-                        </div>
-                        <div className={classes.name}>
-                            Amount Pending
-                        </div>
-                    </Typography>
+                    <Grid className={classes.item} item xs={4}>
+                        <Typography className={classes.title} gutterBottom>
+                            <div className={classes.number}>
+                                &#8377; {format(props.total)}
+                            </div>
+                            <div className={classes.name}>
+                                Total Amount
+                            </div>
+                        </Typography>
+                    </Grid>
+                    <Grid className={classes.item} item xs={4}>
+                        <Typography className={classes.title} gutterBottom>
+                            <div className={classes.number}>
+                                &#8377; {format(props.received)}
+                            </div>
+                            <div className={classes.name}>
+                                Amount Received
+                            </div>
+                        </Typography>
+                    </Grid>
+                    <Grid className={classes.item} item xs={4}>
+                        <Typography className={classes.title} gutterBottom>
+                            <div className={classes.number}>
+                                &#8377; {format(props.pending)}
+                            </div>
+                            <div className={classes.name}>
+                                Amount Pending
+                            </div>
+                        </Typography>
+                    </Grid>
                 </Grid>
             </CardContent>
         </Card>

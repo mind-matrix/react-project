@@ -44,7 +44,7 @@ const useStyles = makeStyles((theme) => ({
       }),
     },
     invoiceButton: {
-      maxWidth: '420px',
+      maxWidth: '360px',
       margin: '10px 10px 30px 20px'
     },
     menuButton: {
