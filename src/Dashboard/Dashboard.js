@@ -3,12 +3,11 @@ import { makeStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
-import Button from '@material-ui/core/Button';
-import IconButton from '@material-ui/core/IconButton';
-import MenuIcon from '@material-ui/icons/Menu';
 import AppIcon from '../AppIcon';
-import { CssBaseline, Icon, Grid } from '@material-ui/core';
+import { CssBaseline, Icon, Grid, Button, Box } from '@material-ui/core';
+import { ArrowDropDown, Tune, ChevronLeft, ChevronRight } from '@material-ui/icons';
 import InvoiceCard from './InvoiceCard';
+import DetailedInvoiceCard from './DetailedInvoiceCard';
 
 import history from '../history';
 
@@ -42,6 +41,10 @@ const useStyles = makeStyles((theme) => ({
         easing: theme.transitions.easing.sharp,
         duration: theme.transitions.duration.enteringScreen,
       }),
+    },
+    invoiceButton: {
+      maxWidth: '420px',
+      margin: '10px 10px 30px 20px'
     },
     menuButton: {
       marginRight: 36,
@@ -79,7 +82,10 @@ const useStyles = makeStyles((theme) => ({
       flexGrow: 1,
       height: '100vh',
       overflow: 'auto',
-      paddingTop: '10px'
+      paddingTop: '10px',
+      marginLeft: '10px',
+      marginRight: '10px',
+      overflowX: 'hidden'
     },
     container: {
       paddingTop: theme.spacing(4),
@@ -94,19 +100,49 @@ const useStyles = makeStyles((theme) => ({
     fixedHeight: {
       height: 240,
     },
+    detailedInvoiceHeader: {
+      maxWidth: 420,
+      textAlign: 'left',
+      margin: '15px auto',
+      fontSize: '16pt',
+      fontWeight: 'bolder',
+      color: '#35332B',
+      '& > .sub': {
+        fontSize: '10pt',
+        opacity: 0.6
+      }
+    }
 }));
 
 export default function Dashboard() {
     const [state, setState] = React.useState({
         invoices: [
-
+          { header: 'YTD Issued invoice', total: 3001000, received: 2001000, pending: 1000000 },
+          { header: 'MTD Issued invoice', total: 3001000, received: 2001000, pending: 1000000 }
         ],
         detailedList: [
-
-        ]
+          { date: '12 Mar 2020', name: 'Rakesh Gupta', phone: '994635525', total: 10000, due: 2000 },
+          { date: '12 Mar 2020', name: 'Rakesh Gupta', phone: '994635525', total: 10000, due: false },
+          ...Array(98).fill({ date: '12 Mar 2020', name: 'Rakesh Gupta', phone: '994635525', total: 10000, due: 2000 })
+        ],
+        recordsPerPage: 10,
+        page: 1,
+        sortBy: null
     });
 
     const classes = useStyles();
+
+    const prevPage = () => {
+      if (state.page > 1) {
+        setState({ ...state, page: state.page - 1 });
+      }
+    };
+
+    const nextPage = () => {
+      if (state.page < state.detailedList.length / state.recordsPerPage) {
+        setState({ ...state, page: state.page + 1 });
+      }
+    };
 
     return (
         <div className={classes.root}>
@@ -122,10 +158,67 @@ export default function Dashboard() {
             </AppBar>
             <main className={classes.content}>
               <div className={classes.appBarSpacer} />
+              <Button
+                fullWidth
+                disableElevation
+                variant="contained"
+                color="primary"
+                className={classes.invoiceButton}
+              >
+                <Box py={1}>
+                    Generate Invoice
+                </Box>
+              </Button>
               <Grid container spacing={3}>
-                    <Grid item xs={12}>
-                        <InvoiceCard total={100000} received={300000} pending={4500000}></InvoiceCard>
-                    </Grid>
+                    {
+                      state.invoices.map((invoice) => {
+                        return <Grid item xs={12}>
+                          <InvoiceCard header={invoice.header} total={invoice.total} received={invoice.received} pending={invoice.pending}></InvoiceCard>
+                        </Grid>
+                      })
+                    }
+                </Grid>
+                <Typography className={classes.detailedInvoiceHeader}>
+                  Detailed Invoice List
+                  <Typography style={{ float: 'right' }}>
+                    <Button style={{ textTransform: 'none', padding: '5px 5px', marginRight: '5px' }} variant="outlined">
+                      Sort by
+                      <ArrowDropDown />
+                    </Button>
+                    <Button style={{ textTransform: 'none', padding: '5px 5px' }} variant="outlined">
+                      <Tune style={{ marginRight: '5px' }} />
+                      Filter
+                    </Button>
+                  </Typography>
+                  <Typography className={`sub`}>
+                    {state.detailedList.length} records found
+                  </Typography>
+                </Typography>
+                <Grid container spacing={3}>
+                  {
+                    state.detailedList.map((invoice, index) => {
+                      if (index < (state.page-1)*state.recordsPerPage) return;
+                      if (index > (state.page)*state.recordsPerPage-1) return;
+                      return <Grid item xs={12}>
+                        <DetailedInvoiceCard date={invoice.date} name={invoice.name} phone={invoice.phone} total={invoice.total} due={invoice.due}></DetailedInvoiceCard>
+                      </Grid>
+                    })
+                  }
+                  <Grid item xs={12}>
+                    <Box maxWidth={200} style={{width:'fit-content', margin:'0 auto'}}>
+                      <Typography>
+                        <Button onClick={prevPage} style={{ padding: '5px 5px', minWidth: 0}} variant="outlined">
+                          <ChevronLeft style={{verticalAlign: 'middle', fontSize: '10pt'}} />
+                        </Button>
+                        <span style={{ padding: '5px 10px', fontSize: '10pt' }}>
+                          {state.page}/{state.detailedList.length/state.recordsPerPage}
+                        </span>
+                        <Button style={{ padding: '5px 5px', minWidth: 0}} variant="outlined">
+                          <ChevronRight onClick={nextPage} style={{verticalAlign: 'middle', fontSize: '10pt'}} />
+                        </Button>
+                      </Typography>
+                    </Box>
+                  </Grid>
                 </Grid>
             </main>
         </div>

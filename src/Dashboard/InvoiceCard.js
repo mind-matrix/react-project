@@ -7,9 +7,19 @@ const useStyles = makeStyles({
         width: 'fit-content',
         margin: '0 auto'
     },
+    header: {
+        color: '#0A0A0A',
+        opacity: 0.6,
+        fontSize: '14pt',
+        textAlign: 'left',
+        lineHeight: '19px',
+        marginBottom: '26px'
+    },
     title: {
         textAlign: 'center',
-        margin: '5px 15px',
+        fontSize: '18pt',
+        lineHeight: '24px',
+        margin: '5px 13px',
         '&:nth-child(1)': {
             color: '#35332B'
         },
@@ -37,7 +47,7 @@ export default function InvoiceCard(props) {
         if (number < 1000) {
             return Math.round(number);
         } else if (number < 100000) {
-            return (Math.round(number * 100/1000) / 100).toFixed(2) + ' K';
+            return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
         } else if (number < 10000000) {
             return (Math.round(number * 100/100000) / 100).toFixed(2) + ' L';
         } else {
@@ -48,6 +58,9 @@ export default function InvoiceCard(props) {
     return (
         <Card className={classes.root}>
             <CardContent>
+                <Typography className={classes.header}>
+                    {props.header}
+                </Typography>
                 <Grid container alignItems="center">
                     <Typography className={classes.title} gutterBottom>
                         <div className={classes.number}>
