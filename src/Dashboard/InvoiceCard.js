@@ -5,7 +5,8 @@ const useStyles = makeStyles({
     root: {
         display: 'block',
         width: 'fit-content',
-        margin: '0 auto'
+        margin: '0 auto',
+        backgroundColor: 'white'
     },
     header: {
         color: '#0A0A0A',

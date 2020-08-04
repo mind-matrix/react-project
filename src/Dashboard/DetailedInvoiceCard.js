@@ -7,7 +7,8 @@ const useStyles = makeStyles({
     root: {
         display: 'block',
         margin: '0 auto',
-        maxWidth: 420
+        maxWidth: 420,
+        backgroundColor: 'white'
     },
     date: {
         color: '#35332B',

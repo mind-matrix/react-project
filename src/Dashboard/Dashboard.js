@@ -8,6 +8,7 @@ import { CssBaseline, Icon, Grid, Button, Box } from '@material-ui/core';
 import { ArrowDropDown, Tune, ChevronLeft, ChevronRight } from '@material-ui/icons';
 import InvoiceCard from './InvoiceCard';
 import DetailedInvoiceCard from './DetailedInvoiceCard';
+import Wave from '../Wave';
 
 import history from '../history';
 
@@ -15,7 +16,7 @@ const drawerWidth = 240;
 
 const useStyles = makeStyles((theme) => ({
     root: {
-      display: 'flex',
+      display: 'flex'
     },
     toolbar: {
       paddingRight: 24, // keep right padding when drawer closed
@@ -85,7 +86,8 @@ const useStyles = makeStyles((theme) => ({
       paddingTop: '10px',
       marginLeft: '10px',
       marginRight: '10px',
-      overflowX: 'hidden'
+      overflowX: 'hidden',
+      paddingBottom: '100px'
     },
     container: {
       paddingTop: theme.spacing(4),
@@ -146,6 +148,7 @@ export default function Dashboard() {
 
     return (
         <div className={classes.root}>
+            <Wave />
             <CssBaseline />
             <AppBar elevation={1} position="absolute" style={{backgroundColor: 'white'}}>
                 <Toolbar>

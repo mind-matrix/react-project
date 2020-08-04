@@ -10,18 +10,9 @@ import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import OtpInput from 'react-otp-input';
 import AppIcon from '../AppIcon';
-import WaveSVG from '../wave.svg';
-import '../Wave.css';
+import Wave from '../Wave';
 
 import history from '../history';
-
-function Wave() {
-  return (
-    <div className="Wave-icon">
-      <img src={WaveSVG} alt="Wave" />
-    </div>
-  );
-}
 
 const useStyles = makeStyles((theme) => ({
   paper: {
