@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
@@ -16,11 +16,11 @@ import '../Wave.css';
 import history from '../history';
 
 function Wave() {
-    return (
-        <div className="Wave-icon">
-            <img src={WaveSVG} alt="Wave" />
-        </div>
-    );
+  return (
+    <div className="Wave-icon">
+      <img src={WaveSVG} alt="Wave" />
+    </div>
+  );
 }
 
 const useStyles = makeStyles((theme) => ({
@@ -56,6 +56,9 @@ const useStyles = makeStyles((theme) => ({
 
 export default function VerifyOTP() {
   const classes = useStyles();
+  const [otp, setOtp] = useState();
+
+  const otpChange = otp => setOtp(otp);
 
   const [state, setState] = React.useState({
     otp: null
@@ -67,48 +70,47 @@ export default function VerifyOTP() {
 
   return (
     <Container component="main" maxWidth="xs">
-        <Wave />
-        <CssBaseline />
-        <div className={classes.paper}>
-            <AppIcon />
-            <Typography component="h1" variant="h5">
-              Verify OTP
+      <Wave />
+      <CssBaseline />
+      <div className={classes.paper}>
+        <AppIcon width={116} />
+        <Typography component="h6" variant="h6" style={{ marginTop: 100 }}>
+          Verify OTP
             </Typography>
-            <form className={classes.form} noValidate>
-              <div className={classes.otp}>
-                <OtpInput
-                  onChange={handleChange}
-                  numInputs={4}
-                  isInputNum
-                  value={state.otp}
-                  separator={<span>&nbsp;</span>}
-                />
-              </div>
-              <Button
-                  type="submit"
-                  fullWidth
-                  disableElevation
-                  variant="contained"
-                  color="primary"
-                  className={classes.submit}
-                  onClick={() => history.push('/register')}
-              >
-                  <Box py={1}>
-                      Verify &amp; Login
-                  </Box>
-              </Button>
-              <Grid container>
-                <Grid item xs={12}>
-                  Didn't get OTP?
-                </Grid>
-                <Grid item xs={12}>
-                  <Link href="#" variant="h6">
-                    {"Resend OTP"}
-                  </Link>
-                </Grid>
+        <form className={classes.form} noValidate>
+          <OtpInput
+            containerStyle={{display: 'flex', justifyContent: 'space-around', color: 'black'}}
+            inputStyle={{height: 50, width: 50, fontSize: '1.2rem'}}
+            numInputs={4}
+            value={otp}
+            onChange={otpChange}
+            isInputNum={true}
+          />
+          <Button
+            type="submit"
+            fullWidth
+            disableElevation
+            variant="contained"
+            color="primary"
+            className={classes.submit}
+            onClick={() => history.push('/register')}
+          >
+            <Box py={1}>
+              Verify &amp; Login
+                </Box>
+          </Button>
+          <Grid container>
+            <Grid item xs={12}>
+              Didn't get OTP?
               </Grid>
-            </form>
-        </div>
+            <Grid item xs={12}>
+              <Link href="#" variant="h6" component="h6" style={{ textDecoration: 'underline', marginTop: 10 }}>
+                {"Resend OTP"}
+              </Link>
+            </Grid>
+          </Grid>
+        </form>
+      </div>
     </Container>
   );
 }

@@ -22,11 +22,11 @@ import '../Wave.css';
 import history from '../history';
 
 function Wave() {
-    return (
-        <div className="Wave-icon">
-            <img src={WaveSVG} alt="Wave" />
-        </div>
-    );
+  return (
+    <div className="Wave-icon">
+      <img src={WaveSVG} alt="Wave" />
+    </div>
+  );
 }
 
 const useStyles = makeStyles((theme) => ({
@@ -56,41 +56,42 @@ export default function Login() {
 
   return (
     <Container component="main" maxWidth="xs">
-        <Wave />
-        <CssBaseline />
-        <div className={classes.paper}>
-            <AppIcon />
-            <Typography component="h1" variant="h5">
-            Invoice Generation
-            </Typography>
-            <form className={classes.form} noValidate>
-            <TextField
-                variant="outlined"
-                margin="normal"
-                required
-                fullWidth
-                id="phone"
-                color="secondary"
-                label="Enter Phone Number"
-                name="phone"
-                autoComplete="phone"
-                autoFocus
-            />
-            <Button
-              type="submit"
-              fullWidth
-              disableElevation
-              variant="contained"
-              color="primary"
-              className={classes.submit}
-              onClick={() => history.push('/verify')}
-            >
-                <Box py={1}>
-                    Login
+      <Wave />
+      <CssBaseline />
+      <div className={classes.paper}>
+        <AppIcon width={116}/>
+        <Typography component="h6" variant="h6" style={{marginTop: 100}}>
+          Invoice Generation
+        </Typography>
+        <form className={classes.form} noValidate>
+          <TextField
+            variant="outlined"
+            margin="normal"
+            required
+            fullWidth
+            id="phone"
+            color="secondary"
+            label="Enter Phone Number"
+            name="phone"
+            autoComplete="phone"
+            color="primary"
+            autoFocus
+          />
+          <Button
+            type="submit"
+            fullWidth
+            disableElevation
+            variant="contained"
+            color="primary"
+            className={classes.submit}
+            onClick={() => history.push('/verify')}
+          >
+            <Box py={1}>
+              Login
                 </Box>
-            </Button>
-            </form>
-        </div>
+          </Button>
+        </form>
+      </div>
     </Container>
   );
 }
