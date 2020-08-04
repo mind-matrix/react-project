@@ -213,8 +213,8 @@ export default function Dashboard() {
                         <span style={{ padding: '5px 10px', fontSize: '10pt' }}>
                           {state.page}/{state.detailedList.length/state.recordsPerPage}
                         </span>
-                        <Button style={{ padding: '5px 5px', minWidth: 0}} variant="outlined">
-                          <ChevronRight onClick={nextPage} style={{verticalAlign: 'middle', fontSize: '10pt'}} />
+                        <Button onClick={nextPage} style={{ padding: '5px 5px', minWidth: 0}} variant="outlined">
+                          <ChevronRight style={{verticalAlign: 'middle', fontSize: '10pt'}} />
                         </Button>
                       </Typography>
                     </Box>
