@@ -4,8 +4,10 @@ import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import AppIcon from '../AppIcon';
-import { CssBaseline, Icon, Grid, Button, Box } from '@material-ui/core';
+import { CssBaseline, Icon, Grid, Button, Box, Slide } from '@material-ui/core';
 import { ArrowDropDown, Tune, ChevronLeft, ChevronRight } from '@material-ui/icons';
+import FilterSelect from './FilterSelect';
+import FullScreenDialog from './FullScreenDialog';
 import InvoiceCard from './InvoiceCard';
 import DetailedInvoiceCard from './DetailedInvoiceCard';
 import Wave from '../Wave';
@@ -113,8 +115,15 @@ const useStyles = makeStyles((theme) => ({
         fontSize: '10pt',
         opacity: 0.6
       }
+    },
+    dialogTitle: {
+      color: '#ffffff'
     }
 }));
+
+const Transition = React.forwardRef(function Transition(props, ref) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
 
 export default function Dashboard() {
     const [state, setState] = React.useState({
@@ -131,6 +140,25 @@ export default function Dashboard() {
         page: 1,
         sortBy: null
     });
+
+    const [filter, setFilterOpen] = React.useState(false);
+    const [sort, setSortOpen] = React.useState(false);
+
+    const handleFilterOpen = () => {
+      setFilterOpen(true);
+    };
+
+    const handleFilterClose = () => {
+      setFilterOpen(false);
+    };
+
+    const handleSortOpen = () => {
+      setSortOpen(true);
+    };
+
+    const handleSortClose = () => {
+      setSortOpen(false);
+    };
 
     const classes = useStyles();
 
@@ -188,9 +216,9 @@ export default function Dashboard() {
                       Sort by
                       <ArrowDropDown />
                     </Button>
-                    <Button style={{ textTransform: 'none', padding: '5px 5px' }} variant="outlined">
-                      <Tune style={{ marginRight: '5px' }} />
-                      Filter
+                    <Button onClick={handleFilterOpen} style={{ textTransform: 'none', padding: '5px 5px' }} variant="outlined">
+                        <Tune style={{ marginRight: '5px' }} />
+                        Filter
                     </Button>
                   </Typography>
                   <Typography className={`sub`}>
@@ -224,6 +252,9 @@ export default function Dashboard() {
                   </Grid>
                 </Grid>
             </main>
+            <FullScreenDialog title="Filter" value={filter} onClick={handleFilterOpen} onClose={handleFilterClose}>
+              <FilterSelect />
+            </FullScreenDialog>
         </div>
     )
 }

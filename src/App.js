@@ -1,3 +1,4 @@
+import 'moment';
 import React from 'react';
 import './App.css';
 import {
@@ -8,6 +9,8 @@ import {
 } from "react-router-dom";
 import { createMuiTheme } from '@material-ui/core/styles';
 import { makeStyles, ThemeProvider } from '@material-ui/core/styles';
+import MomentUtils from '@date-io/moment';
+import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 import Login from './Login/Login';
 import VerifyOTP from './VerifyOTP/VerifyOTP';
 import RegisterForm from './RegisterForm/RegisterForm';
@@ -32,18 +35,20 @@ function App() {
 
 
   return (
-    <div className="App">
-      <ThemeProvider theme={theme}>
-        <Router history={history}>
-          <Switch>
-            <Route path="/" exact component={Login} />
-            <Route path="/verify" exact component={VerifyOTP} />
-            <Route path="/register" exact component={RegisterForm} />
-            <Route path="/dashboard" exact component={Dashboard} />
-          </Switch>
-        </Router>
-      </ThemeProvider>
-    </div>
+    <MuiPickersUtilsProvider utils={MomentUtils}>
+      <div className="App">
+        <ThemeProvider theme={theme}>
+          <Router history={history}>
+            <Switch>
+              <Route path="/" exact component={Login} />
+              <Route path="/verify" exact component={VerifyOTP} />
+              <Route path="/register" exact component={RegisterForm} />
+              <Route path="/dashboard" exact component={Dashboard} />
+            </Switch>
+          </Router>
+        </ThemeProvider>
+      </div>
+    </MuiPickersUtilsProvider>
   );
 }
 
