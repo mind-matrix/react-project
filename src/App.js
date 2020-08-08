@@ -15,6 +15,7 @@ import Login from './Login/Login';
 import VerifyOTP from './VerifyOTP/VerifyOTP';
 import RegisterForm from './RegisterForm/RegisterForm';
 import Dashboard from './Dashboard/Dashboard';
+import GenerateInvoice from './Invoice/GenerateInvoice';
 
 import history from './history';
 
@@ -44,6 +45,7 @@ function App() {
               <Route path="/verify" exact component={VerifyOTP} />
               <Route path="/register" exact component={RegisterForm} />
               <Route path="/dashboard" exact component={Dashboard} />
+              <Route path="/invoice" exact component={GenerateInvoice} />
             </Switch>
           </Router>
         </ThemeProvider>

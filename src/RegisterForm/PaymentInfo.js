@@ -8,7 +8,7 @@ import TextField from '@material-ui/core/TextField';
 import Container from '@material-ui/core/Container';
 import Box from '@material-ui/core/Box';
 import grey from '@material-ui/core/colors/grey';
-import ToggleOption from './ToggleOption';
+import ToggleOption from '../ToggleOption';
 
 export default function PaymentInfo() {
     
@@ -41,7 +41,7 @@ export default function PaymentInfo() {
 
     return (
         <Container>
-            <ToggleOption onToggle={handleToggle} value={state.type} />
+            <ToggleOption onToggle={handleToggle} value={state.type} buttons={['Fund Transfer', 'Payment Link']} />
             <Box fontSize={12} mb={2} style={{textAlign: 'left', color: grey[400]}}>Add Bank Details</Box>
             <FormControl required fullWidth variant="outlined">
                 <InputLabel htmlFor="outlined-age-native-simple">Bank Name</InputLabel>

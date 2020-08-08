@@ -6,10 +6,11 @@ import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
-import AppIcon from '../AppIcon';
-import RegisterFormStepper from './RegisterFormStepper';
 import { CssBaseline, Icon } from '@material-ui/core';
+import { ArrowBack } from '@material-ui/icons';
 import Wave from '../Wave';
+
+import history from '../history';
 
 const drawerWidth = 240;
 
@@ -104,16 +105,18 @@ export default function RegisterForm() {
       <CssBaseline />
       <AppBar elevation={1} position="absolute" style={{backgroundColor: 'white'}}>
         <Toolbar>
-            <AppIcon width={60} />
+            <IconButton edge="start" onClick={() => history.back()} aria-label="close">
+              <ArrowBack />
+            </IconButton>
             <Typography variant="h6" className={classes.title}>
-            Register
+            Generate Invoice
             </Typography>
             <div style={{width: 60}}></div>
         </Toolbar>
       </AppBar>
       <main className={classes.content}>
         <div className={classes.appBarSpacer} />
-        <RegisterFormStepper />
+        Content
       </main>
     </div>
   );

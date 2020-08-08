@@ -1,7 +1,16 @@
 import React from 'react';
 import Grid from '@material-ui/core/Grid';
 import { KeyboardDatePicker } from '@material-ui/pickers';
-import { Typography, TextField, Slider, Select, Input, FormControl, InputLabel, withStyles } from '@material-ui/core';
+import { Typography, TextField, Slider, Select, Button, Box, FormControl, InputLabel, withStyles, makeStyles } from '@material-ui/core';
+
+const useStyles = makeStyles({
+  header: {
+    color: '#35332B',
+    opacity: 0.6,
+    fontSize: '12pt',
+    marginTop: '30px'
+  }
+});
 
 const ProSlider = withStyles({
   root: {
@@ -18,6 +27,8 @@ const ProSlider = withStyles({
 const paymentStatus = ['Pending', 'Received']
 
 export default function FilterSelect(props) {
+    const classes = useStyles();
+
     const [date, setDate] = React.useState({
         start: null,
         end: null
@@ -43,6 +54,10 @@ export default function FilterSelect(props) {
       setStatus(val);
     };
 
+    const handleOnApply = () => {
+      props.onApply({ date, amount, status });
+    };
+
     const formatCurrency = (number) => {
       if (number < 1000) {
           return Math.round(number);
@@ -58,7 +73,7 @@ export default function FilterSelect(props) {
     return (
       <Grid container style={{ maxWidth: 420 }} justify="space-around">
         <Grid item xs={12}>
-          <Typography gutterBottom>
+          <Typography className={classes.header} gutterBottom>
             Date range
           </Typography>
           <Grid container justify="space-between">
@@ -102,13 +117,13 @@ export default function FilterSelect(props) {
           </Grid>
         </Grid>
         <Grid item xs={12}>
-          <Typography id="phone-number" gutterBottom>
+          <Typography id="phone-number" className={classes.header} gutterBottom>
             Phone Number
           </Typography>
           <TextField fullWidth aria-lanbelledby="phone-number" label="Phone Number" variant="outlined" />
         </Grid>
         <Grid item xs={12}>
-          <Typography id="amount-range" gutterBottom>
+          <Typography id="amount-range" className={classes.header} gutterBottom>
             Amount range
           </Typography>
           <Typography style={{ fontWeight: 'bolder' }} gutterBottom>
@@ -125,7 +140,7 @@ export default function FilterSelect(props) {
           />
         </Grid>
         <Grid item xs={12}>
-          <Typography id="payment-status" gutterBottom>
+          <Typography id="payment-status" className={classes.header} gutterBottom>
             Payment Status
           </Typography>
           <FormControl required fullWidth variant="outlined">
@@ -149,6 +164,20 @@ export default function FilterSelect(props) {
               }
             </Select>
           </FormControl>
+        </Grid>
+        <Grid item xs={12}>
+          <Button
+            fullWidth
+            disableElevation
+            variant="contained"
+            color="primary"
+            onClick={handleOnApply}
+            style={{ marginTop: '20px', textTransform: 'none' }}
+          >
+            <Box py={1}>
+              Apply
+            </Box>
+          </Button>
         </Grid>
       </Grid>
     );

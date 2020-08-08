@@ -43,16 +43,15 @@ export default function ToggleOption(props) {
         <Container>
             <ThemeProvider theme={theme}>
                 <div className={classes.root}>
-                    <ToggleButton onClick={() => onToggle(0)} className={props.value === 0 ? 'active':''}>
-                        <Box py={1}>
-                            Fund Transfer
-                        </Box>
-                    </ToggleButton>
-                    <ToggleButton onClick={() => onToggle(1)} className={props.value === 1 ? 'active':''}>
-                        <Box py={1}>
-                            Payment Link
-                        </Box>
-                    </ToggleButton>
+                    {
+                        props.buttons.map((button, index) => {
+                            return (<ToggleButton onClick={() => onToggle(index)} className={props.value === index ? 'active':''}>
+                                <Box py={1}>
+                                    {button}
+                                </Box>
+                            </ToggleButton>);
+                        })
+                    }
                 </div>
             </ThemeProvider>
         </Container>

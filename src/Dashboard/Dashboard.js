@@ -7,6 +7,7 @@ import AppIcon from '../AppIcon';
 import { CssBaseline, Icon, Grid, Button, Box, Slide } from '@material-ui/core';
 import { ArrowDropDown, Tune, ChevronLeft, ChevronRight } from '@material-ui/icons';
 import FilterSelect from './FilterSelect';
+import SortSelect from './SortSelect';
 import FullScreenDialog from './FullScreenDialog';
 import InvoiceCard from './InvoiceCard';
 import DetailedInvoiceCard from './DetailedInvoiceCard';
@@ -46,6 +47,7 @@ const useStyles = makeStyles((theme) => ({
       }),
     },
     invoiceButton: {
+      textTransform: 'none',
       maxWidth: '360px',
       margin: '10px 10px 30px 20px'
     },
@@ -152,11 +154,21 @@ export default function Dashboard() {
       setFilterOpen(false);
     };
 
+    const handleFilterApply = (options) => {
+      // apply filters
+      setFilterOpen(false);
+    };
+
     const handleSortOpen = () => {
       setSortOpen(true);
     };
 
     const handleSortClose = () => {
+      setSortOpen(false);
+    };
+
+    const handleSortApply = (options) => {
+      // apply sort
       setSortOpen(false);
     };
 
@@ -192,6 +204,7 @@ export default function Dashboard() {
               <Button
                 fullWidth
                 disableElevation
+                onClick={() => history.push('/invoice')}
                 variant="contained"
                 color="primary"
                 className={classes.invoiceButton}
@@ -212,7 +225,7 @@ export default function Dashboard() {
                 <Typography className={classes.detailedInvoiceHeader}>
                   Detailed Invoice List
                   <Typography style={{ float: 'right' }}>
-                    <Button style={{ textTransform: 'none', padding: '5px 5px', marginRight: '5px' }} variant="outlined">
+                    <Button onClick={handleSortOpen} style={{ textTransform: 'none', padding: '5px 5px', marginRight: '5px' }} variant="outlined">
                       Sort by
                       <ArrowDropDown />
                     </Button>
@@ -253,7 +266,10 @@ export default function Dashboard() {
                 </Grid>
             </main>
             <FullScreenDialog title="Filter" value={filter} onClick={handleFilterOpen} onClose={handleFilterClose}>
-              <FilterSelect />
+              <FilterSelect onApply={handleFilterApply} />
+            </FullScreenDialog>
+            <FullScreenDialog title="Sort" value={sort} onClick={handleSortOpen} onClose={handleSortClose}>
+              <SortSelect onApply={handleSortApply} />
             </FullScreenDialog>
         </div>
     )
