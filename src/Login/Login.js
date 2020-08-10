@@ -66,7 +66,6 @@ export default function Login() {
             name="phone"
             autoComplete="phone"
             color="primary"
-            autoFocus
           />
           <Button
             type="submit"

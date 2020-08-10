@@ -3,7 +3,6 @@ import { makeStyles } from '@material-ui/core/styles';
 import Stepper from '@material-ui/core/Stepper';
 import Step from '@material-ui/core/Step';
 import StepLabel from '@material-ui/core/StepLabel';
-import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import { ArrowForward } from '@material-ui/icons';
 import Typography from '@material-ui/core/Typography';
@@ -133,7 +132,7 @@ export default function RegisterFormStepper() {
           </div>
         ) : (
             <div>
-              <Typography className={classes.instructions}>{getStepContent(activeStep)}</Typography>
+              {getStepContent(activeStep)}
               <div>
                 {isStepOptional(activeStep) && (
                   <Button

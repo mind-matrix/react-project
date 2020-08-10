@@ -120,7 +120,7 @@ export default function FilterSelect(props) {
           <Typography id="phone-number" className={classes.header} gutterBottom>
             Phone Number
           </Typography>
-          <TextField fullWidth aria-lanbelledby="phone-number" label="Phone Number" variant="outlined" />
+          <TextField fullWidth aria-labelledby="phone-number" label="Phone Number" variant="outlined" />
         </Grid>
         <Grid item xs={12}>
           <Typography id="amount-range" className={classes.header} gutterBottom>

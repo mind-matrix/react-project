@@ -70,32 +70,32 @@ export default function InvoiceCard(props) {
                 <Grid container alignItems="center">
                     <Grid className={classes.item} item xs={4}>
                         <Typography className={classes.title} gutterBottom>
-                            <div className={classes.number}>
+                            <p className={classes.number}>
                                 &#8377; {format(props.total)}
-                            </div>
-                            <div className={classes.name}>
+                            </p>
+                            <p className={classes.name}>
                                 Total Amount
-                            </div>
+                            </p>
                         </Typography>
                     </Grid>
                     <Grid className={classes.item} item xs={4}>
                         <Typography className={classes.title} gutterBottom>
-                            <div className={classes.number}>
+                            <p className={classes.number}>
                                 &#8377; {format(props.received)}
-                            </div>
-                            <div className={classes.name}>
+                            </p>
+                            <p className={classes.name}>
                                 Amount Received
-                            </div>
+                            </p>
                         </Typography>
                     </Grid>
                     <Grid className={classes.item} item xs={4}>
                         <Typography className={classes.title} gutterBottom>
-                            <div className={classes.number}>
+                            <p className={classes.number}>
                                 &#8377; {format(props.pending)}
-                            </div>
-                            <div className={classes.name}>
+                            </p>
+                            <p className={classes.name}>
                                 Amount Pending
-                            </div>
+                            </p>
                         </Typography>
                     </Grid>
                 </Grid>
