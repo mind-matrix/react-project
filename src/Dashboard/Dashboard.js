@@ -215,8 +215,8 @@ export default function Dashboard() {
               </Button>
               <Grid container spacing={3}>
                     {
-                      state.invoices.map((invoice) => {
-                        return <Grid item xs={12}>
+                      state.invoices.map((invoice, i) => {
+                        return <Grid item key={i} xs={12}>
                           <InvoiceCard header={invoice.header} total={invoice.total} received={invoice.received} pending={invoice.pending}></InvoiceCard>
                         </Grid>
                       })
@@ -243,7 +243,7 @@ export default function Dashboard() {
                     state.detailedList.map((invoice, index) => {
                       if (index < (state.page-1)*state.recordsPerPage) return;
                       if (index > (state.page)*state.recordsPerPage-1) return;
-                      return <Grid item xs={12}>
+                      return <Grid item key={index} xs={12}>
                         <DetailedInvoiceCard date={invoice.date} name={invoice.name} phone={invoice.phone} total={invoice.total} due={invoice.due}></DetailedInvoiceCard>
                       </Grid>
                     })

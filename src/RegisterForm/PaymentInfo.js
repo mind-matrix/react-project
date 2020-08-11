@@ -14,11 +14,11 @@ export default function PaymentInfo() {
     
     const [state, setState] = React.useState({
         type: 0,
-        bank: null,
-        account: null,
-        accountType: null,
-        ifsc: null,
-        upi: null
+        bank: '',
+        account: '',
+        accountType: '',
+        ifsc: '',
+        upi: ''
     });
 
     const banks = [
@@ -58,8 +58,8 @@ export default function PaymentInfo() {
                 >
                     <option aria-label="None" value="" />
                     {
-                        banks.map((bank) => {
-                            return <option value={bank}>{bank}</option>;
+                        banks.map(bank => {
+                            return <option key={bank} value={bank}>{bank}</option>;
                         })
                     }
                 </Select>
@@ -75,7 +75,6 @@ export default function PaymentInfo() {
                 name="account"
                 value={state.account}
                 onChange={handleChange}
-                autoFocus
             />
             <FormControl required fullWidth variant="outlined">
                 <InputLabel htmlFor="outlined-age-native-simple">Account Type</InputLabel>
@@ -92,8 +91,8 @@ export default function PaymentInfo() {
                 >
                     <option aria-label="None" value="" />
                     {
-                        accountTypes.map((accountType) => {
-                            return <option value={accountType}>{accountType}</option>;
+                        accountTypes.map(accountType => {
+                            return <option key={accountType} value={accountType}>{accountType}</option>;
                         })
                     }
                 </Select>
@@ -109,7 +108,6 @@ export default function PaymentInfo() {
                 name="ifsc"
                 value={state.ifsc}
                 onChange={handleChange}
-                autoFocus
             />
             <Box fontSize={12} style={{textAlign: 'left', color: grey[400]}}>UPI Details</Box>
             <TextField
@@ -123,7 +121,6 @@ export default function PaymentInfo() {
                 name="upi"
                 value={state.upi}
                 onChange={handleChange}
-                autoFocus
             />
         </Container>
     );

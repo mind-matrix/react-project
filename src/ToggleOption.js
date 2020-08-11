@@ -45,7 +45,7 @@ export default function ToggleOption(props) {
                 <div className={classes.root}>
                     {
                         props.buttons.map((button, index) => {
-                            return (<ToggleButton onClick={() => onToggle(index)} className={props.value === index ? 'active':''}>
+                            return (<ToggleButton key={index} onClick={() => onToggle(index)} className={props.value === index ? 'active':''}>
                                 <Box py={1}>
                                     {button}
                                 </Box>

@@ -5,9 +5,9 @@ import Container from '@material-ui/core/Container';
 export default function BasicDetails() {
 
     const [state, setState] = React.useState({
-        name: null,
-        email: null,
-        address: null
+        name: '',
+        email: '',
+        address: ''
     });
 
     const handleChange = (event) => {
@@ -28,7 +28,6 @@ export default function BasicDetails() {
                 color="primary"
                 value={state.name}
                 onChange={handleChange}
-                autoFocus
             />
             <TextField
                 variant="outlined"
@@ -42,7 +41,6 @@ export default function BasicDetails() {
                 color="primary"
                 value={state.email}
                 onChange={handleChange}
-                autoFocus
             />
             <TextField
                 variant="outlined"

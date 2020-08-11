@@ -10,12 +10,12 @@ import grey from '@material-ui/core/colors/grey';
 export default function BusinessInfo() {
 
     const [state, setState] = React.useState({
-        name: null,
+        name: '',
         sameAddress: false,
-        address: null,
-        pan: null,
-        gst: null,
-        tnc: null
+        address: '',
+        pan: '',
+        gst: '',
+        tnc: ''
     });
 
     const handleChange = (event) => {
@@ -39,7 +39,6 @@ export default function BusinessInfo() {
                 name="name"
                 value={state.name}
                 onChange={handleChange}
-                autoFocus
             />
             <FormControlLabel
                 style={{ float: 'left' }}
@@ -67,7 +66,6 @@ export default function BusinessInfo() {
                 onChange={handleChange}
                 rows={4}
                 multiline
-                autoFocus
             />
             <TextField
                 variant="outlined"
@@ -80,7 +78,6 @@ export default function BusinessInfo() {
                 name="pan"
                 value={state.pan}
                 onChange={handleChange}
-                autoFocus
             />
             <TextField
                 variant="outlined"
@@ -91,8 +88,7 @@ export default function BusinessInfo() {
                 label="GST Number"
                 name="gst"
                 value={state.gst}
-                onChange={handleChange}
-                autoFocus
+                onChange={handleChange}                
             />
             <Box fontSize={12} style={{textAlign: 'left', color: grey[400]}}>Business Logo</Box>
             <ImageUpload />
@@ -108,7 +104,6 @@ export default function BusinessInfo() {
                 onChange={handleChange}
                 multiline
                 rows={10}
-                autoFocus
             />
         </Container>
     );
