@@ -6,9 +6,9 @@ import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
-import { CssBaseline, Icon, Grid, TextField, InputLabel, Divider } from '@material-ui/core';
+import { CssBaseline, Icon, Grid, TextField, InputLabel, Divider, Card, CardContent } from '@material-ui/core';
 import { KeyboardDatePicker } from '@material-ui/pickers';
-import { ArrowBack as ArrowBackIcon, Person as PersonIcon } from '@material-ui/icons';
+import { ArrowBack as ArrowBackIcon, Person as PersonIcon, Add as AddIcon } from '@material-ui/icons';
 import Wave from '../Wave';
 import CustomerSelectInput from './CustomerSelectInput';
 
@@ -112,6 +112,11 @@ const useStyles = makeStyles((theme) => ({
       color: '#35332B',
       opacity: 0.7,
       fontSize: '10pt'
+    },
+    productCard: {
+      borderRadius: 16,
+      width: '100%',
+      margin: 10
     }
 }));
 
@@ -211,6 +216,89 @@ export default function GenerateInvoice() {
             null
           }
           <Divider style={{ width: '100%', marginTop: '15px' }} />
+          <Card className={classes.productCard}>
+            <CardContent>
+              <Grid container justify="space-between">
+                <Grid item xs={6} style={{ textAlign: 'left', fontWeight: 'bolder' }}>
+                  Product 1
+                </Grid>
+                <Grid item xs={6} style={{ textAlign: 'right', fontWeight: 'bolder' }}>
+                  Rs. 5000
+                </Grid>
+              </Grid>
+              <Grid container justify="space-between">
+                <Grid item xs={6} style={{ textAlign: 'left' }}>
+                  Item Subtotal
+                </Grid>
+                <Grid item xs={6} style={{ textAlign: 'right' }}>
+                  5 X Rs. 10000
+                </Grid>
+              </Grid>
+            </CardContent>
+          </Card>
+          <Button variant="outlined" style={{ fontWeight: 'bold', textTransform: 'none', fontSize: 16, margin: '10px auto', paddingTop: '10px', paddingBottom: '10px' }}>
+            <AddIcon />
+            Add Item
+          </Button>
+          <Divider style={{ width: '100%', marginTop: '15px' }} />
+          <Grid container justify="space-between">
+            <Grid item xs={6} style={{ textAlign: 'left', fontSize: 18 }}>
+              Total Amount
+            </Grid>
+            <Grid item xs={6} style={{ textAlign: 'right', fontWeight: 'bolder', fontSize: 18 }}>
+              Rs. 5000
+            </Grid>
+          </Grid>
+          <Grid container justify="space-between">
+            <Grid item xs={6} style={{ textAlign: 'left', fontSize: 14 }}>
+              Advance Paid
+            </Grid>
+            <Grid item xs={6} style={{ textAlign: 'right', fontSize: 14 }}>
+              Rs. 10000
+            </Grid>
+          </Grid>
+          <Grid container justify="space-between">
+            <Grid item xs={6} style={{ textAlign: 'left', fontSize: 14 }}>
+              Discount
+            </Grid>
+            <Grid item xs={6} style={{ textAlign: 'right', fontSize: 14 }}>
+              Rs. 200
+            </Grid>
+          </Grid>
+          <Grid container justify="space-between">
+            <Grid item xs={6} style={{ textAlign: 'left', fontSize: 14 }}>
+              GST %9
+            </Grid>
+            <Grid item xs={6} style={{ textAlign: 'right', fontSize: 14 }}>
+              Rs. 450
+            </Grid>
+          </Grid>
+          <Divider style={{ width: '100%', marginTop: '15px' }} />
+          <Grid container justify="space-between">
+            <Grid item xs={6} style={{ textAlign: 'left', fontSize: 14 }}>
+              Shipping
+            </Grid>
+            <Grid item xs={6} style={{ textAlign: 'right', fontSize: 14 }}>
+              Rs. 0
+            </Grid>
+          </Grid>
+          <Grid container justify="space-between">
+            <Grid item xs={6} style={{ textAlign: 'left', fontSize: 18, fontWeight: 'bold' }}>
+              Balance Amount
+            </Grid>
+            <Grid item xs={6} style={{ textAlign: 'right', fontSize: 18, color: '#419945' }}>
+              Rs. 4250
+            </Grid>
+          </Grid>
+          <Divider style={{ width: '100%', marginTop: '15px', marginBottom: '15px' }} />
+          <TextField
+            label="Payment terms/Notes, if any"
+            multiline
+            required
+            fullWidth
+            rows={4}
+            variant="outlined"
+          />
         </Grid>
       </main>
     </div>

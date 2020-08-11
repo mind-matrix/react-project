@@ -12,6 +12,8 @@ import BusinessInfo from './BusinessInfo';
 import PaymentInfo from './PaymentInfo';
 import { Container } from '@material-ui/core';
 
+import { withRouter } from 'react-router-dom';
+
 import history from '../history';
 
 const useStyles = makeStyles((theme) => ({
@@ -48,7 +50,7 @@ function getStepContent(step) {
   }
 }
 
-export default function RegisterFormStepper() {
+function RegisterFormStepper() {
   const classes = useStyles();
   const [activeStep, setActiveStep] = React.useState(0);
   const [skipped, setSkipped] = React.useState(new Set());
@@ -65,6 +67,7 @@ export default function RegisterFormStepper() {
   const handleNext = () => {
     if (activeStep === 2) {
       history.push('/dashboard');
+      window.location.reload(); // TODO: MUST REPLACE WITH A STABLE SOLUTION!! Workaround
       return;
     }
 
@@ -173,3 +176,5 @@ export default function RegisterFormStepper() {
     </div>
   );
 }
+
+export default withRouter(RegisterFormStepper);

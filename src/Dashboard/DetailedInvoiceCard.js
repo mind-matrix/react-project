@@ -125,7 +125,7 @@ export default function DetailedInvoiceCard(props) {
                     <Grid item xs={3}>
                     {
                         (props.due) ?
-                        <Typography className={classes.title} gutterBottom>
+                        <Typography is="div" className={classes.title} gutterBottom>
                             <div className={classes.dueAmount}>
                                 &#8377; {format(props.due)}
                             </div>

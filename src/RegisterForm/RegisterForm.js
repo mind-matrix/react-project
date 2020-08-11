@@ -11,6 +11,8 @@ import RegisterFormStepper from './RegisterFormStepper';
 import { CssBaseline, Icon } from '@material-ui/core';
 import Wave from '../Wave';
 
+import { withRouter } from 'react-router-dom';
+
 const drawerWidth = 240;
 
 const useStyles = makeStyles((theme) => ({
@@ -95,7 +97,7 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-export default function RegisterForm() {
+function RegisterForm() {
   const classes = useStyles();
 
   return (
@@ -118,3 +120,5 @@ export default function RegisterForm() {
     </div>
   );
 }
+
+export default withRouter(RegisterForm);
