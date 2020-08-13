@@ -204,7 +204,7 @@ export default function Dashboard() {
               <Button
                 fullWidth
                 disableElevation
-                onClick={() => history.push('/invoice')}
+                onClick={() => { history.push('/invoice'); window.location.reload(); }}
                 variant="contained"
                 color="primary"
                 className={classes.invoiceButton}

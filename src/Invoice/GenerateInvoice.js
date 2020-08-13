@@ -6,8 +6,9 @@ import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
-import { CssBaseline, Icon, Grid, TextField, InputLabel, Divider, Card, CardContent } from '@material-ui/core';
+import { CssBaseline, Icon, Grid, TextField, InputLabel, Divider, Card, CardContent, NativeSelect, FormControl, FormLabel, RadioGroup, Radio, FormControlLabel, InputBase, withStyles } from '@material-ui/core';
 import { KeyboardDatePicker } from '@material-ui/pickers';
+import { green } from '@material-ui/core/colors';
 import { ArrowBack as ArrowBackIcon, Person as PersonIcon, Add as AddIcon } from '@material-ui/icons';
 import Wave from '../Wave';
 import CustomerSelectInput from './CustomerSelectInput';
@@ -15,6 +16,41 @@ import CustomerSelectInput from './CustomerSelectInput';
 import history from '../history';
 
 const drawerWidth = 240;
+
+const BootstrapInput = withStyles((theme) => ({
+  root: {
+    'label + &': {
+      marginTop: theme.spacing(3),
+    },
+  },
+  input: {
+    borderRadius: 4,
+    position: 'relative',
+    backgroundColor: theme.palette.background.paper,
+    border: '1px solid #ced4da',
+    fontSize: 16,
+    padding: '10px 26px 10px 12px',
+    transition: theme.transitions.create(['border-color', 'box-shadow']),
+    // Use the system font instead of the default Roboto font.
+    fontFamily: [
+      '-apple-system',
+      'BlinkMacSystemFont',
+      '"Segoe UI"',
+      'Roboto',
+      '"Helvetica Neue"',
+      'Arial',
+      'sans-serif',
+      '"Apple Color Emoji"',
+      '"Segoe UI Emoji"',
+      '"Segoe UI Symbol"',
+    ].join(','),
+    '&:focus': {
+      borderRadius: 4,
+      borderColor: '#80bdff',
+      boxShadow: '0 0 0 0.2rem rgba(0,123,255,.25)',
+    },
+  },
+}))(InputBase);
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -117,8 +153,20 @@ const useStyles = makeStyles((theme) => ({
       borderRadius: 16,
       width: '100%',
       margin: 10
+    },
+    elaboration: {
+      marginBottom: 15
     }
 }));
+
+const GreenRadio = withStyles({
+  root: {
+    '&$checked': {
+      color: green[600],
+    },
+  },
+  checked: {},
+})((props) => <Radio color="default" {...props} />);
 
 export default function GenerateInvoice() {
   const classes = useStyles();
@@ -144,8 +192,15 @@ export default function GenerateInvoice() {
         number: '7466369872'
       }
     ],
+    discountType: 'flat',
     selectedCustomer: null
   });
+
+  const [paymentMode, setPaymentMode] = React.useState('bank');
+
+  const handlePaymentModeChange = (e) => {
+    setPaymentMode(e.target.value);
+  };
 
   const handleChange = (event) => {
     setState({value: event.target.value});
@@ -241,7 +296,7 @@ export default function GenerateInvoice() {
             Add Item
           </Button>
           <Divider style={{ width: '100%', marginTop: '15px' }} />
-          <Grid container justify="space-between">
+          <Grid container justify="space-between" className={classes.elaboration}>
             <Grid item xs={6} style={{ textAlign: 'left', fontSize: 18 }}>
               Total Amount
             </Grid>
@@ -249,7 +304,7 @@ export default function GenerateInvoice() {
               Rs. 5000
             </Grid>
           </Grid>
-          <Grid container justify="space-between">
+          <Grid container justify="space-between" className={classes.elaboration}>
             <Grid item xs={6} style={{ textAlign: 'left', fontSize: 14 }}>
               Advance Paid
             </Grid>
@@ -257,15 +312,24 @@ export default function GenerateInvoice() {
               Rs. 10000
             </Grid>
           </Grid>
-          <Grid container justify="space-between">
+          <Grid container justify="space-between" className={classes.elaboration}>
             <Grid item xs={6} style={{ textAlign: 'left', fontSize: 14 }}>
               Discount
+              <NativeSelect
+                value={state.discountType}
+                onChange={handleChange}
+                input={<BootstrapInput />}
+                style={{ marginLeft: 5 }}
+              >
+                <option value={'flat'}>Flat(Rs.)</option>
+                <option value={'percent'}>Percent(%)</option>
+              </NativeSelect>
             </Grid>
             <Grid item xs={6} style={{ textAlign: 'right', fontSize: 14 }}>
               Rs. 200
             </Grid>
           </Grid>
-          <Grid container justify="space-between">
+          <Grid container justify="space-between" className={classes.elaboration}>
             <Grid item xs={6} style={{ textAlign: 'left', fontSize: 14 }}>
               GST %9
             </Grid>
@@ -299,6 +363,19 @@ export default function GenerateInvoice() {
             rows={4}
             variant="outlined"
           />
+          <FormControl component="fieldset">
+            <FormLabel style={{ textAlign: 'left' }} component="legend">Payment Mode</FormLabel>
+            <RadioGroup aria-label="mode" name="mode" value={paymentMode} onChange={handlePaymentModeChange}>
+              <Grid container>
+                <Grid item xs='auto'>
+                  <FormControlLabel value="bank" control={<GreenRadio />} label="Bank Transfer" />
+                </Grid>
+                <Grid item>
+                  <FormControlLabel value="add" control={<GreenRadio />} label="Add payment" />
+                </Grid>
+              </Grid>
+            </RadioGroup>
+          </FormControl>
         </Grid>
       </main>
     </div>
