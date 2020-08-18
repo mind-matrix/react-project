@@ -17,6 +17,8 @@ import RegisterForm from './RegisterForm/RegisterForm';
 import Dashboard from './Dashboard/Dashboard';
 import GenerateInvoice from './Invoice/GenerateInvoice';
 
+import PDFViewer from './PDFViewer/PDFViewer';
+
 import history from './history';
 
 const theme = createMuiTheme({
@@ -36,7 +38,7 @@ function App() {
 
 
   return (
-    <MuiPickersUtilsProvider utils={MomentUtils}>
+    <MuiPickersUtilsProvider style={{ backgroundColor: 'white' }} utils={MomentUtils}>
       <div className="App">
         <ThemeProvider theme={theme}>
           <Router history={history}>
@@ -46,6 +48,8 @@ function App() {
               <Route path="/register" exact component={RegisterForm} />
               <Route path="/dashboard" exact component={Dashboard} />
               <Route path="/invoice" exact component={GenerateInvoice} />
+
+              <Route path="/pdf" exact component={PDFViewer} />
             </Switch>
           </Router>
         </ThemeProvider>

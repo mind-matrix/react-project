@@ -6,12 +6,17 @@ import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
-import { CssBaseline, Icon, Grid, TextField, InputLabel, Divider, Card, CardContent, NativeSelect, FormControl, FormLabel, RadioGroup, Radio, FormControlLabel, InputBase, withStyles } from '@material-ui/core';
+import { CssBaseline, Box, Grid, TextField, Paper, Divider, Card, CardContent, NativeSelect, FormControl, FormLabel, RadioGroup, Radio, FormControlLabel, InputBase, withStyles } from '@material-ui/core';
 import { KeyboardDatePicker } from '@material-ui/pickers';
 import { green } from '@material-ui/core/colors';
 import { ArrowBack as ArrowBackIcon, Person as PersonIcon, Add as AddIcon } from '@material-ui/icons';
 import Wave from '../Wave';
 import CustomerSelectInput from './CustomerSelectInput';
+
+import FullScreenDialog from '../FullScreenDialog';
+
+import AddItem from './AddItem';
+import AddCustomer from './AddCustomer';
 
 import history from '../history';
 
@@ -198,6 +203,36 @@ export default function GenerateInvoice() {
 
   const [paymentMode, setPaymentMode] = React.useState('bank');
 
+  const [addItem, setAddItemOpen] = React.useState(false);
+
+  const handleAddItemOpen = () => {
+    setAddItemOpen(true);
+  };
+
+  const handleAddItemClose = () => {
+    setAddItemOpen(false);
+  };
+
+  const handleAddItemApply = (item) => {
+    // add item
+    setAddItemOpen(false);
+  };
+
+  const [addCustomer, setAddCustomerOpen] = React.useState(false);
+
+  const handleAddCustomerOpen = () => {
+    setAddCustomerOpen(true);
+  };
+
+  const handleAddCustomerClose = () => {
+    setAddCustomerOpen(false);
+  };
+
+  const handleAddCustomerApply = (customer) => {
+    // add customer
+    setAddCustomerOpen(false);
+  };
+
   const handlePaymentModeChange = (e) => {
     setPaymentMode(e.target.value);
   };
@@ -249,6 +284,7 @@ export default function GenerateInvoice() {
                 format="DD MMM YY"
                 value={state.date}
                 onChange={handleDateChange}
+                classNames={classes.picker}
                 style={{ verticalAlign: 'middle', backgroundColor: '#ffffff' }}
                 inputVariant="outlined"
                 size="small"
@@ -257,7 +293,7 @@ export default function GenerateInvoice() {
         </Grid>
         <div className={classes.spacer} />
         <Grid container style={{ maxWidth: 480, margin: '0 auto' }}>
-          <CustomerSelectInput customers={state.customers} onChange={handleCustomerChange} />
+          <CustomerSelectInput customers={state.customers} onAddCustomer={handleAddCustomerOpen} onChange={handleCustomerChange} />
           {
             state.selectedCustomer ?
             <Typography className={classes.customer}>
@@ -291,7 +327,7 @@ export default function GenerateInvoice() {
               </Grid>
             </CardContent>
           </Card>
-          <Button variant="outlined" style={{ fontWeight: 'bold', textTransform: 'none', fontSize: 16, margin: '10px auto', paddingTop: '10px', paddingBottom: '10px' }}>
+          <Button onClick={handleAddItemOpen} variant="outlined" style={{ fontWeight: 'bold', textTransform: 'none', fontSize: 16, margin: '10px auto', paddingTop: '10px', paddingBottom: '10px' }}>
             <AddIcon />
             Add Item
           </Button>
@@ -376,8 +412,30 @@ export default function GenerateInvoice() {
               </Grid>
             </RadioGroup>
           </FormControl>
+          <Grid container>
+            <Grid item xs={6}>
+              <Button variant="contained" disableElevation>
+                <Box py={1} px={3}>
+                  Preview
+                </Box>
+              </Button>
+            </Grid>
+            <Grid item xs={6}>
+              <Button variant="contained" color="primary" disableElevation>
+                <Box py={1} px={3}>
+                  Save &amp; Issue
+                </Box>
+              </Button>
+            </Grid>
+          </Grid>
         </Grid>
       </main>
+      <FullScreenDialog title="Add Item" value={addItem} onClick={handleAddItemOpen} onClose={handleAddItemClose}>
+        <AddItem onApply={handleAddItemApply} />
+      </FullScreenDialog>
+      <FullScreenDialog title="Add Customer" value={addCustomer} onClick={handleAddCustomerOpen} onClose={handleAddCustomerClose}>
+        <AddCustomer onApply={handleAddCustomerApply} />
+      </FullScreenDialog>
     </div>
   );
 }

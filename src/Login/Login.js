@@ -52,7 +52,7 @@ export default function Login() {
       <div className={classes.paper}>
         <AppIcon width={116}/>
         <Typography component="h6" variant="h6" style={{marginTop: 100}}>
-          Invoice Generation
+          Enter Mobile Number
         </Typography>
         <form className={classes.form} noValidate>
           <TextField
@@ -77,7 +77,7 @@ export default function Login() {
             onClick={() => history.push('/verify')}
           >
             <Box py={1}>
-              Login
+              Submit
                 </Box>
           </Button>
         </form>

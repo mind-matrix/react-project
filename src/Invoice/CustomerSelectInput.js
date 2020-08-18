@@ -22,6 +22,11 @@ export default function CustomerSelectInput(props) {
         setOpen(false);
     };
 
+    const handleAddCustomer = () => {
+        props.onAddCustomer();
+        setOpen(false);
+    };
+
     const handleSelectClose = (number, event) => {
         setState({ number });
         props.onChange(number);
@@ -50,7 +55,7 @@ export default function CustomerSelectInput(props) {
     }, [open]);
 
     return (
-        <div style={{ position: 'relative', width: '100%' }}>
+        <div style={{ position: 'relative', width: '100%', backgroundColor: '#ffffff', zIndex: 1 }}>
             <ClickAwayListener onClickAway={handleClose}>
                 <TextField
                     ref={anchorRef}
@@ -73,7 +78,7 @@ export default function CustomerSelectInput(props) {
                 >
                 <Paper style={{ backgroundColor: '#ffffff' }}>
                     <MenuList autoFocusItem={false} id="menu-list-grow" onKeyDown={handleListKeyDown}>
-                        <MenuItem style={{ backgroundColor: 'rgba(41, 88, 193, 0.2)', padding: '15px 10px' }} onClick={handleClose}>
+                        <MenuItem style={{ backgroundColor: 'rgba(41, 88, 193, 0.2)', padding: '15px 10px' }} onClick={handleAddCustomer}>
                             <AddIcon /> Add Customer
                         </MenuItem>
                         {

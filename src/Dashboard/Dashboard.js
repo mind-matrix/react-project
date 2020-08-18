@@ -8,7 +8,7 @@ import { CssBaseline, Icon, Grid, Button, Box, Slide } from '@material-ui/core';
 import { ArrowDropDown, Tune, ChevronLeft, ChevronRight } from '@material-ui/icons';
 import FilterSelect from './FilterSelect';
 import SortSelect from './SortSelect';
-import FullScreenDialog from './FullScreenDialog';
+import FullScreenDialog from '../FullScreenDialog';
 import InvoiceCard from './InvoiceCard';
 import DetailedInvoiceCard from './DetailedInvoiceCard';
 import Wave from '../Wave';
