@@ -16,6 +16,8 @@ import VerifyOTP from './VerifyOTP/VerifyOTP';
 import RegisterForm from './RegisterForm/RegisterForm';
 import Dashboard from './Dashboard/Dashboard';
 import GenerateInvoice from './Invoice/GenerateInvoice';
+import CancelInvoice from './Invoice/CancelInvoice';
+import RefundNotice from './Invoice/RefundNotice';
 
 import PDFViewer from './PDFViewer/PDFViewer';
 
@@ -48,6 +50,9 @@ function App() {
               <Route path="/register" exact component={RegisterForm} />
               <Route path="/dashboard" exact component={Dashboard} />
               <Route path="/invoice" exact component={GenerateInvoice} />
+              
+              <Route path="/cancelInvoice" exact component={CancelInvoice} />
+              <Route path="/refundNotice" exact component={RefundNotice} />
 
               <Route path="/pdf" exact component={PDFViewer} />
             </Switch>

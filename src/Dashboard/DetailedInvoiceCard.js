@@ -1,7 +1,13 @@
 import React from 'react';
-import { Card, CardContent, Grid, Divider, Typography, makeStyles } from '@material-ui/core';
+import { Card, CardContent, Grid, Divider, Typography, makeStyles, styled } from '@material-ui/core';
 
-import { CalendarToday, Check } from '@material-ui/icons'
+import { CalendarToday, Check } from '@material-ui/icons';
+
+import { Link } from 'react-router-dom';
+
+const ItemLink = styled(Link)({
+    textDecoration: 'none'
+});
 
 const useStyles = makeStyles({
     root: {
@@ -155,13 +161,23 @@ export default function DetailedInvoiceCard(props) {
                     <Grid item xs={4} className={classes.link}>
                         {
                             (props.due) ?
-                            <Typography>
-                                Cancel Invoice
-                            </Typography>
+                            <ItemLink to={{
+                                pathname: '/cancelInvoice',
+                                state: { invoice: props.number, date: props.date }
+                            }}>
+                                <Typography>
+                                    Cancel Invoice
+                                </Typography>
+                            </ItemLink>
                             :
-                            <Typography>
-                                Process Refund
-                            </Typography>
+                            <ItemLink to={{
+                                pathname: '/refundNotice',
+                                state: { invoice: props.number, date: props.date, paymentId: 'XXXX', paymentDate: 'XXXX' }
+                            }}>
+                                <Typography>
+                                    Process Refund
+                                </Typography>
+                            </ItemLink>
                         }
                     </Grid>
                 </Grid>

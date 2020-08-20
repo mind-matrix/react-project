@@ -1,5 +1,5 @@
 import React from 'react';
-import { Grid, TextField, Toolbar, Box, Button, Typography, IconButton, AppBar, CssBaseline, makeStyles } from '@material-ui/core';
+import { Grid, Select, Toolbar, Box, Button, Typography, IconButton, AppBar, CssBaseline, makeStyles } from '@material-ui/core';
 import { ArrowBack as ArrowBackIcon } from '@material-ui/icons';
 import Wave from '../Wave';
 
@@ -40,9 +40,15 @@ const useStyles = makeStyles( (theme) => ({
     spacer: theme.mixins.toolbar,
 }) );
 
-export default function CancelInvoice(props) {
+export default function RefundNotice(props) {
     
     const classes = useStyles();
+
+    const [refundType, setRefundType] = React.useState(0);
+
+    const handleSetRefundType = (val) => {
+        setRefundType(val);
+    };
 
     return (
     <div className={classes.root}>
@@ -54,7 +60,7 @@ export default function CancelInvoice(props) {
               <ArrowBackIcon />
             </IconButton>
             <Typography variant="h6" className={classes.title}>
-            Cancel Invoice
+            Refund Notice
             </Typography>
             <div style={{width: 60}}></div>
         </Toolbar>
@@ -62,18 +68,24 @@ export default function CancelInvoice(props) {
       <main className={classes.content}>
         <div className={classes.appBarSpacer} />
         <Typography style={{ padding: '10px', backgroundColor: '#F8F5E8' }}>
-            You are about to cancel <b>{ props.location.state.number }</b> dated <b>{ props.location.state.date }</b>
+            You are about to generate refund notice against Invoice <b>{ props.location.state.number || 'XXXX' }</b> dated <b>{ props.location.state.date || 'XXXX' }</b> and payment id <b>{ props.location.state.paymentId || 'XXXX' }</b> dated <b>{ props.location.state.paymentDate || 'XXXX' }</b>
         </Typography>
         <div className={classes.spacer} />
         <Box px={2}>
-            <TextField
-                label="Cancel Invoice Subject/Message"
-                multiline
-                required
-                fullWidth
-                rows={4}
-                variant="outlined"
-            />
+            <Select
+              native
+              value={refundType}
+              onChange={handleSetRefundType}
+              label="Refund Type"
+              color="primary"
+              inputProps={{
+                  name: 'status',
+                  id: 'outlined-refund-type-select',
+              }}
+            >
+              <option aria-label="Full Type" value={0} />
+              <option aria-label="Another Type" value={1} />
+            </Select>
             <div className={classes.spacer} />
             <Grid container>
                 <Grid item xs={6}>

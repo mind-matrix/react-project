@@ -134,9 +134,9 @@ export default function Dashboard() {
           { header: 'MTD Issued invoice', total: 3001000, received: 2001000, pending: 1000000 }
         ],
         detailedList: [
-          { date: '12 Mar 2020', name: 'Rakesh Gupta', phone: '994635525', total: 10000, due: 2000 },
-          { date: '12 Mar 2020', name: 'Rakesh Gupta', phone: '994635525', total: 10000, due: false },
-          ...Array(98).fill({ date: '12 Mar 2020', name: 'Rakesh Gupta', phone: '994635525', total: 10000, due: 2000 })
+          { number: 'INV/20-21/1', date: '12 Mar 2020', name: 'Rakesh Gupta', phone: '994635525', total: 10000, due: 2000 },
+          { number: 'INV/20-21/2', date: '12 Mar 2020', name: 'Rakesh Gupta', phone: '994635525', total: 10000, due: false },
+          ...Array(98).fill({ number: 'INV/20-21/2', date: '12 Mar 2020', name: 'Rakesh Gupta', phone: '994635525', total: 10000, due: 2000 })
         ],
         recordsPerPage: 10,
         page: 1,
