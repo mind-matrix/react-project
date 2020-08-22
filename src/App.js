@@ -15,9 +15,11 @@ import Login from './Login/Login';
 import VerifyOTP from './VerifyOTP/VerifyOTP';
 import RegisterForm from './RegisterForm/RegisterForm';
 import Dashboard from './Dashboard/Dashboard';
-import GenerateInvoice from './Invoice/GenerateInvoice';
-import CancelInvoice from './Invoice/CancelInvoice';
-import RefundNotice from './Invoice/RefundNotice';
+import GenerateInvoice from './GenerateInvoice/GenerateInvoice';
+import CancelInvoice from './GenerateInvoice/CancelInvoice';
+import RefundNotice from './GenerateInvoice/RefundNotice';
+
+import Invoice from './Invoice/Invoice';
 
 import PDFViewer from './PDFViewer/PDFViewer';
 
@@ -49,7 +51,9 @@ function App() {
               <Route path="/verify" exact component={VerifyOTP} />
               <Route path="/register" exact component={RegisterForm} />
               <Route path="/dashboard" exact component={Dashboard} />
-              <Route path="/invoice" exact component={GenerateInvoice} />
+              <Route path="/generateInvoice" exact component={GenerateInvoice} />
+
+              <Route path="/invoice" exact component={Invoice} />
               
               <Route path="/cancelInvoice" exact component={CancelInvoice} />
               <Route path="/refundNotice" exact component={RefundNotice} />

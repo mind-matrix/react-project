@@ -4,7 +4,8 @@ import {
   Switch,
   Route,
   Link,
-  useRouteMatch
+  useRouteMatch,
+  withRouter
 } from "react-router-dom";
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
@@ -18,7 +19,11 @@ import Container from '@material-ui/core/Container';
 import AppIcon from '../AppIcon';
 import Wave from '../Wave';
 
+import axios from 'axios';
+
 import history from '../history';
+
+const queryString = require('query-string');
 
 const useStyles = makeStyles( (theme) => ({
   paper: {
@@ -46,10 +51,48 @@ const useStyles = makeStyles( (theme) => ({
   }
 }) );
 
-export default function Login() {
+function Invoice(props) {
   const classes = useStyles();
 
+  const [mobileNumber, setMobile] = React.useState('');
+
+  const handleChange = (e) => {
+    setMobile(e.target.value);
+  };
+
   const match = useRouteMatch();
+
+  console.log(props.location.search);
+
+  let params = queryString.parse(props.location.search);
+
+  console.log(params);
+
+  let { invoiceId } = params;
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (mobileNumber) {
+        axios.post('http://parchi-dev.ap-south-1.elasticbeanstalk.com:8181/papi/receipt/scan/showrcpt', {
+            invoiceId,
+            mobileNumber
+        }, {
+            responseType: 'json',
+            headers: {
+                "Authorization": "Basic c2VydmljZXMtcGFyY2hpLWFwaTpwYXJjaGktc2VydmljZXMtYXBpMjAyMA=="
+            }
+        }).then((response) => {
+            let { invoice_location } = response.data;
+            console.log(invoice_location, response.data);
+            props.history.push({
+                pathname: '/pdf',
+                state: {
+                    url: invoice_location
+                }
+            })
+        });
+    }
+  };
 
   return (
     <Container component="main" maxWidth="xs">
@@ -67,6 +110,8 @@ export default function Login() {
             required
             fullWidth
             id="phone"
+            value={mobileNumber}
+            onChange={handleChange}
             color="secondary"
             label="Enter Phone Number"
             name="phone"
@@ -80,7 +125,7 @@ export default function Login() {
             variant="contained"
             color="primary"
             className={classes.submit}
-            onClick={() => history.push('/verify')}
+            onClick={handleSubmit}
           >
             <Box py={1} className={classes.submitText}>
               Submit
@@ -91,3 +136,5 @@ export default function Login() {
     </Container>
   );
 }
+
+export default withRouter(Invoice);
