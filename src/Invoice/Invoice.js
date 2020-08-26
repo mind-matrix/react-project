@@ -101,7 +101,7 @@ function Invoice(props) {
       <div className={classes.paper}>
         <AppIcon width={116}/>
         <Typography className={classes.header} component="h6" variant="h6" style={{marginTop: 100}}>
-          Enter Mobile Number
+          Enter mobile number to get receipt SMS
         </Typography>
         <form className={classes.form} noValidate>
           <TextField
