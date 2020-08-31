@@ -47,7 +47,7 @@ const useStyles = makeStyles({
     },
     due: {
         width: 'fit-content',
-        textAlign: 'center',
+        margin: '0 auto',
         backgroundColor: '#E87716',
         borderRadius: '4pt',
         padding: '4px 4px',
@@ -101,7 +101,7 @@ export default function DetailedInvoiceCard(props) {
     };
 
     return (
-        <Card className={classes.root}>
+        <Card elevation={4} className={classes.root}>
             <CardContent style={{ paddingBottom: 0 }}>
                 <Typography className={classes.date}>
                     <CalendarToday className={classes.icon} />

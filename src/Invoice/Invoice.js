@@ -73,7 +73,7 @@ function Invoice(props) {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (mobileNumber) {
-        axios.post('http://parchi-dev.ap-south-1.elasticbeanstalk.com:8181/papi/receipt/scan/showrcpt', {
+        axios.post('https://api.getparchi.com/papi/receipt/scan/showrcpt', {
             invoiceId,
             mobileNumber
         }, {

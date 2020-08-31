@@ -22,7 +22,7 @@ const useStyles = makeStyles((theme) => ({
   title: {
     marginLeft: theme.spacing(2),
     flex: 1,
-    color: '#000000'
+    color: '#E2714D'
   },
   content: {
     backgroundColor: '#ffffff'

@@ -6,6 +6,7 @@ const useStyles = makeStyles({
         display: 'block',
         margin: '0 auto',
         maxWidth: 420,
+        width: '100%',
         backgroundColor: 'white'
     },
     header: {
@@ -62,7 +63,7 @@ export default function InvoiceCard(props) {
     };
 
     return (
-        <Card className={classes.root}>
+        <Card elevation={4} className={classes.root}>
             <CardContent>
                 <Typography className={classes.header}>
                     {props.header}

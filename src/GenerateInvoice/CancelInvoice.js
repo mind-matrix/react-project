@@ -27,7 +27,7 @@ const useStyles = makeStyles( (theme) => ({
     title: {
         flexGrow: 1,
         fontWeight: 600,
-        color: '#35332B'
+        color: '#E2714D'
     },
     appBar: {
         zIndex: theme.zIndex.drawer + 1,

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Grid, Select, Toolbar, Box, Button, Typography, IconButton, AppBar, CssBaseline, makeStyles } from '@material-ui/core';
+import { Grid, FormControl, InputLabel, Select, Toolbar, Box, Button, Typography, IconButton, AppBar, CssBaseline, makeStyles } from '@material-ui/core';
 import { ArrowBack as ArrowBackIcon } from '@material-ui/icons';
 import Wave from '../Wave';
 
@@ -15,6 +15,11 @@ const useStyles = makeStyles( (theme) => ({
         overflow: 'auto',
         paddingBottom: '100px'
     },
+    formControl: {
+        margin: theme.spacing(1),
+        minWidth: 120,
+        maxWidth: 340
+    },
     toolbar: {
         paddingRight: 24, // keep right padding when drawer closed
     },
@@ -27,7 +32,7 @@ const useStyles = makeStyles( (theme) => ({
     title: {
         flexGrow: 1,
         fontWeight: 600,
-        color: '#35332B'
+        color: '#E2714D'
     },
     appBar: {
         zIndex: theme.zIndex.drawer + 1,
@@ -46,8 +51,8 @@ export default function RefundNotice(props) {
 
     const [refundType, setRefundType] = React.useState(0);
 
-    const handleSetRefundType = (val) => {
-        setRefundType(val);
+    const handleSetRefundType = (e) => {
+        setRefundType(e.target.value);
     };
 
     return (
@@ -72,20 +77,23 @@ export default function RefundNotice(props) {
         </Typography>
         <div className={classes.spacer} />
         <Box px={2}>
-            <Select
-              native
-              value={refundType}
-              onChange={handleSetRefundType}
-              label="Refund Type"
-              color="primary"
-              inputProps={{
-                  name: 'status',
-                  id: 'outlined-refund-type-select',
-              }}
-            >
-              <option aria-label="Full Type" value={0} />
-              <option aria-label="Another Type" value={1} />
-            </Select>
+            <FormControl variant="outlined" fullWidth className={classes.formControl}>
+                <InputLabel htmlFor="outlined-refund-type">Refund Type</InputLabel>
+                <Select
+                    native
+                    value={refundType}
+                    onChange={handleSetRefundType}
+                    label="Refund Type"
+                    color="primary"
+                    inputProps={{
+                        name: 'refundType',
+                        id: 'outlined-refund-type',
+                    }}
+                >
+                    <option aria-label="Full Type" value={0}>Full Type</option>
+                    <option aria-label="Another Type" value={1}>Another Type</option>
+                </Select>
+            </FormControl>
             <div className={classes.spacer} />
             <Grid container>
                 <Grid item xs={6}>

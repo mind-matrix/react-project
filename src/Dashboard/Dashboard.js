@@ -13,6 +13,8 @@ import InvoiceCard from './InvoiceCard';
 import DetailedInvoiceCard from './DetailedInvoiceCard';
 import Wave from '../Wave';
 
+import FreechargeIcon from '../FreechargeIcon';
+
 import history from '../history';
 
 const drawerWidth = 240;
@@ -48,8 +50,14 @@ const useStyles = makeStyles((theme) => ({
     },
     invoiceButton: {
       textTransform: 'none',
+      backgroundColor: '#E2714D',
+      color: '#FFFFFF',
       maxWidth: '360px',
-      margin: '10px 10px 30px 20px'
+      margin: '0 auto',
+      marginBottom: '30px',
+      '&:hover': {
+        backgroundColor: '#E2714E'
+      }
     },
     menuButton: {
       marginRight: 36,
@@ -60,7 +68,7 @@ const useStyles = makeStyles((theme) => ({
     title: {
       flexGrow: 1,
       fontWeight: 600,
-      color: '#35332B'
+      color: '#E2714D'
     },
     drawerPaper: {
       position: 'relative',
@@ -194,19 +202,17 @@ export default function Dashboard() {
                 <Toolbar>
                     <AppIcon width={60} />
                     <Typography variant="h6" className={classes.title}>
-                    Dashboard
+                      Dashboard
                     </Typography>
-                    <Icon style={{width: 60, color: 'white'}}>save</Icon>
+                    <FreechargeIcon />
                 </Toolbar>
             </AppBar>
             <main className={classes.content}>
               <div className={classes.appBarSpacer} />
               <Button
                 fullWidth
-                disableElevation
-                onClick={() => { history.push('/invoice'); window.location.reload(); }}
+                onClick={() => { history.push('/generateInvoice'); window.location.reload(); }}
                 variant="contained"
-                color="primary"
                 className={classes.invoiceButton}
               >
                 <Box py={1}>
@@ -216,7 +222,7 @@ export default function Dashboard() {
               <Grid container spacing={3}>
                     {
                       state.invoices.map((invoice, i) => {
-                        return <Grid item key={i} xs={12}>
+                        return <Grid item style={{ padding: '14px' }} key={i} xs={12}>
                           <InvoiceCard header={invoice.header} total={invoice.total} received={invoice.received} pending={invoice.pending}></InvoiceCard>
                         </Grid>
                       })
@@ -243,7 +249,7 @@ export default function Dashboard() {
                     state.detailedList.map((invoice, index) => {
                       if (index < (state.page-1)*state.recordsPerPage) return;
                       if (index > (state.page)*state.recordsPerPage-1) return;
-                      return <Grid item key={index} xs={12}>
+                      return <Grid item style={{ padding: '14px' }} key={index} xs={12}>
                         <DetailedInvoiceCard date={invoice.date} name={invoice.name} phone={invoice.phone} total={invoice.total} due={invoice.due}></DetailedInvoiceCard>
                       </Grid>
                     })

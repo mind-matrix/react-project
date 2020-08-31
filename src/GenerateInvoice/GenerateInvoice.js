@@ -95,7 +95,7 @@ const useStyles = makeStyles((theme) => ({
     title: {
       flexGrow: 1,
       fontWeight: 600,
-      color: '#35332B'
+      color: '#E2714D'
     },
     drawerPaper: {
       position: 'relative',
@@ -123,7 +123,9 @@ const useStyles = makeStyles((theme) => ({
       flexGrow: 1,
       height: '100vh',
       overflow: 'auto',
-      paddingBottom: '100px'
+      paddingBottom: '100px',
+      paddingLeft: '15px',
+      paddingRight: '15px'
     },
     container: {
       paddingTop: theme.spacing(4),
@@ -333,10 +335,10 @@ export default function GenerateInvoice() {
           </Button>
           <Divider style={{ width: '100%', marginTop: '15px' }} />
           <Grid container justify="space-between" className={classes.elaboration}>
-            <Grid item xs={6} style={{ textAlign: 'left', fontSize: 18 }}>
+            <Grid item xs={6} style={{ textAlign: 'left', fontSize: 18, paddingTop: '10px' }}>
               Total Amount
             </Grid>
-            <Grid item xs={6} style={{ textAlign: 'right', fontWeight: 'bolder', fontSize: 18 }}>
+            <Grid item xs={6} style={{ textAlign: 'right', fontWeight: 'bolder', fontSize: 18, paddingTop: '10px' }}>
               Rs. 5000
             </Grid>
           </Grid>
@@ -375,23 +377,24 @@ export default function GenerateInvoice() {
           </Grid>
           <Divider style={{ width: '100%', marginTop: '15px' }} />
           <Grid container justify="space-between">
-            <Grid item xs={6} style={{ textAlign: 'left', fontSize: 14 }}>
+            <Grid item xs={6} style={{ textAlign: 'left', fontSize: 14, paddingTop: '10px' }}>
               Shipping
             </Grid>
-            <Grid item xs={6} style={{ textAlign: 'right', fontSize: 14 }}>
+            <Grid item xs={6} style={{ textAlign: 'right', fontSize: 14, paddingTop: '10px' }}>
               Rs. 0
             </Grid>
           </Grid>
           <Grid container justify="space-between">
-            <Grid item xs={6} style={{ textAlign: 'left', fontSize: 18, fontWeight: 'bold' }}>
+            <Grid item xs={6} style={{ textAlign: 'left', fontSize: 18, fontWeight: 'bold', paddingTop: '10px' }}>
               Balance Amount
             </Grid>
-            <Grid item xs={6} style={{ textAlign: 'right', fontSize: 18, color: '#419945' }}>
+            <Grid item xs={6} style={{ textAlign: 'right', fontSize: 18, color: '#419945', paddingTop: '10px' }}>
               Rs. 4250
             </Grid>
           </Grid>
           <Divider style={{ width: '100%', marginTop: '15px', marginBottom: '15px' }} />
           <TextField
+            style={{ paddingTop: '10px' }}
             label="Payment terms/Notes, if any"
             multiline
             required

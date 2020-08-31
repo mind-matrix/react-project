@@ -23,6 +23,8 @@ import Invoice from './Invoice/Invoice';
 
 import PDFViewer from './PDFViewer/PDFViewer';
 
+import ReceiptView from './ReceiptView/ReceiptView';
+
 import history from './history';
 
 const theme = createMuiTheme({
@@ -54,6 +56,8 @@ function App() {
               <Route path="/generateInvoice" exact component={GenerateInvoice} />
 
               <Route path="/invoice" exact component={Invoice} />
+
+              <Route path="/receipt-view" exact component={ReceiptView} />
               
               <Route path="/cancelInvoice" exact component={CancelInvoice} />
               <Route path="/refundNotice" exact component={RefundNotice} />

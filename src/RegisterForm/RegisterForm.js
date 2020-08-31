@@ -11,6 +11,8 @@ import RegisterFormStepper from './RegisterFormStepper';
 import { CssBaseline, Icon } from '@material-ui/core';
 import Wave from '../Wave';
 
+import FreechargeIcon from '../FreechargeIcon';
+
 import { withRouter } from 'react-router-dom';
 
 const drawerWidth = 240;
@@ -53,7 +55,7 @@ const useStyles = makeStyles((theme) => ({
     title: {
       flexGrow: 1,
       fontWeight: 600,
-      color: '#35332B'
+      color: '#E2714D'
     },
     drawerPaper: {
       position: 'relative',
@@ -110,7 +112,7 @@ function RegisterForm() {
             <Typography variant="h6" className={classes.title}>
             Register
             </Typography>
-            <div style={{width: 60}}></div>
+            <FreechargeIcon />
         </Toolbar>
       </AppBar>
       <main className={classes.content}>
