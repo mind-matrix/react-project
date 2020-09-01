@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { CssBaseline, AppBar, Toolbar, Typography, makeStyles, Box, Grid, Button } from '@material-ui/core'
+import { CssBaseline, AppBar, Toolbar, Typography, makeStyles, Box, Grid, Button, Dialog, DialogTitle, DialogContent, Select, FormControl, InputLabel, TextField } from '@material-ui/core'
 import { ArrowBack, Tune } from '@material-ui/icons';
 import AppIcon from '../AppIcon';
 import FreechargeIcon from '../FreechargeIcon';
@@ -7,10 +7,30 @@ import { Link } from 'react-router-dom';
 import DetailedInvoiceCard from './DetailedInvoiceCard';
 import FullScreenDialog from '../FullScreenDialog';
 import FilterSelect from './FilterSelect';
+import { KeyboardDatePicker } from '@material-ui/pickers';
 
 function PaymentHistory(props) {
     const [filter, setFilterOpen] = React.useState(false);
+    const [openMark, setOpenMark] = useState(false);
+    const [selectedDate, setSelectedDate] = React.useState(new Date());
+    const [mode, setMode] = useState('');
     const classes = useStyles();
+
+    const modeChangeHandler = (event) => {
+        setMode(event.target.value)
+    }
+
+    const handleDateChange = (date) => {
+        setSelectedDate(date)
+    }
+
+    const openMarkDialog = () => {
+        setOpenMark(true);
+    }
+
+    const closeMarkDialog = () => {
+        setOpenMark(false);
+    }
 
     const handleFilterOpen = () => {
         setFilterOpen(true);
@@ -47,10 +67,10 @@ function PaymentHistory(props) {
                     </Box>
                 </Grid>
                 <Grid item xs={12} style={{ padding: '10px 14px' }}>
-                    <DetailedInvoiceCard individual due />
+                    <DetailedInvoiceCard individual due mark={() => openMarkDialog()} />
                 </Grid>
                 <Grid item xs={12} style={{ padding: '10px 14px' }}>
-                    <DetailedInvoiceCard individual due />
+                    <DetailedInvoiceCard individual due mark={() => openMarkDialog()} />
                 </Grid>
                 <Grid item xs={12}>
                     <Box style={{ padding: '0px 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -77,6 +97,52 @@ function PaymentHistory(props) {
             <FullScreenDialog title="Filter" value={filter} onClick={handleFilterOpen} onClose={handleFilterClose}>
                 <FilterSelect onApply={handleFilterApply} />
             </FullScreenDialog>
+            <Dialog onClose={closeMarkDialog} aria-labelledby="mark-dialog" open={openMark}>
+                <DialogTitle className={classes.dialogTitle} id="mark-dialog" onClose={closeMarkDialog}>
+                    Mark Received
+                </DialogTitle>
+                <DialogContent>
+                    <Grid container>
+                        <Grid item xs={12}>
+                            <KeyboardDatePicker
+                                margin="normal"
+                                fullWidth
+                                id="date-picker-dialog"
+                                label="Payment Date"
+                                format="DD/MM/yyyy"
+                                value={selectedDate}
+                                onChange={handleDateChange}
+                                KeyboardButtonProps={{
+                                    'aria-label': 'Payment Date',
+                                }}
+                            />
+                        </Grid>
+                        <Grid item xs={12} style={{ marginTop: '20px' }}>
+                            <FormControl variant="outlined" className={classes.formControl} fullWidth>
+                                <InputLabel htmlFor="outlined-age-native-simple">Payment Mode</InputLabel>
+                                <Select
+                                    native
+                                    value={mode}
+                                    onChange={modeChangeHandler}
+                                    label="Payment Mode"
+                                >
+                                    <option aria-label="None" value="" hidden disabled></option>
+                                    <option value={10}>Online</option>
+                                    <option value={20}>Cash</option>
+                                </Select>
+                            </FormControl>
+                        </Grid>
+                        <Grid item xs={12} style={{ marginTop: '20px' }}>
+                            <TextField id="outlined-basic" label="Payment Details" variant="outlined" fullWidth />
+                        </Grid>
+                        <Grid item xs={12} style={{margin:'30px 0px'}}>
+                            <Button className={classes.button} variant="contained" color="primary" fullWidth onClick={closeMarkDialog}>
+                                Update
+                            </Button>
+                        </Grid>
+                    </Grid>
+                </DialogContent>
+            </Dialog>
         </div>
     )
 }
@@ -110,6 +176,15 @@ const useStyles = makeStyles(theme => ({
         fontWeight: '600',
         color: '#35332B',
         padding: '20px 0px'
+    },
+    button: {        
+        height: '44px',
+        fontSize: '16px',
+        textTransform: 'none',
+    },
+    dialogTitle: {
+        fontSize: '20px',
+        fontWeight: '600'
     }
 }))
 

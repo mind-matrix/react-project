@@ -54,7 +54,7 @@ export default function DetailedInvoiceCard(props) {
                             <Grid item xs={4}>
                                 {
                                     (props.due) ?
-                                        <Button variant="contained" className={classes.receiveButton}>Mark Receive</Button>
+                                        <Button variant="contained" className={classes.receiveButton} onClick={props.mark}>Mark Receive</Button>
                                         :
                                         <Box>
                                             <Typography variant="caption" className={classes.bank} align="right" display="block">YR142643</Typography>
@@ -102,7 +102,9 @@ export default function DetailedInvoiceCard(props) {
                             props.due ?
                                 <Grid style={{ borderTop: '1px solid rgba(53, 51, 43, 0.1)' }} container alignItems="center">
                                     <Grid item xs={4} className={classes.link}>
-                                        <Typography>cancel Invoice</Typography>
+                                        <Link to='/cancelInvoice' style={{ textDecoration: 'none' }}>
+                                            <Typography className={classes.linkText}>Cancel Invoice</Typography>
+                                        </Link>
                                     </Grid>
                                     <Grid item xs={4} className={classes.link}>
                                         <Typography>Send Reminder</Typography>
@@ -114,7 +116,9 @@ export default function DetailedInvoiceCard(props) {
                                 :
                                 <Grid style={{ borderTop: '1px solid rgba(53, 51, 43, 0.1)' }} container alignItems="center">
                                     <Grid item xs={4} className={classes.link}>
-                                        <Typography>Process Refund</Typography>
+                                        <Link to='/refundNotice' style={{ textDecoration: 'none' }}>
+                                            <Typography className={classes.linkText}>Process Refund</Typography>
+                                        </Link>
                                     </Grid>
                                     <Grid item xs={4} className={classes.link}>
                                         <Typography>Issue Credit Note</Typography>
