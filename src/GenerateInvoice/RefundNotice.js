@@ -4,7 +4,7 @@ import { ArrowBack as ArrowBackIcon } from '@material-ui/icons';
 
 import history from '../history';
 
-const useStyles = makeStyles( (theme) => ({
+const useStyles = makeStyles((theme) => ({
     root: {
         display: 'flex',
     },
@@ -20,7 +20,10 @@ const useStyles = makeStyles( (theme) => ({
         maxWidth: 340
     },
     toolbar: {
-        paddingRight: 24, // keep right padding when drawer closed
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
     },
     toolbarIcon: {
         display: 'flex',
@@ -36,16 +39,21 @@ const useStyles = makeStyles( (theme) => ({
     appBar: {
         zIndex: theme.zIndex.drawer + 1,
         transition: theme.transitions.create(['width', 'margin'], {
-          easing: theme.transitions.easing.sharp,
-          duration: theme.transitions.duration.leavingScreen,
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.leavingScreen,
         }),
     },
     appBarSpacer: theme.mixins.toolbar,
     spacer: theme.mixins.toolbar,
-}) );
+    button: {
+        fontSize: '16px',
+        height: '56px',
+        textTransform: 'none'
+    }
+}));
 
 export default function RefundNotice(props) {
-    
+
     const classes = useStyles();
 
     const [refundType, setRefundType] = React.useState(0);
@@ -55,63 +63,59 @@ export default function RefundNotice(props) {
     };
 
     return (
-    <div className={classes.root}>
-      
-      <CssBaseline />
-      <AppBar elevation={1} position="absolute" style={{backgroundColor: 'white'}}>
-        <Toolbar>
-            <IconButton edge="start" onClick={() => history.back()} aria-label="close">
-              <ArrowBackIcon />
-            </IconButton>
-            <Typography variant="h6" className={classes.title}>
-            Refund Notice
-            </Typography>
-            <div style={{width: 60}}></div>
-        </Toolbar>
-      </AppBar>
-      <main className={classes.content}>
-        <div className={classes.appBarSpacer} />
-        <Typography style={{ padding: '10px', backgroundColor: '#F8F5E8' }}>
-            You are about to generate refund notice against Invoice <b>{ props.location.state.number || 'XXXX' }</b> dated <b>{ props.location.state.date || 'XXXX' }</b> and payment id <b>{ props.location.state.paymentId || 'XXXX' }</b> dated <b>{ props.location.state.paymentDate || 'XXXX' }</b>
-        </Typography>
-        <div className={classes.spacer} />
-        <Box px={2}>
-            <FormControl variant="outlined" fullWidth className={classes.formControl}>
-                <InputLabel htmlFor="outlined-refund-type">Refund Type</InputLabel>
-                <Select
-                    native
-                    value={refundType}
-                    onChange={handleSetRefundType}
-                    label="Refund Type"
-                    color="primary"
-                    inputProps={{
-                        name: 'refundType',
-                        id: 'outlined-refund-type',
-                    }}
-                >
-                    <option aria-label="Full Type" value={0}>Full Type</option>
-                    <option aria-label="Another Type" value={1}>Another Type</option>
-                </Select>
-            </FormControl>
-            <div className={classes.spacer} />
-            <Grid container>
-                <Grid item xs={6}>
-                <Button variant="contained" disableElevation>
-                    <Box py={1} px={3}>
-                    Preview
-                    </Box>
-                </Button>
-                </Grid>
-                <Grid item xs={6}>
-                <Button variant="contained" color="primary" disableElevation>
-                    <Box py={1} px={3}>
-                    Save &amp; Issue
-                    </Box>
-                </Button>
-                </Grid>
-            </Grid>
-        </Box>
-      </main>
-    </div>
+        <div className={classes.root}>
+
+            <CssBaseline />
+            <AppBar elevation={1} position="absolute" style={{ backgroundColor: 'white' }}>
+                <Toolbar className={classes.toolbar}>
+                    <IconButton edge="start" onClick={() => history.back()} aria-label="close">
+                        <ArrowBackIcon />
+                    </IconButton>
+                    <Typography variant="h6" className={classes.title} align="center">
+                        Refund Notice
+                    </Typography>
+                    <div style={{ width: 60 }}></div>
+                </Toolbar>
+            </AppBar>
+            <main className={classes.content}>
+                <div className={classes.appBarSpacer} />
+                <Typography style={{ padding: '10px', backgroundColor: '#F8F5E8' }}>
+                    You are about to generate refund notice against Invoice <b>'XXXX'</b> dated <b>'XXXX' </b> and payment id <b>'XXXX' </b> dated <b>'XXXX'</b>
+                </Typography>
+                <div className={classes.spacer} />
+                <Box px={2}>
+                    <FormControl variant="outlined" fullWidth className={classes.formControl}>
+                        <InputLabel htmlFor="outlined-refund-type">Refund Type</InputLabel>
+                        <Select
+                            native
+                            value={refundType}
+                            onChange={handleSetRefundType}
+                            label="Refund Type"
+                            color="primary"
+                            inputProps={{
+                                name: 'refundType',
+                                id: 'outlined-refund-type',
+                            }}
+                        >
+                            <option aria-label="Full Type" value={0}>Full Refund</option>
+                            <option aria-label="Another Type" value={1}>Half Type</option>
+                        </Select>
+                    </FormControl>
+                    <div className={classes.spacer} />
+                    <Grid container spacing={1}>
+                        <Grid item xs={6}>
+                            <Button className={classes.button} variant="contained" disableElevation fullWidth>
+                                Preview
+                            </Button>
+                        </Grid>
+                        <Grid item xs={6}>
+                            <Button className={classes.button} variant="contained" color="primary" disableElevation fullWidth>
+                                Save &amp; Issue
+                            </Button>
+                        </Grid>
+                    </Grid>
+                </Box>
+            </main>
+        </div>
     );
 }

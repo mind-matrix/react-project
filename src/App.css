@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Nunito&family=Roboto&family=Rubik&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans&family=Poppins&family=Roboto&display=swap');
 
 .App-logo {
   height: 40vmin;
@@ -37,4 +37,12 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+.poppins, .MuiButton-label {
+  font-family: 'Poppins', sans-serif;
+}
+
+.open-sans {
+  font-family: 'Open Sans', sans-serif;
 }

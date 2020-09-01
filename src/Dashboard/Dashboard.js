@@ -1,10 +1,7 @@
 import React, { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import Typography from '@material-ui/core/Typography';
 import AppIcon from '../AppIcon';
-import { CssBaseline, Icon, Grid, Button, Box, Slide, FormControl, Select, MenuItem, InputLabel } from '@material-ui/core';
+import { CssBaseline, AppBar, Toolbar, Icon, Typography, Grid, Button, Box, Slide, Menu, MenuItem } from '@material-ui/core';
 import { ArrowDropDown, Tune, ChevronLeft, ChevronRight } from '@material-ui/icons';
 import FilterSelect from './FilterSelect';
 import SortSelect from './SortSelect';
@@ -101,12 +98,12 @@ const useStyles = makeStyles((theme) => ({
     marginLeft: '10px',
     marginRight: '10px',
     overflowX: 'hidden',
-    paddingBottom: '100px',
-    textAlign: 'center'
+    paddingBottom: '100px'
   },
   container: {
     paddingTop: theme.spacing(4),
     paddingBottom: theme.spacing(4),
+
   },
   paper: {
     padding: theme.spacing(2),
@@ -157,6 +154,8 @@ export default function Dashboard() {
 
   const [filter, setFilterOpen] = React.useState(false);
   const [sort, setSortOpen] = React.useState(false);
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const [selectedIndex, setSelectedIndex] = React.useState(1);
 
   const handleFilterOpen = () => {
     setFilterOpen(true);
@@ -171,8 +170,12 @@ export default function Dashboard() {
     setFilterOpen(false);
   };
 
-  const handleSortOpen = () => {
-    setSortOpen(true);
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleSortOpen = (event) => {
+    setAnchorEl(event.currentTarget);
   };
 
   const handleSortClose = () => {
@@ -210,12 +213,14 @@ export default function Dashboard() {
       </AppBar>
       <main className={classes.content}>
         <div className={classes.appBarSpacer} />
-        <Button
-          fullWidth
-          onClick={() => { history.push('/generateInvoice'); window.location.reload(); }}
-          variant="contained"
-          className={classes.invoiceButton}
-        >Generate Invoice</Button>
+        <Grid container align="center">
+          <Button
+            fullWidth
+            onClick={() => { history.push('/generateInvoice'); window.location.reload(); }}
+            variant="contained"
+            className={classes.invoiceButton}
+          >Generate Invoice</Button>
+        </Grid>
         <Grid container>
           {
             state.invoices.map((invoice, i) =>
@@ -225,13 +230,24 @@ export default function Dashboard() {
             )
           }
         </Grid>
-        <Box display="flex" flexDirection="row" justifyContent="space-between" style={{marginTop: '20px'}}>
+        <Box display="flex" flexDirection="row" justifyContent="space-between" style={{ marginTop: '20px' }}>
           <Typography className={classes.detailedInvoiceHeader} display="inline">Detailed Invoice List</Typography>
           <Box>
-            <Button onClick={handleSortOpen} style={{ textTransform: 'none', fontSize: '10px', height: '24px', padding: '5px 5px', marginRight: '5px' }} variant="outlined">
+            <Button aria-controls="simple-menu" aria-haspopup="true" onClick={handleSortOpen} style={{ textTransform: 'none', fontSize: '10px', height: '24px', padding: '5px 5px', marginRight: '5px' }} variant="outlined">
               Sort by
                       <ArrowDropDown />
             </Button>
+            <Menu
+              id="simple-menu"
+              anchorEl={anchorEl}
+              keepMounted
+              open={Boolean(anchorEl)}
+              onClose={handleClose}
+            >
+              <MenuItem onClick={handleClose}>Low to High</MenuItem>
+              <MenuItem onClick={handleClose}>High to Low</MenuItem>
+              <MenuItem onClick={handleClose}>Time</MenuItem>
+            </Menu>
             <Button onClick={handleFilterOpen} style={{ textTransform: 'none', fontSize: '10px', height: '24px', padding: '5px 5px' }} variant="outlined">
               <Tune style={{ marginRight: '5px', height: '15px' }} />
                         Filter

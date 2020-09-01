@@ -41,6 +41,7 @@ const useStyles = makeStyles({
         display: 'block',
         fontSize: '18px',
         fontWeight: 'bold',
+        fontFamily: 'Open Sans'
     },
     name: {
         fontSize: '10px',
