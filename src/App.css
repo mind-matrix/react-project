@@ -39,7 +39,7 @@
   }
 }
 
-.poppins {
+.poppins, .MuiButton-label {
   font-family: 'Poppins', sans-serif;
 }
 

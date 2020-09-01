@@ -18,19 +18,16 @@ import Dashboard from './Dashboard/Dashboard';
 import GenerateInvoice from './GenerateInvoice/GenerateInvoice';
 import CancelInvoice from './GenerateInvoice/CancelInvoice';
 import RefundNotice from './GenerateInvoice/RefundNotice';
-
 import Invoice from './Invoice/Invoice';
-
 import PDFViewer from './PDFViewer/PDFViewer';
-
 import ReceiptView from './ReceiptView/ReceiptView';
-
 import history from './history';
+import PaymentHistory from './Dashboard/PaymentHistory';
 
 const theme = createMuiTheme({
   palette: {
     primary: {
-      main: '#419945'
+      main: '#E2714D'
     },
     secondary: {
       main: '#DAD9D8'
@@ -54,6 +51,7 @@ function App() {
               <Route path="/register" exact component={RegisterForm} />
               <Route path="/dashboard" exact component={Dashboard} />
               <Route path="/generateInvoice" exact component={GenerateInvoice} />
+              <Route path="/payment-history" exact component={PaymentHistory} />
 
               <Route path="/invoice" exact component={Invoice} />
 
