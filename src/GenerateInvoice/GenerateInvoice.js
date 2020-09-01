@@ -166,17 +166,11 @@ export default function GenerateInvoice() {
                   {state.selectedCustomer.number}
                 </Typography>
               </Typography>
-<<<<<<< HEAD
             </Typography>
             :
             null
           } */}
           <InvoiceInput />
-=======
-              :
-              null
-          }
->>>>>>> 4da9455bfb9345e01c9c148352fa5cdbed51837b
           <Divider style={{ width: '100%', marginTop: '15px' }} />
           <Card className={classes.productCard}>
             <CardContent>
