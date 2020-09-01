@@ -206,28 +206,42 @@ export default function GenerateInvoice() {
             </Grid>
           </Grid>
           <Grid container justify="space-between" className={classes.elaboration}>
-            <Grid item xs={6} style={{ textAlign: 'left', fontSize: 14 }}>
+            <Grid item xs={9} style={{ textAlign: 'left', fontSize: 14 }}>
               Advance Paid
             </Grid>
-            <Grid item xs={6} style={{ textAlign: 'right', fontSize: 14 }}>
-              Rs. 10000
+            <Grid item xs={3} style={{ textAlign: 'right', fontSize: 14, paddingTop: '10px' }}>
+              <TextField
+                color="secondary"
+                required
+                fullWidth
+                variant="outlined"
+                value="1000"
+                size="small"
+              />
             </Grid>
           </Grid>
           <Grid container justify="space-between" className={classes.elaboration}>
-            <Grid item xs={6} style={{ textAlign: 'left', fontSize: 14 }}>
+            <Grid item xs={9} style={{ textAlign: 'left', fontSize: 14 }}>
               Discount
               <NativeSelect
                 value={state.discountType}
                 onChange={handleChange}
                 input={<BootstrapInput />}
-                style={{ marginLeft: 5, width: "40px" }}
+                style={{ marginLeft: 5}}
               >
                 <option value={'flat'}>Flat(Rs.)</option>
                 <option value={'percent'}>Percent(%)</option>
               </NativeSelect>
             </Grid>
-            <Grid item xs={6} style={{ textAlign: 'right', fontSize: 14 }}>
-              Rs. 200
+            <Grid item xs={3} style={{ textAlign: 'right', fontSize: 14, paddingTop: '10px' }}>
+              <TextField
+                color="secondary"
+                required
+                fullWidth
+                variant="outlined"
+                value="200"
+                size="small"
+              />
             </Grid>
           </Grid>
           <Grid container justify="space-between" className={classes.elaboration}>
@@ -251,8 +265,8 @@ export default function GenerateInvoice() {
                 size="small"
               />
             </Grid>
-            <Grid item xs={6}></Grid>
-            <Grid item xs={2} style={{ textAlign: 'right', fontSize: 14, paddingTop: '10px' }}>
+            <Grid item xs={5}></Grid>
+            <Grid item xs={3} style={{ textAlign: 'right', fontSize: 14, paddingTop: '10px' }}>
               <TextField
                 color="secondary"
                 required
