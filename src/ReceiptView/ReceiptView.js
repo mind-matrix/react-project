@@ -136,7 +136,8 @@ const useStyles = makeStyles({
     rewardIcon: {
         width: '100%',
         maxWidth: '92px',
-        height: 'auto'
+        height: 'auto',
+        textAlign: 'center'
     },
     rewardTitle: {
         marginTop: '19.5px',
@@ -215,7 +216,8 @@ const useStyles = makeStyles({
         lineHeight: '16px',
         fontFamily: 'Roboto',
         fontWeight: 'bolder',
-        verticalAlign: 'middle'
+        verticalAlign: 'middle',
+        textAlign: 'center'
     }
 });
 
