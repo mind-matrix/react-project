@@ -220,7 +220,7 @@ export default function GenerateInvoice() {
                 value={state.discountType}
                 onChange={handleChange}
                 input={<BootstrapInput />}
-                style={{ marginLeft: 5 }}
+                style={{ marginLeft: 5, width: "40px" }}
               >
                 <option value={'flat'}>Flat(Rs.)</option>
                 <option value={'percent'}>Percent(%)</option>
@@ -232,7 +232,8 @@ export default function GenerateInvoice() {
           </Grid>
           <Grid container justify="space-between" className={classes.elaboration}>
             <Grid item xs={6} style={{ textAlign: 'left', fontSize: 14 }}>
-              GST %9
+              GST
+              <input type="text" style={{ marginLeft: '10px', display: 'inline', width: '30px', borderRadius: '4px', border: '1px solid black'}}></input>
             </Grid>
             <Grid item xs={6} style={{ textAlign: 'right', fontSize: 14 }}>
               Rs. 450
@@ -240,11 +241,26 @@ export default function GenerateInvoice() {
           </Grid>
           <Divider style={{ width: '100%', marginTop: '15px' }} />
           <Grid container justify="space-between">
-            <Grid item xs={6} style={{ textAlign: 'left', fontSize: 14, paddingTop: '10px' }}>
-              Shipping
+            <Grid item xs={4} style={{ textAlign: 'left', fontSize: 14, paddingTop: '10px' }}>
+              <TextField
+                color="secondary"
+                required
+                fullWidth
+                variant="outlined"
+                value="Shipping"
+                size="small"
+              />
             </Grid>
-            <Grid item xs={6} style={{ textAlign: 'right', fontSize: 14, paddingTop: '10px' }}>
-              Rs. 0
+            <Grid item xs={6}></Grid>
+            <Grid item xs={2} style={{ textAlign: 'right', fontSize: 14, paddingTop: '10px' }}>
+              <TextField
+                color="secondary"
+                required
+                fullWidth
+                variant="outlined"
+                value="10"
+                size="small"
+              />
             </Grid>
           </Grid>
           <Grid container justify="space-between">
@@ -256,52 +272,7 @@ export default function GenerateInvoice() {
             </Grid>
           </Grid>
           <Divider style={{ width: '100%', marginTop: '15px', marginBottom: '15px' }} />
-          <Grid container>
-            <Grid item xs={6}>
-              <Box pr={1}>
-                <TextField fullWidth label="PAN Number" variant="outlined" />
-              </Box>
-            </Grid>
-            <Grid item xs={6}>
-              <Box pl={1}>
-                <TextField fullWidth label="GST Number" variant="outlined" />
-              </Box>
-            </Grid>
-          </Grid>
-          <TextField
-            style={{ paddingTop: '10px' }}
-            label="Payment terms/Notes, if any"
-            multiline
-            required
-            fullWidth
-            rows={4}
-            variant="outlined"
-          />
-          <FormControl component="fieldset">
-            <FormLabel style={{ textAlign: 'left' }} component="legend">Payment Mode</FormLabel>
-            {/* <RadioGroup aria-label="mode" name="mode" value={paymentMode} onChange={handlePaymentModeChange}>
-              <Grid container>
-                <Grid item xs='auto'>
-                  <FormControlLabel value="bank" control={<GreenRadio />} label="Bank Transfer" />
-                </Grid>
-                <Grid item>
-                  <FormControlLabel value="add" control={<GreenRadio />} label="Add payment" />
-                </Grid>
-              </Grid>
-            </RadioGroup> */}
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={paymentLink}
-                  onChange={handlePaymentLink}
-                  name="paymentLink"
-                  color="primary"
-                />
-              }
-              label="Payment Link"
-            />
-          </FormControl>
-          <Grid container>
+          <Grid container spacing={1}>
             <Grid item xs={6}>
               <TextField
                 label="PAN Number"
