@@ -6,11 +6,12 @@ import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
-import { CssBaseline, Box, Grid, TextField, Paper, Divider, Card, CardContent, NativeSelect, FormControl, FormLabel, RadioGroup, Radio, FormControlLabel, InputBase, withStyles } from '@material-ui/core';
+import { CssBaseline, Checkbox, Box, Grid, TextField, Paper, Divider, Card, CardContent, NativeSelect, FormControl, FormLabel, RadioGroup, Radio, FormControlLabel, InputBase, withStyles } from '@material-ui/core';
 import { KeyboardDatePicker } from '@material-ui/pickers';
 import { green } from '@material-ui/core/colors';
 import { ArrowBack as ArrowBackIcon, Person as PersonIcon, Add as AddIcon } from '@material-ui/icons';
 import CustomerSelectInput from './CustomerSelectInput';
+import InvoiceInput from './InvoiceInput';
 
 import FullScreenDialog from '../FullScreenDialog';
 
@@ -205,6 +206,12 @@ export default function GenerateInvoice() {
 
   const [paymentMode, setPaymentMode] = React.useState('bank');
 
+  const [paymentLink, setPaymentLink] = React.useState(false);
+
+  const handlePaymentLink = (e) => {
+    setPaymentLink(e.target.checked);
+  };
+
   const [addItem, setAddItemOpen] = React.useState(false);
 
   const handleAddItemOpen = () => {
@@ -295,7 +302,7 @@ export default function GenerateInvoice() {
         </Grid>
         <div className={classes.spacer} />
         <Grid container style={{ maxWidth: 480, margin: '0 auto' }}>
-          <CustomerSelectInput customers={state.customers} onAddCustomer={handleAddCustomerOpen} onChange={handleCustomerChange} />
+          {/* <CustomerSelectInput customers={state.customers} onAddCustomer={handleAddCustomerOpen} onChange={handleCustomerChange} />
           {
             state.selectedCustomer ?
             <Typography className={classes.customer}>
@@ -307,7 +314,8 @@ export default function GenerateInvoice() {
             </Typography>
             :
             null
-          }
+          } */}
+          <InvoiceInput />
           <Divider style={{ width: '100%', marginTop: '15px' }} />
           <Card className={classes.productCard}>
             <CardContent>
@@ -393,6 +401,18 @@ export default function GenerateInvoice() {
             </Grid>
           </Grid>
           <Divider style={{ width: '100%', marginTop: '15px', marginBottom: '15px' }} />
+          <Grid container>
+            <Grid item xs={6}>
+              <Box pr={1}>
+                <TextField fullWidth label="PAN Number" variant="outlined" />
+              </Box>
+            </Grid>
+            <Grid item xs={6}>
+              <Box pl={1}>
+                <TextField fullWidth label="GST Number" variant="outlined" />
+              </Box>
+            </Grid>
+          </Grid>
           <TextField
             style={{ paddingTop: '10px' }}
             label="Payment terms/Notes, if any"
@@ -404,7 +424,7 @@ export default function GenerateInvoice() {
           />
           <FormControl component="fieldset">
             <FormLabel style={{ textAlign: 'left' }} component="legend">Payment Mode</FormLabel>
-            <RadioGroup aria-label="mode" name="mode" value={paymentMode} onChange={handlePaymentModeChange}>
+            {/* <RadioGroup aria-label="mode" name="mode" value={paymentMode} onChange={handlePaymentModeChange}>
               <Grid container>
                 <Grid item xs='auto'>
                   <FormControlLabel value="bank" control={<GreenRadio />} label="Bank Transfer" />
@@ -413,7 +433,18 @@ export default function GenerateInvoice() {
                   <FormControlLabel value="add" control={<GreenRadio />} label="Add payment" />
                 </Grid>
               </Grid>
-            </RadioGroup>
+            </RadioGroup> */}
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={paymentLink}
+                  onChange={handlePaymentLink}
+                  name="paymentLink"
+                  color="primary"
+                />
+              }
+              label="Payment Link"
+            />
           </FormControl>
           <Grid container>
             <Grid item xs={6}>

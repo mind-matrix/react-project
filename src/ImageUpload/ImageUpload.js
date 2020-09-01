@@ -6,10 +6,12 @@ import PlaceHolderImage from './placeholder-image.png';
 const useStyles = makeStyles((theme) => ({
     root: {
       display: 'block',
-      textAlign: 'left'
+      textAlign: 'left',
+      width: '100%'
     },
     previewContainer: {
         display: 'inline-block',
+        width: '100%',
         position: 'relative',
         "&:hover div": {
             display: 'block'
@@ -17,6 +19,7 @@ const useStyles = makeStyles((theme) => ({
     },
     preview: {
         backgroundColor: '#F8F5E8',
+        width: '100%',
         maxWidth: 250,
         borderRadius: 8,
         "&:hover": {
@@ -32,6 +35,29 @@ const useStyles = makeStyles((theme) => ({
         left: '50%',
         transform: 'translate(-50%, -50%)',
         pointerEvents: 'none'
+    },
+    altBox: {
+        backgroundColor: 'rgba(65, 65, 65, 0.05)',
+        position: 'relative',
+        width: '100%',
+        maxWidth: '250px',
+        height: '74pt',
+        borderRadius: 8,
+        "&:hover": {
+            backgroundColor: 'rgba(0,0,0,0.6)',
+            backgroundBlendMode: 'screen multiply'
+        }
+    },
+    altBoxText: {
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        color: '#35332B',
+        opacity: '50%',
+        fontSize: '8pt',
+        fontFamily: 'Roboto',
+        lineHeight: '10px'
     }
 }));
 
@@ -82,7 +108,16 @@ export default function ImageUpload(props) {
         <div className={classes.root}>
             <CssBaseline />
             <div className={classes.previewContainer}>
-                <img className={classes.preview} onClick={uploadHandler} src={state.preview} alt={props.altText || 'Image Preview'} />
+                {
+                    props.alt && state.preview === PlaceHolderImage ?
+                    <div onClick={uploadHandler} className={classes.altBox}>
+                        <span className={classes.altBoxText}>
+                            + Add logo
+                        </span>
+                    </div>
+                    :
+                    <img className={classes.preview} onClick={uploadHandler} src={state.preview} alt={props.altText || 'Image Preview'} />
+                }
                 <div className={classes.hoverBox}>
                     Upload
                 </div>
