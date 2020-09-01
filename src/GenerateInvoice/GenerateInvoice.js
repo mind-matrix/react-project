@@ -461,6 +461,7 @@ const useStyles = makeStyles((theme) => ({
   },
   button: {
     height: '56px',
-    textTransform: 'none'
+    textTransform: 'none',
+    fontSize: '16px'
   }
 }));
