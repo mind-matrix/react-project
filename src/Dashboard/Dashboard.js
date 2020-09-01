@@ -101,7 +101,8 @@ const useStyles = makeStyles((theme) => ({
     marginLeft: '10px',
     marginRight: '10px',
     overflowX: 'hidden',
-    paddingBottom: '100px'
+    paddingBottom: '100px',
+    textAlign: 'center'
   },
   container: {
     paddingTop: theme.spacing(4),
