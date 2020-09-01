@@ -9,7 +9,6 @@ import MenuIcon from '@material-ui/icons/Menu';
 import AppIcon from '../AppIcon';
 import RegisterFormStepper from './RegisterFormStepper';
 import { CssBaseline, Icon } from '@material-ui/core';
-import Wave from '../Wave';
 
 import FreechargeIcon from '../FreechargeIcon';
 
@@ -104,7 +103,7 @@ function RegisterForm() {
 
   return (
     <div className={classes.root}>
-      <Wave />
+      
       <CssBaseline />
       <AppBar elevation={1} position="absolute" style={{backgroundColor: 'white'}}>
         <Toolbar>

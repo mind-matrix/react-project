@@ -1,7 +1,6 @@
 import React from 'react';
 import { Grid, TextField, Toolbar, Box, Button, Typography, IconButton, AppBar, CssBaseline, makeStyles } from '@material-ui/core';
 import { ArrowBack as ArrowBackIcon } from '@material-ui/icons';
-import Wave from '../Wave';
 
 import history from '../history';
 
@@ -46,7 +45,7 @@ export default function CancelInvoice(props) {
 
     return (
     <div className={classes.root}>
-      <Wave />
+      
       <CssBaseline />
       <AppBar elevation={1} position="absolute" style={{backgroundColor: 'white'}}>
         <Toolbar>

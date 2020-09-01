@@ -17,7 +17,6 @@ import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Container from '@material-ui/core/Container';
 import AppIcon from '../AppIcon';
-import Wave from '../Wave';
 
 import axios from 'axios';
 
@@ -96,7 +95,7 @@ function Invoice(props) {
 
   return (
     <Container component="main" maxWidth="xs">
-      <Wave />
+      
       <CssBaseline />
       <div className={classes.paper}>
         <AppIcon width={116}/>

@@ -10,7 +10,6 @@ import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import OtpInput from 'react-otp-input';
 import AppIcon from '../AppIcon';
-import Wave from '../Wave';
 
 import history from '../history';
 
@@ -61,7 +60,7 @@ export default function VerifyOTP() {
 
   return (
     <Container component="main" maxWidth="xs">
-      <Wave />
+      
       <CssBaseline />
       <div className={classes.paper}>
         <AppIcon width={116} />

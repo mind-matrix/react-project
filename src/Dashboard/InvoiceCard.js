@@ -4,7 +4,7 @@ import { Card, CardContent, Grid, Divider, Typography, makeStyles } from '@mater
 const useStyles = makeStyles({
     root: {
         display: 'block',
-        margin: '0 auto',
+        margin: '5px auto',
         maxWidth: 420,
         width: '100%',
         backgroundColor: 'white'
@@ -12,10 +12,9 @@ const useStyles = makeStyles({
     header: {
         color: '#0A0A0A',
         opacity: 0.6,
-        fontSize: '14pt',
+        fontSize: '14px',
         textAlign: 'left',
-        lineHeight: '19px',
-        marginBottom: '26px'
+        marginBottom: '20px'
     },
     item: {
         '&:nth-child(1)': {
@@ -32,17 +31,20 @@ const useStyles = makeStyles({
     },
     title: {
         textAlign: 'center',
-        fontSize: '18pt',
+        fontSize: '18px',
         lineHeight: '24px',
         margin: '5px 8px'
     },
     number: {
+        padding: 0,
+        margin: 0,
         display: 'block',
-        fontSize: 20,
-        fontWeight: 'bolder',
+        fontSize: '18px',
+        fontWeight: 'bold',
     },
     name: {
-        fontSize: 12,
+        fontSize: '10px',
+        fontWeight: 'bold',
         lineHeight: 1
     }
 });
@@ -63,12 +65,12 @@ export default function InvoiceCard(props) {
     };
 
     return (
-        <Card elevation={4} className={classes.root}>
+        <Card elevation={2} className={classes.root}>
             <CardContent>
                 <Typography className={classes.header}>
                     {props.header}
                 </Typography>
-                <Grid container alignItems="center">
+                <Grid container>
                     <Grid className={classes.item} item xs={4}>
                         <Typography className={classes.title} gutterBottom>
                             <p className={classes.number}>

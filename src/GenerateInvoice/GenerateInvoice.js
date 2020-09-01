@@ -10,7 +10,6 @@ import { CssBaseline, Box, Grid, TextField, Paper, Divider, Card, CardContent, N
 import { KeyboardDatePicker } from '@material-ui/pickers';
 import { green } from '@material-ui/core/colors';
 import { ArrowBack as ArrowBackIcon, Person as PersonIcon, Add as AddIcon } from '@material-ui/icons';
-import Wave from '../Wave';
 import CustomerSelectInput from './CustomerSelectInput';
 
 import FullScreenDialog from '../FullScreenDialog';
@@ -254,7 +253,7 @@ export default function GenerateInvoice() {
 
   return (
     <div className={classes.root}>
-      <Wave />
+      
       <CssBaseline />
       <AppBar elevation={1} position="absolute" style={{backgroundColor: 'white'}}>
         <Toolbar>
