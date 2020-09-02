@@ -6,15 +6,13 @@ import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
-import { CssBaseline, Checkbox, Box, Grid, TextField, Paper, Divider, Card, CardContent, NativeSelect, FormControl, FormLabel, RadioGroup, Radio, FormControlLabel, InputBase, withStyles } from '@material-ui/core';
+import { CssBaseline, Checkbox, Box, Menu, MenuItem, Grid, TextField, Paper, Divider, Card, CardContent, NativeSelect, FormControl, FormLabel, RadioGroup, Radio, FormControlLabel, InputBase, withStyles } from '@material-ui/core';
 import { KeyboardDatePicker } from '@material-ui/pickers';
 import { green } from '@material-ui/core/colors';
-import { ArrowBack as ArrowBackIcon, Person as PersonIcon, Add as AddIcon } from '@material-ui/icons';
+import { ArrowBack as ArrowBackIcon, Person as PersonIcon, Add as AddIcon, ArrowDropDown } from '@material-ui/icons';
 import CustomerSelectInput from './CustomerSelectInput';
 import InvoiceInput from './InvoiceInput';
-
 import FullScreenDialog from '../FullScreenDialog';
-
 import AddItem from './AddItem';
 import AddCustomer from './AddCustomer';
 
@@ -63,8 +61,20 @@ export default function GenerateInvoice() {
 
   const [paymentLink, setPaymentLink] = React.useState(false);
 
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const [filter, setFilter] = React.useState('Flat(₹)')
+
   const handlePaymentLink = (e) => {
     setPaymentLink(e.target.checked);
+  };
+
+  const filterCloseHandler = (name) => {
+    setFilter(name);
+    setAnchorEl(null);
+  };
+
+  const handleSortOpen = (event) => {
+    setAnchorEl(event.currentTarget);
   };
 
   const [addItem, setAddItemOpen] = React.useState(false);
@@ -198,18 +208,18 @@ export default function GenerateInvoice() {
           </Button>
           <Divider style={{ width: '100%', marginTop: '15px' }} />
           <Grid container justify="space-between" className={classes.elaboration}>
-            <Grid item xs={6} style={{ textAlign: 'left', fontSize: 18, paddingTop: '10px' }}>
+            <Grid item xs={6} style={{ textAlign: 'left', fontSize: '16px' }}>
               Total Amount
             </Grid>
-            <Grid item xs={6} style={{ textAlign: 'right', fontWeight: 'bolder', fontSize: 18, paddingTop: '10px' }}>
+            <Grid item xs={6} style={{ textAlign: 'right', fontWeight: 'bolder', fontSize: '16px' }}>
               Rs. 5000
             </Grid>
           </Grid>
-          <Grid container justify="space-between" className={classes.elaboration}>
+          <Grid container justify="space-between" alignItems="center" className={classes.elaboration}>
             <Grid item xs={9} style={{ textAlign: 'left', fontSize: 14 }}>
               Advance Paid
             </Grid>
-            <Grid item xs={3} style={{ textAlign: 'right', fontSize: 14, paddingTop: '10px' }}>
+            <Grid item xs={3} style={{ textAlign: 'right', fontSize: 14 }}>
               <TextField
                 color="secondary"
                 required
@@ -220,20 +230,25 @@ export default function GenerateInvoice() {
               />
             </Grid>
           </Grid>
-          <Grid container justify="space-between" className={classes.elaboration}>
+          <Grid container justify="space-between" alignItems="center" className={classes.elaboration}>
             <Grid item xs={9} style={{ textAlign: 'left', fontSize: 14 }}>
               Discount
-              <NativeSelect
-                value={state.discountType}
-                onChange={handleChange}
-                input={<BootstrapInput />}
-                style={{ marginLeft: 5}}
+              <Button aria-controls="simple-menu" aria-haspopup="true" onClick={handleSortOpen} style={{ textTransform: 'none', fontSize: '10px', height: '24px', padding: '5px 5px', margin: '0px 5px' }} variant="outlined">
+                {filter}
+                <ArrowDropDown />
+              </Button>
+              <Menu
+                id="simple-menu"
+                anchorEl={anchorEl}
+                keepMounted
+                open={Boolean(anchorEl)}
+                onClose={filterCloseHandler}
               >
-                <option value={'flat'}>Flat(Rs.)</option>
-                <option value={'percent'}>Percent(%)</option>
-              </NativeSelect>
+                <MenuItem onClick={() => filterCloseHandler("Flat(₹)")}>Flat(₹)</MenuItem>
+                <MenuItem onClick={() => filterCloseHandler("Percent(%)")}>Percent(%)</MenuItem>
+              </Menu>
             </Grid>
-            <Grid item xs={3} style={{ textAlign: 'right', fontSize: 14, paddingTop: '10px' }}>
+            <Grid item xs={3} style={{ textAlign: 'right', fontSize: 14 }}>
               <TextField
                 color="secondary"
                 required
@@ -247,15 +262,15 @@ export default function GenerateInvoice() {
           <Grid container justify="space-between" className={classes.elaboration}>
             <Grid item xs={6} style={{ textAlign: 'left', fontSize: 14 }}>
               GST
-              <input type="text" style={{ marginLeft: '10px', display: 'inline', width: '30px', borderRadius: '4px', border: '1px solid black'}}></input>
+              <input type="text" style={{ marginLeft: '10px', padding: '5px', display: 'inline', width: '50px', borderRadius: '4px', border: '0.5px solid #a0a0a0' }}></input>
             </Grid>
-            <Grid item xs={6} style={{ textAlign: 'right', fontSize: 14 }}>
+            <Grid item xs={6} style={{ textAlign: 'right', fontSize: '16px' }}>
               Rs. 450
             </Grid>
           </Grid>
           <Divider style={{ width: '100%', marginTop: '15px' }} />
           <Grid container justify="space-between">
-            <Grid item xs={4} style={{ textAlign: 'left', fontSize: 14, paddingTop: '10px' }}>
+            <Grid item xs={4} style={{ textAlign: 'left', fontSize: '14px', paddingTop: '10px' }}>
               <TextField
                 color="secondary"
                 required
@@ -278,10 +293,10 @@ export default function GenerateInvoice() {
             </Grid>
           </Grid>
           <Grid container justify="space-between">
-            <Grid item xs={6} style={{ textAlign: 'left', fontSize: 18, fontWeight: 'bold', paddingTop: '10px' }}>
+            <Grid item xs={6} style={{ textAlign: 'left', fontSize: '16px', fontWeight: 'bold', paddingTop: '10px' }}>
               Balance Amount
             </Grid>
-            <Grid item xs={6} style={{ textAlign: 'right', fontSize: 18, color: '#419945', paddingTop: '10px' }}>
+            <Grid item xs={6} style={{ textAlign: 'right', fontSize: '16px', color: '#419945', fontWeight: 'bold', paddingTop: '10px' }}>
               Rs. 4250
             </Grid>
           </Grid>
@@ -496,7 +511,7 @@ const useStyles = makeStyles((theme) => ({
     margin: 10
   },
   elaboration: {
-    marginBottom: 15
+    margin: '5px'
   },
   button: {
     height: '56px',

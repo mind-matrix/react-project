@@ -32,7 +32,7 @@ export default function InvoiceInput(props) {
                         <TextField fullWidth label="Bill To" multiline rows={4} variant="outlined"></TextField>
                     </Box>
                 </Grid>
-                <Grid item xs={6}>
+                <Grid item xs={6} style={{marginTop: "-5px"}}>
                     <Box pl={1}>
                         <Grid container>
                             <Grid item xs={12}>
