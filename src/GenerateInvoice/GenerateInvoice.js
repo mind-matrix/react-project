@@ -54,7 +54,8 @@ export default function GenerateInvoice() {
       }
     ],
     discountType: 'flat',
-    selectedCustomer: null
+    selectedCustomer: null,
+    gstPercent: 9
   });
 
   const [paymentMode, setPaymentMode] = React.useState('bank');
@@ -156,7 +157,7 @@ export default function GenerateInvoice() {
             format="DD MMM YY"
             value={state.date}
             onChange={handleDateChange}
-            classNames={classes.picker}
+            className={classes.picker}
             style={{ verticalAlign: 'middle', backgroundColor: '#ffffff' }}
             inputVariant="outlined"
             size="small"
@@ -224,6 +225,7 @@ export default function GenerateInvoice() {
                 color="secondary"
                 required
                 fullWidth
+                className={classes.amountBox}
                 variant="outlined"
                 value="1000"
                 size="small"
@@ -253,23 +255,24 @@ export default function GenerateInvoice() {
                 color="secondary"
                 required
                 fullWidth
+                className={classes.amountBox}
                 variant="outlined"
                 value="200"
                 size="small"
               />
             </Grid>
           </Grid>
-          <Grid container justify="space-between" className={classes.elaboration}>
-            <Grid item xs={6} style={{ textAlign: 'left', fontSize: 14 }}>
-              GST
-              <input type="text" style={{ marginLeft: '10px', padding: '5px', display: 'inline', width: '50px', borderRadius: '4px', border: '0.5px solid #a0a0a0' }}></input>
+          <Grid container justify="space-between" alignItems="center" className={classes.elaboration}>
+            <Grid item xs={6} alignItems="center" style={{ textAlign: 'left', fontSize: '14px' }}>
+              GST (%)
+              <TextField name="gstPercent" className={classes.gstPercent} value={state.gstPercent} onChange={handleChange} variant="outlined"></TextField>
             </Grid>
             <Grid item xs={6} style={{ textAlign: 'right', fontSize: '16px' }}>
               Rs. 450
             </Grid>
           </Grid>
           <Divider style={{ width: '100%', marginTop: '15px' }} />
-          <Grid container justify="space-between">
+          <Grid container justify="space-between" alignItems="center">
             <Grid item xs={4} style={{ textAlign: 'left', fontSize: '14px', paddingTop: '10px' }}>
               <TextField
                 color="secondary"
@@ -517,5 +520,21 @@ const useStyles = makeStyles((theme) => ({
     height: '56px',
     textTransform: 'none',
     fontSize: '16px'
+  },
+  amountBox: {
+    '& input': {
+      paddingTop: '10px',
+      paddingBottom: '8px',
+      paddingRight: '12px',
+      textAlign: 'right',
+      fontSize: '12pt'
+    }
+  },
+  gstPercent: {
+    width: '67px',
+    marginLeft: '5px',
+    '& input': {
+      padding: '5px'
+    }
   }
 }));
