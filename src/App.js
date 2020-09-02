@@ -23,6 +23,7 @@ import PDFViewer from './PDFViewer/PDFViewer';
 import ReceiptView from './ReceiptView/ReceiptView';
 import history from './history';
 import PaymentHistory from './Dashboard/PaymentHistory';
+import CreditNote from './CreditNote/CreditNote';
 
 const theme = createMuiTheme({
   palette: {
@@ -54,6 +55,8 @@ function App() {
               <Route path="/payment-history" exact component={PaymentHistory} />
 
               <Route path="/invoice" exact component={Invoice} />
+
+              <Route path="/credit-note" exact component={CreditNote} />
 
               <Route path="/receipt-view" exact component={ReceiptView} />
               
