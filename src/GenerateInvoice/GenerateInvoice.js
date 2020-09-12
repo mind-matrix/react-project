@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -15,8 +15,11 @@ import InvoiceInput from './InvoiceInput';
 import FullScreenDialog from '../FullScreenDialog';
 import AddItem from './AddItem';
 import AddCustomer from './AddCustomer';
-
-import history from '../history';
+import { checkCustomerPhone, createInvoice, getInvoiceNo } from '../shared/dataService';
+import CreditNote from '../CreditNote/CreditNote';
+import ImageUpload from '../ImageUpload/ImageUpload';
+import { INVOICE_TYPE, MERCHANT_ID } from '../shared/constant';
+import { useHistory } from 'react-router-dom';
 
 const drawerWidth = 240;
 
@@ -29,49 +32,52 @@ const GreenRadio = withStyles({
   checked: {},
 })((props) => <Radio color="default" {...props} />);
 
-export default function GenerateInvoice() {
+const GenerateInvoice = () => {
   const classes = useStyles();
-
-  const [state, setState] = React.useState({
-    inv: null,
+  const history = useHistory();
+  const [state, setState] = useState({
+    inv: "",
+    merchantCode: "",
     date: new Date(),
-    customers: [
-      {
-        name: 'Salim K',
-        number: '7466366554'
-      },
-      {
-        name: 'Rakesh P',
-        number: '7466366354'
-      },
-      {
-        name: 'Sure Kumar',
-        number: '7466361233'
-      },
-      {
-        name: 'Akash Gupta',
-        number: '7466369872'
-      }
-    ],
+    customerId: null,
+    customerPhone: null,
     discountType: 'flat',
+    discountValue: 0,
+    totalDiscount: 0,
     selectedCustomer: null,
-    gstPercent: 9
+    total: 0,
+    gstPercent: 9,
+    gstTotal: 0,
+    logo: null,
+    invoiceFrom: '',
+    billTo: '',
+    sameAsBillTo: false,
+    shipTo: '',
+    advance: 0,
+    otherBill: 'Shipping',
+    otherBillAmount: 0,
+    pan: '',
+    gst: '',
+    notes: ''
   });
+  const [balance, setBalance] = useState(0);
+  const [product, setProduct] = useState([]);
+  const [logo, setLogo] = useState(null);
+  const handleChecked = (e) => {
+    setState({
+      ...state,
+      sameAsBillTo: e.target.checked,
+      shipTo: e.target.checked ? '' : state.shipTo
+    });
+  };
 
   const [paymentMode, setPaymentMode] = React.useState('bank');
-
   const [paymentLink, setPaymentLink] = React.useState(false);
-
   const [anchorEl, setAnchorEl] = React.useState(null);
-  const [filter, setFilter] = React.useState('Flat(₹)')
+  const [filter, setFilter] = React.useState('flat');
 
   const handlePaymentLink = (e) => {
     setPaymentLink(e.target.checked);
-  };
-
-  const filterCloseHandler = (name) => {
-    setFilter(name);
-    setAnchorEl(null);
   };
 
   const handleSortOpen = (event) => {
@@ -89,15 +95,30 @@ export default function GenerateInvoice() {
   };
 
   const handleAddItemApply = (item) => {
-    // add item
+    setProduct([...product, item]);
     setAddItemOpen(false);
+    setState({
+      ...state,
+      total: state.total + item.productQty * item.unitPrice,
+      gstTotal: (state.total + item.productQty * item.unitPrice) * state.gstPercent / 100
+    });
+    setBalance(state.total + item.productQty * item.unitPrice + (state.total + item.productQty * item.unitPrice) * state.gstPercent / 100 - state.totalDiscount - state.advance + state.otherBillAmount);
   };
 
   const [addCustomer, setAddCustomerOpen] = React.useState(false);
+  const [invoicePreview, setInvoicePreview] = useState(false);
 
   const handleAddCustomerOpen = () => {
     setAddCustomerOpen(true);
   };
+
+  const invoicePreviewHandler = () => {
+    setInvoicePreview(true);
+  }
+
+  const invoicePreviewClose = () => {
+    setInvoicePreview(false);
+  }
 
   const handleAddCustomerClose = () => {
     setAddCustomerOpen(false);
@@ -112,10 +133,6 @@ export default function GenerateInvoice() {
     setPaymentMode(e.target.value);
   };
 
-  const handleChange = (event) => {
-    setState({ value: event.target.value });
-  };
-
   const handleDateChange = (val) => {
     setState({ date: val });
   };
@@ -125,10 +142,109 @@ export default function GenerateInvoice() {
     setState({ ...state, selectedCustomer: customer });
   };
 
+  useEffect(() => {
+    getInvoiceNo(sessionStorage.getItem(MERCHANT_ID), INVOICE_TYPE.INVOICE)
+      .then(res => res.json())
+      .then(data => {
+        setState({
+          ...state,
+          inv: data.nextInvoiceNumber,
+          merchantCode: data.merchantCode
+        })
+      })
+  }, [])
+
+  const checkPhoneNumber = (event) => {
+    if (event.target.value.length == 10) {
+      setState({
+        ...state,
+        customerPhone: event.target.value
+      })
+      checkCustomerPhone(event.target.value)
+        .then(res => res.json())
+        .then(data => {
+          if (Object.keys(data).length === 0) {
+            setAddCustomerOpen(true);
+          } else {
+            setState({ ...state, customerId: data.customerId })
+          }
+        })
+    }
+  }
+
+  const updateAdvance = (event) => {
+    setState({ ...state, advance: event.target.value });
+    setBalance(state.total - event.target.value - state.totalDiscount + state.gstTotal + state.otherBillAmount);
+  }
+
+  const updateDiscount = (event) => {
+    if (filter == 'flat') {
+      setState({ ...state, totalDiscount: event.target.value, discountValue: event.target.value });
+      setBalance(state.total - state.advance - event.target.value + state.gstTotal + state.otherBillAmount)
+    } else if (filter == 'percent') {
+      setState({ ...state, totalDiscount: (state.total * event.target.value / 100), discountValue: event.target.value });
+      setBalance(state.total - state.advance - (state.total * event.target.value / 100) + state.gstTotal + state.otherBillAmount)
+    }
+  }
+
+  const filterCloseHandler = (name) => {
+    if (typeof name == 'string') {
+      setFilter(name);
+      setState({ ...state, discountType: name });
+      if (name == 'flat') {
+        setState({ ...state, totalDiscount: state.discountValue });
+        setBalance(state.total - state.advance - state.discountValue + state.gstTotal + state.otherBillAmount)
+      } else if (name == 'percent') {
+        setState({ ...state, totalDiscount: state.total * state.discountValue / 100 });
+        setBalance(state.total - state.advance - state.total * state.discountValue / 100 + state.gstTotal + state.otherBillAmount)
+      }
+    }
+    setAnchorEl(null);
+  };
+
+  const onGSTChange = (event) => {
+    setState({ ...state, gstPercent: event.target.value, gstTotal: state.total * event.target.value / 100 });
+    setBalance(state.total - state.advance - state.totalDiscount + state.total * event.target.value / 100 + state.otherBillAmount)
+  }
+
+  const otherBillChange = (event) => {
+    setState({ ...state, otherBillAmount: parseInt(event.target.value) });
+    setBalance(state.total - state.advance - state.totalDiscount + state.gstTotal + parseInt(event.target.value))
+  }
+
+  const submit = () => {
+    let data = {
+      merchantCode: state.merchantCode,
+      invoiceNumber: state.inv,
+      customerId: state.customerId,
+      balanceAmount: balance,
+      discountAmount: state.totalDiscount,
+      discountPercentage: state.discountType == 'percent' ? state.discountValue : null,
+      advanceAmount: state.advance,
+      gstPercentage: state.gstPercent,
+      gstAmount: state.gstTotal,
+      roundoffAmount: state.total,
+      otherAmount: state.otherAmount,
+      otherAmtDesc: state.otherAmtDesc,
+      paymentTerms: 'online',
+      totalAmount: state.total,
+      productList: product
+    }
+
+    createInvoice(data)
+      .then(res => res.json())
+      .then(data => {
+        if(data.invoiceRefId) {
+          window.alert('Invoice Generated succesfully');
+          history.push('/dashboard');
+        }
+      })
+  }
+
   return (
-    <div className={classes.root}>
+    <div>
       <CssBaseline />
-      <AppBar elevation={1} position="absolute" style={{ backgroundColor: 'white' }}>
+      <AppBar elevation={1} position="fixed" style={{ backgroundColor: 'white' }}>
         <Toolbar>
           <IconButton edge="start" onClick={() => history.back()} aria-label="close">
             <ArrowBackIcon />
@@ -140,12 +256,12 @@ export default function GenerateInvoice() {
         </Toolbar>
       </AppBar>
       <div className={classes.appBarSpacer} />
-      <Grid style={{ padding: '10px', backgroundColor: '#F8F5E8' }} container justify="space-between" spacing={2}>
+      <Grid style={{ padding: '10px', backgroundColor: '#F8F5E8' }} container spacing={2}>
         <Grid item xs={6}>
           <Typography style={{ display: 'inline', marginRight: '10px' }}>
             Inv No.
             </Typography>
-          <TextField value={state.inv} onChange={handleChange} style={{ verticalAlign: 'middle', backgroundColor: '#ffffff' }} variant="outlined" size="small" />
+          <TextField value={state.inv} style={{ verticalAlign: 'middle', backgroundColor: '#ffffff' }} variant="outlined" size="small" disabled />
         </Grid>
         <Grid item xs={6}>
           <Typography style={{ display: 'inline', marginRight: '10px' }}>
@@ -156,6 +272,7 @@ export default function GenerateInvoice() {
             variant="inline"
             format="DD MMM YY"
             value={state.date}
+            maxDate={new Date()}
             onChange={handleDateChange}
             className={classes.picker}
             style={{ verticalAlign: 'middle', backgroundColor: '#ffffff' }}
@@ -177,31 +294,79 @@ export default function GenerateInvoice() {
                   {state.selectedCustomer.number}
                 </Typography>
               </Typography>
-            </Typography>
             :
             null
           } */}
-          <InvoiceInput />
+          <TextField
+            variant="outlined"
+            fullWidth
+            label="Customer Mobile Number"
+            style={{ marginBottom: 15 }}
+            onBlur={checkPhoneNumber}
+          />
+          <Grid container>
+            <Grid item xs={4}>
+              <ImageUpload alt logo={(file) => setLogo(file)} />
+            </Grid>
+            <Grid item xs={8}>
+              <Box pl={2} pb={2}>
+                <TextField fullWidth label="Invoice From" multiline rows={4} variant="outlined" value={state.invoiceFrom} onChange={e => setState({ ...state, invoiceFrom: e.target.value })}></TextField>
+              </Box>
+            </Grid>
+            <Grid item xs={6}>
+              <Box pr={1}>
+                <TextField fullWidth label="Bill To" multiline rows={4} variant="outlined" value={state.billTo} onChange={e => setState({ ...state, billTo: e.target.value })}></TextField>
+              </Box>
+            </Grid>
+            <Grid item xs={6} style={{ marginTop: "-5px" }}>
+              <Box pl={1}>
+                <Grid container>
+                  <Grid item xs={12}>
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          checked={state.sameAsBillTo}
+                          onChange={handleChecked}
+                          name="sameAsBill"
+                          color="primary"
+                        />
+                      }
+                      label="Same as bill to"
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField fullWidth label="Ship To" multiline rows={2} variant="outlined" value={state.shipTo} onChange={e => setState({ ...state, shipTo: e.target.value })} disabled={state.sameAsBillTo}></TextField>
+                  </Grid>
+                </Grid>
+              </Box>
+            </Grid>
+          </Grid>
           <Divider style={{ width: '100%', marginTop: '15px' }} />
           <Card className={classes.productCard}>
-            <CardContent>
-              <Grid container justify="space-between">
-                <Grid item xs={6} style={{ textAlign: 'left', fontWeight: 'bolder' }}>
-                  Product 1
-                </Grid>
-                <Grid item xs={6} style={{ textAlign: 'right', fontWeight: 'bolder' }}>
-                  Rs. 5000
-                </Grid>
-              </Grid>
-              <Grid container justify="space-between">
-                <Grid item xs={6} style={{ textAlign: 'left' }}>
-                  Item Subtotal
-                </Grid>
-                <Grid item xs={6} style={{ textAlign: 'right' }}>
-                  5 X Rs. 10000
-                </Grid>
-              </Grid>
-            </CardContent>
+            {product.length ?
+              <CardContent>
+                {product.map((prod, i) => (
+                  <Box key={i} style={{ marginBottom: 10 }}>
+                    <Grid container justify="space-between">
+                      <Grid item xs={6} style={{ textAlign: 'left', fontWeight: 'bolder', fontSize: 12 }}>
+                        {prod.productDescription}
+                      </Grid>
+                      <Grid item xs={6} style={{ textAlign: 'right', fontWeight: 'bolder', fontSize: 12 }}>
+                        ₹{prod.unitPrice * prod.productQty}
+                      </Grid>
+                    </Grid>
+                    <Grid container justify="space-between">
+                      <Grid item xs={6} style={{ textAlign: 'left', opacity: '50%', fontSize: 10 }}>
+                        Item Subtotal
+                      </Grid>
+                      <Grid item xs={6} style={{ textAlign: 'right', opacity: '50%', fontSize: 10 }}>
+                        {prod.productQty} X ₹{prod.unitPrice}
+                      </Grid>
+                    </Grid>
+                  </Box>
+                ))}
+              </CardContent> : null
+            }
           </Card>
           <Button onClick={handleAddItemOpen} variant="outlined" style={{ fontWeight: 'bold', textTransform: 'none', fontSize: 16, margin: '10px auto', paddingTop: '10px', paddingBottom: '10px' }}>
             <AddIcon />
@@ -213,7 +378,7 @@ export default function GenerateInvoice() {
               Total Amount
             </Grid>
             <Grid item xs={6} style={{ textAlign: 'right', fontWeight: 'bolder', fontSize: '16px' }}>
-              Rs. 5000
+              ₹{state.total}
             </Grid>
           </Grid>
           <Grid container justify="space-between" alignItems="center" className={classes.elaboration}>
@@ -225,9 +390,11 @@ export default function GenerateInvoice() {
                 color="secondary"
                 required
                 fullWidth
+                type="number"
                 className={classes.amountBox}
                 variant="outlined"
-                value="1000"
+                value={state.advance}
+                onChange={updateAdvance}
                 size="small"
               />
             </Grid>
@@ -246,8 +413,8 @@ export default function GenerateInvoice() {
                 open={Boolean(anchorEl)}
                 onClose={filterCloseHandler}
               >
-                <MenuItem onClick={() => filterCloseHandler("Flat(₹)")}>Flat(₹)</MenuItem>
-                <MenuItem onClick={() => filterCloseHandler("Percent(%)")}>Percent(%)</MenuItem>
+                <MenuItem onClick={() => filterCloseHandler("flat")}>Flat(₹)</MenuItem>
+                <MenuItem onClick={() => filterCloseHandler("percent")}>Percent(%)</MenuItem>
               </Menu>
             </Grid>
             <Grid item xs={3} style={{ textAlign: 'right', fontSize: 14 }}>
@@ -255,20 +422,22 @@ export default function GenerateInvoice() {
                 color="secondary"
                 required
                 fullWidth
+                type="number"
                 className={classes.amountBox}
                 variant="outlined"
-                value="200"
+                value={state.discountValue}
+                onChange={updateDiscount}
                 size="small"
               />
             </Grid>
           </Grid>
           <Grid container justify="space-between" alignItems="center" className={classes.elaboration}>
-            <Grid item xs={6} alignItems="center" style={{ textAlign: 'left', fontSize: '14px' }}>
+            <Grid item xs={6} style={{ textAlign: 'left', fontSize: '14px', display: 'flex', alignItems: 'center' }}>
               GST (%)
-              <TextField name="gstPercent" className={classes.gstPercent} value={state.gstPercent} onChange={handleChange} variant="outlined"></TextField>
+              <TextField name="gstPercent" className={classes.gstPercent} value={state.gstPercent} onChange={onGSTChange} variant="outlined"></TextField>
             </Grid>
             <Grid item xs={6} style={{ textAlign: 'right', fontSize: '16px' }}>
-              Rs. 450
+              ₹{state.gstTotal}
             </Grid>
           </Grid>
           <Divider style={{ width: '100%', marginTop: '15px' }} />
@@ -279,7 +448,8 @@ export default function GenerateInvoice() {
                 required
                 fullWidth
                 variant="outlined"
-                value="Shipping"
+                value={state.otherBill}
+                onChange={e => setState({ ...state, otherBill: e.target.value })}
                 size="small"
               />
             </Grid>
@@ -289,8 +459,11 @@ export default function GenerateInvoice() {
                 color="secondary"
                 required
                 fullWidth
+                type="number"
                 variant="outlined"
-                value="10"
+                className={classes.amountBox}
+                value={state.otherBillAmount}
+                onChange={otherBillChange}
                 size="small"
               />
             </Grid>
@@ -300,7 +473,7 @@ export default function GenerateInvoice() {
               Balance Amount
             </Grid>
             <Grid item xs={6} style={{ textAlign: 'right', fontSize: '16px', color: '#419945', fontWeight: 'bold', paddingTop: '10px' }}>
-              Rs. 4250
+              ₹{balance}
             </Grid>
           </Grid>
           <Divider style={{ width: '100%', marginTop: '15px', marginBottom: '15px' }} />
@@ -311,6 +484,8 @@ export default function GenerateInvoice() {
                 color="secondary"
                 required
                 fullWidth
+                value={state.pan}
+                onChange={(e) => setState({ ...state, pan: e.target.value })}
                 variant="outlined"
               />
             </Grid>
@@ -320,6 +495,8 @@ export default function GenerateInvoice() {
                 color="secondary"
                 required
                 fullWidth
+                value={state.gst}
+                onChange={(e) => setState({ ...state, gst: e.target.value })}
                 variant="outlined"
               />
             </Grid>
@@ -332,6 +509,8 @@ export default function GenerateInvoice() {
                 required
                 fullWidth
                 rows={4}
+                value={state.notes}
+                onChange={(e) => setState({ ...state, notes: e.target.value })}
                 variant="outlined"
               />
             </Grid>
@@ -350,12 +529,12 @@ export default function GenerateInvoice() {
           </Grid>
           <Grid container spacing={1}>
             <Grid item xs={6}>
-              <Button className={classes.button} variant="contained" variant="contained" fullWidth>
+              <Button className={classes.button} onClick={invoicePreviewHandler} variant="contained" variant="contained" fullWidth>
                 Preview
               </Button>
             </Grid>
             <Grid item xs={6}>
-              <Button className={classes.button} variant="contained" color="primary" variant="contained" fullWidth>
+              <Button className={classes.button} variant="contained" color="primary" variant="contained" fullWidth onClick={submit}>
                 Save &amp; Issue
               </Button>
             </Grid>
@@ -366,7 +545,10 @@ export default function GenerateInvoice() {
         <AddItem onApply={handleAddItemApply} />
       </FullScreenDialog>
       <FullScreenDialog title="Add Customer" value={addCustomer} onClick={handleAddCustomerOpen} onClose={handleAddCustomerClose}>
-        <AddCustomer onApply={handleAddCustomerApply} />
+        <AddCustomer onApply={handleAddCustomerApply} phone={state.customerPhone} />
+      </FullScreenDialog>
+      <FullScreenDialog title="Invoice Preview" header value={invoicePreview} onClick={invoicePreviewHandler} onClose={invoicePreviewClose}>
+        <CreditNote product={product} />
       </FullScreenDialog>
     </div>
   );
@@ -473,7 +655,6 @@ const useStyles = makeStyles((theme) => ({
   spacer: theme.mixins.toolbar,
   content: {
     flexGrow: 1,
-    height: '100vh',
     overflow: 'auto',
     paddingBottom: '100px',
     paddingLeft: '15px',
@@ -509,7 +690,7 @@ const useStyles = makeStyles((theme) => ({
     fontSize: '10pt'
   },
   productCard: {
-    borderRadius: 16,
+    borderRadius: 10,
     width: '100%',
     margin: 10
   },
@@ -538,3 +719,5 @@ const useStyles = makeStyles((theme) => ({
     }
   }
 }));
+
+export default GenerateInvoice;

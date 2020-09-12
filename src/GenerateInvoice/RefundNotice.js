@@ -80,41 +80,41 @@ export default function RefundNotice(props) {
             <main className={classes.content}>
                 <div className={classes.appBarSpacer} />
                 <Typography style={{ padding: '10px', backgroundColor: '#F8F5E8' }}>
-                    You are about to generate refund notice against Invoice <b>'XXXX'</b> dated <b>'XXXX' </b> and payment id <b>'XXXX' </b> dated <b>'XXXX'</b>
+                    You are about to process a refund against the Invoice <b>Invoice Number</b> dated <b>Invoice Date</b> paid on <b>Payment date </b> to <b>Customer Name</b>
                 </Typography>
-                <div className={classes.spacer} />
-                <Box px={2}>
-                    <FormControl variant="outlined" fullWidth className={classes.formControl}>
-                        <InputLabel htmlFor="outlined-refund-type">Refund Type</InputLabel>
-                        <Select
-                            native
-                            value={refundType}
-                            onChange={handleSetRefundType}
-                            label="Refund Type"
-                            color="primary"
-                            inputProps={{
-                                name: 'refundType',
-                                id: 'outlined-refund-type',
-                            }}
-                        >
-                            <option aria-label="Full Type" value={0}>Full Refund</option>
-                            <option aria-label="Another Type" value={1}>Half Type</option>
-                        </Select>
-                    </FormControl>
-                    <div className={classes.spacer} />
-                    <Grid container spacing={1}>
-                        <Grid item xs={6}>
-                            <Button className={classes.button} variant="contained" disableElevation fullWidth>
-                                Preview
+                        <div className={classes.spacer} />
+                        <Box px={2}>
+                            <FormControl variant="outlined" fullWidth className={classes.formControl}>
+                                <InputLabel htmlFor="outlined-refund-type">Refund Type</InputLabel>
+                                <Select
+                                    native
+                                    value={refundType}
+                                    onChange={handleSetRefundType}
+                                    label="Refund Type"
+                                    color="primary"
+                                    inputProps={{
+                                        name: 'refundType',
+                                        id: 'outlined-refund-type',
+                                    }}
+                                >
+                                    <option aria-label="Full Type" value={0}>Full Refund</option>
+                                    <option aria-label="Another Type" value={1}>Half Type</option>
+                                </Select>
+                            </FormControl>
+                            <div className={classes.spacer} />
+                            <Grid container spacing={1}>
+                                <Grid item xs={6}>
+                                    <Button className={classes.button} variant="contained" disableElevation fullWidth>
+                                        Preview
                             </Button>
-                        </Grid>
-                        <Grid item xs={6}>
-                            <Button className={classes.button} variant="contained" color="primary" disableElevation fullWidth>
-                                Save &amp; Issue
+                                </Grid>
+                                <Grid item xs={6}>
+                                    <Button className={classes.button} variant="contained" color="primary" disableElevation fullWidth>
+                                        Save &amp; Issue
                             </Button>
-                        </Grid>
-                    </Grid>
-                </Box>
+                                </Grid>
+                            </Grid>
+                        </Box>
             </main>
         </div>
     );

@@ -24,6 +24,7 @@ import ReceiptView from './ReceiptView/ReceiptView';
 import history from './history';
 import PaymentHistory from './Dashboard/PaymentHistory';
 import CreditNote from './CreditNote/CreditNote';
+import moment from 'moment';
 
 const theme = createMuiTheme({
   palette: {
@@ -38,37 +39,33 @@ const theme = createMuiTheme({
 });
 
 function App() {
-
-
-
+  moment.locale('in');
   return (
-    <MuiPickersUtilsProvider style={{ backgroundColor: 'white' }} utils={MomentUtils}>
-      <div className="App">
-        <ThemeProvider theme={theme}>
-          <Router history={history}>
-            <Switch>
-              <Route path="/" exact component={Login} />
-              <Route path="/verify" exact component={VerifyOTP} />
-              <Route path="/register" exact component={RegisterForm} />
-              <Route path="/dashboard" exact component={Dashboard} />
-              <Route path="/generateInvoice" exact component={GenerateInvoice} />
-              <Route path="/payment-history" exact component={PaymentHistory} />
-
-              <Route path="/invoice" exact component={Invoice} />
-
-              <Route path="/credit-note" exact component={CreditNote} />
-
-              <Route path="/receipt-view" exact component={ReceiptView} />
-              
-              <Route path="/cancelInvoice" exact component={CancelInvoice} />
-              <Route path="/refundNotice" exact component={RefundNotice} />
-
-              <Route path="/pdf" exact component={PDFViewer} />
-            </Switch>
-          </Router>
-        </ThemeProvider>
-      </div>
-    </MuiPickersUtilsProvider>
+    <div style={{ margin: "0 auto", maxWidth: 480 }}>
+      <MuiPickersUtilsProvider style={{ backgroundColor: 'white' }} utils={MomentUtils}>
+        <div className="App">
+          <ThemeProvider theme={theme}>
+            <Router>
+              <Switch>
+                <Route path="/" exact component={Login} />
+                <Route path="/verify" exact component={VerifyOTP} />
+                <Route path="/register" exact component={RegisterForm} />
+                <Route path="/dashboard" exact component={Dashboard} />
+                <Route path="/generateInvoice" exact component={GenerateInvoice} />
+                <Route path="/payment-history" exact component={PaymentHistory} />
+                <Route path="/invoice" exact component={Invoice} />
+                <Route path="/credit-note" exact component={CreditNote} />
+                <Route path="/receipt-view" exact component={ReceiptView} />
+                <Route path="/cancelInvoice" exact component={CancelInvoice} />
+                <Route path="/refundNotice" exact component={RefundNotice} />
+                <Route path="/pdf" exact component={PDFViewer} />
+                <Route path="/inv" exact component={PDFViewer} />
+              </Switch>
+            </Router>
+          </ThemeProvider>
+        </div>
+      </MuiPickersUtilsProvider>
+    </div >
   );
 }
 

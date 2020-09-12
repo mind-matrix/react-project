@@ -1,7 +1,6 @@
 import React from 'react';
 import Grid from '@material-ui/core/Grid';
-import { KeyboardDatePicker } from '@material-ui/pickers';
-import { Typography, TextField, Slider, Select, Button, Box, FormControl, InputLabel, withStyles, makeStyles } from '@material-ui/core';
+import { Typography, Slider, Select, Button, Box, FormControl, InputLabel, withStyles, makeStyles } from '@material-ui/core';
 import ToggleOption from '../ToggleOption';
 
 const useStyles = makeStyles({

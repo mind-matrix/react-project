@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import AppIcon from '../AppIcon';
 import { CssBaseline, AppBar, Toolbar, Icon, Typography, Grid, Button, Box, Slide, Menu, MenuItem } from '@material-ui/core';
@@ -8,12 +8,209 @@ import SortSelect from './SortSelect';
 import FullScreenDialog from '../FullScreenDialog';
 import InvoiceCard from './InvoiceCard';
 import DetailedInvoiceCard from './DetailedInvoiceCard';
-
 import FreechargeIcon from '../FreechargeIcon';
-
-import history from '../history';
+import { getAllCustomerLedger, getLedgerBalance, getMerchant } from '../shared/dataService';
+import { useHistory } from 'react-router-dom';
+import { MERCHANT_LOGO, FREECHARGE_ID, MERCHANT_ID } from '../shared/constant';
+import moment from 'moment';
+const queryString = require('query-string');
 
 const drawerWidth = 240;
+
+const Transition = React.forwardRef(function Transition(props, ref) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
+
+function Dashboard(props) {
+  moment.locale('in');
+  const [ledger, setLedger] = useState({
+    merchantId: 0,
+    merchantCode: "NA",
+    freechargeId: "NA",
+    ytdTotalAmount: "0",
+    ytdAmountReceived: "0",
+    ytdAmountPending: "0",
+    mtdTotalAmount: "0",
+    mtdAmountReceived: "0",
+    mtdAmountPending: "0"
+  });
+
+  const [customerLedger, setCustomerLedger] = useState([])
+  const [state, setState] = React.useState({
+    recordsPerPage: 10,
+    page: 1,
+    totalPage: 1,
+    sortBy: null
+  });
+  const [filter, setFilterOpen] = React.useState(false);
+  const [sort, setSortOpen] = React.useState(false);
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const [selectedIndex, setSelectedIndex] = React.useState(1);
+
+  let params = queryString.parse(props.location.search);
+  let { id, name } = params;
+  if(id) {
+    sessionStorage.setItem(FREECHARGE_ID, id);
+  }
+  let history = useHistory();
+
+  useEffect(() => {
+    getMerchant(sessionStorage.getItem(FREECHARGE_ID))
+      .then(res => res.json())
+      .then(data => {
+        if (data.merchantId != null) {
+          sessionStorage.setItem(MERCHANT_ID, data.merchantId);
+          sessionStorage.setItem(MERCHANT_LOGO, data.merchantLogo);
+          getLedgerBalance(data.merchantId)
+            .then(res => res.json())
+            .then(data => {
+              if (data.merchantId) {
+                setLedger(data);
+              }
+            })
+            getAllCustomerLedger(data.merchantId)
+              .then(res => res.json())
+              .then(data => {
+                setCustomerLedger(data.customerLedgerDetails);
+                setState({ ...state, totalPage: Math.ceil(data.customerLedgerDetails.length / state.recordsPerPage)})
+              })
+        } else {
+          
+        }
+      })
+  }, [])
+
+  const handleFilterOpen = () => {
+    setFilterOpen(true);
+  };
+
+  const handleFilterClose = () => {
+    setFilterOpen(false);
+  };
+
+  const handleFilterApply = (options) => {
+    // apply filters
+    setFilterOpen(false);
+    console.log(options)
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleSortOpen = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleSortClose = () => {
+    setSortOpen(false);
+  };
+
+  const handleSortApply = (options) => {
+    // apply sort
+    setSortOpen(false);
+  };
+
+  const classes = useStyles();
+
+  const prevPage = () => {
+    if (state.page > 1) {
+      setState({ ...state, page: state.page - 1 });
+    }
+  };
+
+  const nextPage = () => {
+    if (state.page < state.totalPage) {
+      setState({ ...state, page: state.page + 1 });
+    }
+  };
+
+  return (
+    <div className={classes.root}>
+      <CssBaseline />
+      <AppBar elevation={1} position="fixed" style={{ backgroundColor: 'white' }}>
+        <Toolbar>
+          <AppIcon width={60} />
+          <Typography variant="h6" className={classes.title} align="center">Dashboard</Typography>
+          <FreechargeIcon width={80} />
+        </Toolbar>
+      </AppBar>
+      <main className={classes.content}>
+        <div className={classes.appBarSpacer} />
+        <Grid container align="center">
+          <Button
+            fullWidth
+            onClick={() => { history.push('/generateInvoice'); }}
+            variant="contained"
+            className={classes.invoiceButton}
+          >Generate Invoice</Button>
+        </Grid>
+        <Grid container>
+          <Grid item style={{ padding: '2px' }} xs={12}>
+            <InvoiceCard header="YTD Issued invoice" total={ledger.ytdTotalAmount} received={ledger.ytdAmountReceived} pending={ledger.ytdAmountPending}></InvoiceCard>
+          </Grid>
+          <Grid item style={{ padding: '2px' }} xs={12}>
+            <InvoiceCard header="MTD Issued invoice" total={ledger.mtdTotalAmount} received={ledger.mtdAmountReceived} pending={ledger.mtdAmountPending}></InvoiceCard>
+          </Grid>
+        </Grid>
+        <Box display="flex" flexDirection="row" justifyContent="space-between" style={{ marginTop: '20px' }}>
+          <Typography className={classes.detailedInvoiceHeader} display="inline">Detailed Invoice List</Typography>
+          <Box>
+            <Button aria-controls="simple-menu" aria-haspopup="true" onClick={handleSortOpen} style={{ textTransform: 'none', fontSize: '10px', height: '24px', padding: '5px 5px', marginRight: '5px' }} variant="outlined">
+              Sort by
+              <ArrowDropDown />
+            </Button>
+            <Menu
+              id="simple-menu"
+              anchorEl={anchorEl}
+              keepMounted
+              open={Boolean(anchorEl)}
+              onClose={handleClose}
+            >
+              <MenuItem onClick={handleClose}>Low to High</MenuItem>
+              <MenuItem onClick={handleClose}>High to Low</MenuItem>
+              <MenuItem onClick={handleClose}>Time</MenuItem>
+            </Menu>
+            <Button onClick={handleFilterOpen} style={{ textTransform: 'none', fontSize: '10px', height: '24px', padding: '5px 5px' }} variant="outlined">
+              <Tune style={{ marginRight: '5px', height: '15px' }} />
+                        Filter
+                    </Button>
+          </Box>
+        </Box>
+        <Typography className={classes.sub}>{customerLedger.length} records found</Typography>
+        <Grid container spacing={3}>
+          {
+            customerLedger.map((invoice, index) => {
+              if (index < (state.page - 1) * state.recordsPerPage) return;
+              if (index > (state.page) * state.recordsPerPage - 1) return;
+              return <Grid item style={{ padding: '10px 14px' }} key={index} xs={12}>
+                <DetailedInvoiceCard date={moment().format('ll')} name={invoice.customerName} phone={invoice.mobileNumber} total={invoice.totalAmount} due={invoice.dueAmount}></DetailedInvoiceCard>
+              </Grid>
+            })
+          }
+          <Grid item xs={12}>
+            <Box maxWidth={200} style={{ width: 'fit-content', margin: '0 auto' }}>
+              <Typography>
+                <Button onClick={prevPage} style={{ padding: '5px 5px', minWidth: 0 }} variant="outlined">
+                  <ChevronLeft style={{ verticalAlign: 'middle', fontSize: '10pt' }} />
+                </Button>
+                <span style={{ padding: '5px 10px', fontSize: '10pt' }}>
+                  {state.page}/{state.totalPage}
+                </span>
+                <Button onClick={nextPage} style={{ padding: '5px 5px', minWidth: 0 }} variant="outlined">
+                  <ChevronRight style={{ verticalAlign: 'middle', fontSize: '10pt' }} />
+                </Button>
+              </Typography>
+            </Box>
+          </Grid>
+        </Grid>
+      </main>
+      <FullScreenDialog title="Filter" value={filter} onClick={handleFilterOpen} onClose={handleFilterClose}>
+        <FilterSelect onApply={handleFilterApply} dashboard />
+      </FullScreenDialog>
+    </div>
+  )
+}
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -92,7 +289,6 @@ const useStyles = makeStyles((theme) => ({
   appBarSpacer: theme.mixins.toolbar,
   content: {
     flexGrow: 1,
-    height: '100vh',
     overflow: 'auto',
     paddingTop: '10px',
     marginLeft: '10px',
@@ -132,159 +328,4 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-const Transition = React.forwardRef(function Transition(props, ref) {
-  return <Slide direction="up" ref={ref} {...props} />;
-});
-
-export default function Dashboard() {
-  const [state, setState] = React.useState({
-    invoices: [
-      { header: 'YTD Issued invoice', total: 3001000, received: 2001000, pending: 1000000 },
-      { header: 'MTD Issued invoice', total: 3001000, received: 2001000, pending: 1000000 }
-    ],
-    detailedList: [
-      { number: 'INV/20-21/1', date: '12 Mar 2020', name: 'Rakesh Gupta', phone: '994635525', total: 10000, due: 2000 },
-      { number: 'INV/20-21/2', date: '12 Mar 2020', name: 'Rakesh Gupta', phone: '994635525', total: 10000, due: false },
-      ...Array(98).fill({ number: 'INV/20-21/2', date: '12 Mar 2020', name: 'Rakesh Gupta', phone: '994635525', total: 10000, due: 2000 })
-    ],
-    recordsPerPage: 10,
-    page: 1,
-    sortBy: null
-  });
-
-  const [filter, setFilterOpen] = React.useState(false);
-  const [sort, setSortOpen] = React.useState(false);
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const [selectedIndex, setSelectedIndex] = React.useState(1);
-
-  const handleFilterOpen = () => {
-    setFilterOpen(true);
-  };
-
-  const handleFilterClose = () => {
-    setFilterOpen(false);
-  };
-
-  const handleFilterApply = (options) => {
-    // apply filters
-    setFilterOpen(false);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
-  const handleSortOpen = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleSortClose = () => {
-    setSortOpen(false);
-  };
-
-  const handleSortApply = (options) => {
-    // apply sort
-    setSortOpen(false);
-  };
-
-  const classes = useStyles();
-
-  const prevPage = () => {
-    if (state.page > 1) {
-      setState({ ...state, page: state.page - 1 });
-    }
-  };
-
-  const nextPage = () => {
-    if (state.page < state.detailedList.length / state.recordsPerPage) {
-      setState({ ...state, page: state.page + 1 });
-    }
-  };
-
-  return (
-    <div className={classes.root}>
-      <CssBaseline />
-      <AppBar elevation={1} position="absolute" style={{ backgroundColor: 'white' }}>
-        <Toolbar>
-          <AppIcon width={60} />
-          <Typography variant="h6" className={classes.title} align="center">Dashboard</Typography>
-          <FreechargeIcon width={80} />
-        </Toolbar>
-      </AppBar>
-      <main className={classes.content}>
-        <div className={classes.appBarSpacer} />
-        <Grid container align="center">
-          <Button
-            fullWidth
-            onClick={() => { history.push('/generateInvoice'); window.location.reload(); }}
-            variant="contained"
-            className={classes.invoiceButton}
-          >Generate Invoice</Button>
-        </Grid>
-        <Grid container>
-          {
-            state.invoices.map((invoice, i) =>
-              <Grid item style={{ padding: '2px' }} key={i} xs={12}>
-                <InvoiceCard header={invoice.header} total={invoice.total} received={invoice.received} pending={invoice.pending}></InvoiceCard>
-              </Grid>
-            )
-          }
-        </Grid>
-        <Box display="flex" flexDirection="row" justifyContent="space-between" style={{ marginTop: '20px' }}>
-          <Typography className={classes.detailedInvoiceHeader} display="inline">Detailed Invoice List</Typography>
-          <Box>
-            <Button aria-controls="simple-menu" aria-haspopup="true" onClick={handleSortOpen} style={{ textTransform: 'none', fontSize: '10px', height: '24px', padding: '5px 5px', marginRight: '5px' }} variant="outlined">
-              Sort by
-                      <ArrowDropDown />
-            </Button>
-            <Menu
-              id="simple-menu"
-              anchorEl={anchorEl}
-              keepMounted
-              open={Boolean(anchorEl)}
-              onClose={handleClose}
-            >
-              <MenuItem onClick={handleClose}>Low to High</MenuItem>
-              <MenuItem onClick={handleClose}>High to Low</MenuItem>
-              <MenuItem onClick={handleClose}>Time</MenuItem>
-            </Menu>
-            <Button onClick={handleFilterOpen} style={{ textTransform: 'none', fontSize: '10px', height: '24px', padding: '5px 5px' }} variant="outlined">
-              <Tune style={{ marginRight: '5px', height: '15px' }} />
-                        Filter
-                    </Button>
-          </Box>
-        </Box>
-        <Typography className={classes.sub}>{state.detailedList.length} records found</Typography>
-        <Grid container spacing={3}>
-          {
-            state.detailedList.map((invoice, index) => {
-              if (index < (state.page - 1) * state.recordsPerPage) return;
-              if (index > (state.page) * state.recordsPerPage - 1) return;
-              return <Grid item style={{ padding: '10px 14px' }} key={index} xs={12}>
-                <DetailedInvoiceCard date={invoice.date} name={invoice.name} phone={invoice.phone} total={invoice.total} due={invoice.due}></DetailedInvoiceCard>
-              </Grid>
-            })
-          }
-          <Grid item xs={12}>
-            <Box maxWidth={200} style={{ width: 'fit-content', margin: '0 auto' }}>
-              <Typography>
-                <Button onClick={prevPage} style={{ padding: '5px 5px', minWidth: 0 }} variant="outlined">
-                  <ChevronLeft style={{ verticalAlign: 'middle', fontSize: '10pt' }} />
-                </Button>
-                <span style={{ padding: '5px 10px', fontSize: '10pt' }}>
-                  {state.page}/{state.detailedList.length / state.recordsPerPage}
-                </span>
-                <Button onClick={nextPage} style={{ padding: '5px 5px', minWidth: 0 }} variant="outlined">
-                  <ChevronRight style={{ verticalAlign: 'middle', fontSize: '10pt' }} />
-                </Button>
-              </Typography>
-            </Box>
-          </Grid>
-        </Grid>
-      </main>
-      <FullScreenDialog title="Filter" value={filter} onClick={handleFilterOpen} onClose={handleFilterClose}>
-        <FilterSelect onApply={handleFilterApply} />
-      </FullScreenDialog>
-    </div>
-  )
-}
+export default Dashboard;

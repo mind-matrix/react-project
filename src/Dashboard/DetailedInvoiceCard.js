@@ -1,28 +1,10 @@
 import React from 'react';
-import { Card, CardContent, Grid, Divider, Typography, makeStyles, styled, Box, Button } from '@material-ui/core';
-
+import { Card, CardContent, Grid, Typography, makeStyles, styled, Box, Button } from '@material-ui/core';
 import { CalendarToday, Check } from '@material-ui/icons';
-
 import { Link } from 'react-router-dom';
-
-const ItemLink = styled(Link)({
-    textDecoration: 'none'
-});
 
 export default function DetailedInvoiceCard(props) {
     const classes = useStyles();
-
-    const format = (number) => {
-        if (number < 1000) {
-            return Math.round(number);
-        } else if (number < 100000) {
-            return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-        } else if (number < 10000000) {
-            return (Math.round(number * 100 / 100000) / 100).toFixed(2) + ' L';
-        } else {
-            return (Math.round(number * 100 / 10000000) / 100).toFixed(2) + ' Cr';
-        }
-    };
 
     return (
         <Card elevation={4} className={classes.root}>
@@ -33,20 +15,20 @@ export default function DetailedInvoiceCard(props) {
                             <Grid item xs={5}>
                                 <Typography className={classes.title}>
                                     <CalendarToday className={classes.icon} />
-                                    12th March 2020
+                                    {props.date}
                                 </Typography>
-                                <Typography className={classes.sub} align="left" gutterBottom>INV/20-21/1</Typography>
+                                <Typography className={classes.sub} align="left" gutterBottom>{props.invoice}</Typography>
                             </Grid>
                             <Grid item xs={3}>
                                 {
                                     (props.due) ?
                                         <Box>
-                                            <Typography className={classes.title + ' ' + classes.dueAmount} align="left">&#8377; {format(2000)}</Typography>
-                                            <Typography className={classes.due} display="inline" utterBottom>Due</Typography>
+                                            <Typography className={classes.title + ' ' + classes.dueAmount} align="left">₹{props.due}</Typography>
+                                            <Typography className={classes.due} display="inline" gutterBottom>Due</Typography>
                                         </Box>
                                         :
                                         <Box>
-                                            <Typography className={classes.title + ' ' + classes.paidAmount} align="left">&#8377; {format(2000)}</Typography>
+                                            <Typography className={classes.title + ' ' + classes.paidAmount} align="left">₹{props.due}</Typography>
                                             <Typography className={classes.paid} display="inline" gutterBottom>Received</Typography>
                                         </Box>
                                 }
@@ -76,19 +58,19 @@ export default function DetailedInvoiceCard(props) {
                                 <Typography className={classes.sub} align="left" gutterBottom>{props.phone}</Typography>
                             </Grid>
                             <Grid item xs={4}>
-                                <Typography className={classes.title} align="left">&#8377; {format(props.total)}</Typography>
+                                <Typography className={classes.title} align="left">₹{props.total}</Typography>
                                 <Typography className={classes.sub} align="left" gutterBottom>Total</Typography>
                             </Grid>
                             <Grid item xs={3}>
                                 {
                                     (props.due) ?
                                         <Box>
-                                            <Typography className={classes.title + ' ' + classes.dueAmount} align="left">&#8377; {format(props.due)}</Typography>
-                                            <Typography className={classes.due} display="inline" utterBottom>Due</Typography>
+                                            <Typography className={classes.title + ' ' + classes.dueAmount} align="left">₹{props.due}</Typography>
+                                            <Typography className={classes.due} display="inline" gutterBottom>Due</Typography>
                                         </Box>
                                         :
                                         <Box>
-                                            <Typography className={classes.title + ' ' + classes.paidAmount} align="left">&#8377; {format(props.due)}</Typography>
+                                            <Typography className={classes.title + ' ' + classes.paidAmount} align="left">₹{props.due}</Typography>
                                             <Typography className={classes.paid} display="inline" gutterBottom><Check className={classes.iconMiddle} />Paid</Typography>
                                         </Box>
                                 }
@@ -121,7 +103,7 @@ export default function DetailedInvoiceCard(props) {
                                         </Link>
                                     </Grid>
                                     <Grid item xs={4} className={classes.link}>
-                                        <Typography>Issue Credit Note</Typography>
+                                        <Typography>Payment Details</Typography>
                                     </Grid>
                                     <Grid item xs={4} className={classes.link}>
                                         <Typography>View Invoice</Typography>
@@ -131,7 +113,7 @@ export default function DetailedInvoiceCard(props) {
                         :
                         <Grid style={{ borderTop: '1px solid rgba(53, 51, 43, 0.1)' }} container alignItems="center">
                             <Grid item xs={6} className={classes.link}>
-                                <Link to='/payment-history' style={{ textDecoration: 'none' }}>
+                                <Link to={{ pathname: '/payment-history', query: { name: props.name, phone: props.phone } }} style={{ textDecoration: 'none' }}>
                                     <Typography className={classes.linkText}>Payment History</Typography>
                                 </Link>
                             </Grid>
@@ -159,12 +141,12 @@ const useStyles = makeStyles({
         fontSize: '10px',
         textAlign: 'left',
         lineHeight: '13px',
-        display: 'flex',
-        alignItems: 'center'
+        display: 'flex'
     },
     icon: {
         fontSize: '10px',
-        opacity: '0.4'
+        opacity: '0.4',
+        marginRight: 2
     },
     iconMiddle: {
         fontSize: '10pt',
@@ -239,7 +221,6 @@ const useStyles = makeStyles({
         color: '#2958C1',
     },
     receiveButton: {
-        height: '38px',
         fontSize: '12px',
         textTransform: 'none',
         backgroundColor: '#419945',

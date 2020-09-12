@@ -15,9 +15,11 @@ export default function AddItem(props) {
     const classes = useStyles();
 
     const [state, setState] = React.useState({
-        productName: null,
-        quantity: 0,
-        rate: 0
+        productDescription: "",
+        productQty: 0,
+        unitPrice: 0,
+        productRoundAmt: 0,
+        productTotAmt: 0
     });
 
     const handleOnApply = () => {
@@ -30,7 +32,7 @@ export default function AddItem(props) {
                 <Typography id="product-number" className={classes.header} gutterBottom>
                     Product/Service Name
                 </Typography>
-                <TextField fullWidth aria-labelledby="product-number" label="Prpduct/Service Name" variant="outlined" />
+                <TextField fullWidth aria-labelledby="product-number" variant="outlined" onChange={(e) => setState({...state, productDescription: e.target.value})} />
             </Grid>
             <Grid item xs={12}>
                 <Grid container>
@@ -39,7 +41,7 @@ export default function AddItem(props) {
                             <Typography id="quantity" className={classes.header} gutterBottom>
                                 Quantity
                             </Typography>
-                            <TextField fullWidth aria-labelledby="quantity" label="Quantity" variant="outlined" />
+                            <TextField fullWidth aria-labelledby="quantity" variant="outlined" type="number" onChange={(e) => setState({...state, productQty: e.target.value})} />
                         </Box>
                     </Grid>
                     <Grid item xs={7}>
@@ -47,7 +49,7 @@ export default function AddItem(props) {
                             <Typography id="rate" className={classes.header} gutterBottom>
                                 Rate (Prince/Unit)
                             </Typography>
-                            <TextField fullWidth aria-labelledby="rate" label="Rate (Prince/Unit)" variant="outlined" />
+                            <TextField fullWidth aria-labelledby="rate" variant="outlined" type="number" onChange={(e) => setState({...state, unitPrice: e.target.value, productRoundAmt: e.target.value, productTotAmt: e.target.value})} />
                         </Box>
                     </Grid>
                 </Grid>

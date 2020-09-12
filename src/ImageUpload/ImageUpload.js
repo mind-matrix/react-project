@@ -97,6 +97,8 @@ export default function ImageUpload(props) {
                     setState({ preview, file: input.files[0] });
                 }
             });
+
+            props.logo(input.files[0]);
         }
     };
 

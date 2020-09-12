@@ -47,7 +47,7 @@ export default function FilterSelect(props) {
     setAmount(val);
   };
 
-  const [status, setStatus] = React.useState(paymentStatus[0]);
+  const [status, setStatus] = React.useState("");
 
   const handleStatusChange = (val) => {
     setStatus(val);
@@ -57,25 +57,13 @@ export default function FilterSelect(props) {
     props.onApply({ date, amount, status });
   };
 
-  const formatCurrency = (number) => {
-    if (number < 1000) {
-      return Math.round(number);
-    } else if (number < 100000) {
-      return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    } else if (number < 10000000) {
-      return (Math.round(number * 100 / 100000) / 100).toFixed(2) + ' L';
-    } else {
-      return (Math.round(number * 100 / 10000000) / 100).toFixed(2) + ' Cr';
-    }
-  };
-
   return (
     <Grid container style={{ maxWidth: 420 }} justify="space-around">
       <Grid item xs={12}>
         <Typography className={classes.header} gutterBottom>
           Date range
           </Typography>
-        <Grid container justify="space-between" style={{marginTop: '-10px'}}>
+        <Grid container justify="space-between" style={{ marginTop: '-10px' }}>
           <Grid item xs={5}>
             <KeyboardDatePicker
               disableToolbar
@@ -83,7 +71,7 @@ export default function FilterSelect(props) {
               format="MM/dd/yyyy"
               margin="none"
               fullWidth
-              id="date-picker-inline"
+              id="start-date"
               label="Start Date"
               value={date.start}
               onChange={handleDateStartChange}
@@ -104,7 +92,7 @@ export default function FilterSelect(props) {
               format="MM/dd/yyyy"
               margin="none"
               fullWidth
-              id="date-picker-inline"
+              id="end-date"
               label="End Date"
               value={date.end}
               onChange={handleDateEndChange}
@@ -115,55 +103,56 @@ export default function FilterSelect(props) {
           </Grid>
         </Grid>
       </Grid>
-      {/* <Grid item xs={12}>
-        <Typography id="phone-number" className={classes.header} gutterBottom>
-          Phone Number
+      {props.dashboard ?
+        <Grid item xs={12}>
+          <Typography id="phone-number" className={classes.header} gutterBottom style={{ marginTop: '20px' }}>
+            Phone Number
           </Typography>
-        <TextField fullWidth aria-labelledby="phone-number" label="Phone Number" variant="outlined" />
-      </Grid> */}
+          <TextField fullWidth aria-labelledby="phone-number" variant="outlined" />
+        </Grid> : null
+      }
       <Grid item xs={12}>
-        <Typography id="amount-range" className={classes.header} gutterBottom style={{marginTop: '20px'}}>
+        <Typography id="amount-range" className={classes.header} gutterBottom style={{ marginTop: '20px' }}>
           Amount range
           </Typography>
         <Typography style={{ fontWeight: 'bolder' }} gutterBottom>
-          &#8377; {formatCurrency(amount[0])} - &#8377; {formatCurrency(amount[1])}
+          &#8377; {amount[0]} - &#8377; {amount[1]}
         </Typography>
         <ProSlider
           value={amount}
           onChange={handleAmountChange}
           valueLabelDisplay="off"
           min={50}
-          max={10000000}
+          max={100000}
           aria-labelledby="range-slider"
           getAriaValueText={(val) => `INR ${val}`}
         />
       </Grid>
-      {/* <Grid item xs={12}>
-        <Typography id="payment-status" className={classes.header} gutterBottom>
-          Payment Status
+      {props.dashboard ?
+        <Grid item xs={12}>
+          <Typography id="payment-status" className={classes.header} gutterBottom>
+            Payment Status
           </Typography>
-        <FormControl required fullWidth variant="outlined">
-          <InputLabel htmlFor="outlined-age-native-simple">Payment Status</InputLabel>
-          <Select
-            native
-            value={status}
-            onChange={handleStatusChange}
-            label="Payment Status"
-            color="primary"
-            inputProps={{
-              name: 'status',
-              id: 'outlined-age-native-simple',
-            }}
-          >
-            <option aria-label="None" value="" />
-            {
-              paymentStatus.map((val) => {
-                return <option value={val}>{val}</option>;
-              })
-            }
-          </Select>
-        </FormControl>
-      </Grid> */}
+          <FormControl required fullWidth variant="outlined">
+            <Select
+              native
+              value={status}
+              onChange={handleStatusChange}
+              color="primary"
+              inputProps={{
+                name: 'status',
+                id: 'outlined-age-native-simple',
+              }}
+            >
+              <option aria-label="None" value="" selected hidden />
+              {
+                paymentStatus.map((val) => {
+                  return <option value={val}>{val}</option>;
+                })
+              }
+            </Select>
+          </FormControl>
+        </Grid> : null}
       <Grid item xs={12}>
         <Button
           fullWidth

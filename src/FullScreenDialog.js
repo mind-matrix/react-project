@@ -33,7 +33,7 @@ export default function FullScreenDialog(props) {
   return (
     <div>
       <Dialog fullScreen open={props.value} onClose={props.onClose} TransitionComponent={Transition}>
-        <AppBar elevation="0" className={classes.appBar}>
+        <AppBar elevation={props.header ? 1 : 0} className={classes.appBar}>
           <Toolbar>
             <Typography variant="h6" className={classes.title}>
               {props.title}

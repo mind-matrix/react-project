@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { CssBaseline, AppBar, Toolbar, Typography, makeStyles, Box, Grid, Button, Dialog, DialogTitle, DialogContent, Select, FormControl, InputLabel, TextField } from '@material-ui/core'
 import { ArrowBack, Tune } from '@material-ui/icons';
 import AppIcon from '../AppIcon';
@@ -8,13 +8,28 @@ import DetailedInvoiceCard from './DetailedInvoiceCard';
 import FullScreenDialog from '../FullScreenDialog';
 import FilterSelect from './FilterSelect';
 import { KeyboardDatePicker } from '@material-ui/pickers';
+import { getAllCustomerLedger } from '../shared/dataService';
+import { MERCHANT_ID } from '../shared/constant';
+import moment from 'moment';
 
 function PaymentHistory(props) {
-    const [filter, setFilterOpen] = React.useState(false);
+    console.log(props.location.query)
+    const [name, setName] = useState(props.location.query.name);
+    const [phone, setPhone] = useState(props.location.query.phone);
+    const [ledger, setLedger] = useState([]);
+    const [filter, setFilterOpen] = useState(false);
     const [openMark, setOpenMark] = useState(false);
-    const [selectedDate, setSelectedDate] = React.useState(new Date());
+    const [selectedDate, setSelectedDate] = useState(new Date());
     const [mode, setMode] = useState('');
     const classes = useStyles();
+
+    useEffect(() => {
+        getAllCustomerLedger(sessionStorage.getItem(MERCHANT_ID), props.location.query.phone)
+            .then(res => res.json())
+            .then(data => {
+                setLedger(data.customerLedgerDetails);
+            })
+    }, [])
 
     const modeChangeHandler = (event) => {
         setMode(event.target.value)
@@ -54,8 +69,8 @@ function PaymentHistory(props) {
                         <ArrowBack style={{ color: "#000000" }} />
                     </Link>
                     <Box display="flex" flexDirection="column" justifyContent="center" alignItems="center">
-                        <Typography variant="h6" className={classes.title} align="center" display="block">Rakesh Gupta</Typography>
-                        <Typography variant="caption" className={classes.number} align="center" display="block">5475123645</Typography>
+                        <Typography variant="h6" className={classes.title} align="center" display="block">{name}</Typography>
+                        <Typography variant="caption" className={classes.number} align="center" display="block">{phone}</Typography>
                     </Box>
                     <ArrowBack />
                 </Toolbar>
@@ -66,12 +81,15 @@ function PaymentHistory(props) {
                         <Typography className={classes.header} display="block">Pending</Typography>
                     </Box>
                 </Grid>
-                <Grid item xs={12} style={{ padding: '10px 14px' }}>
-                    <DetailedInvoiceCard individual due mark={() => openMarkDialog()} />
-                </Grid>
-                <Grid item xs={12} style={{ padding: '10px 14px' }}>
-                    <DetailedInvoiceCard individual due mark={() => openMarkDialog()} />
-                </Grid>
+                {ledger && ledger.length > 0 ?
+                    ledger.map((invoice, i) => (
+                        invoice.dueAmount ? (
+                            <Grid key={i} item xs={12} style={{ padding: '10px 14px' }}>
+                                <DetailedInvoiceCard individual date={moment().format('ll')} invoice="inv/21-12/21" name={invoice.customerName} phone={invoice.mobileNumber} total={invoice.totalAmount} due={invoice.dueAmount} mark={() => openMarkDialog()} />
+                            </Grid>
+                        ) : null
+                    )) : null
+                }
                 <Grid item xs={12}>
                     <Box style={{ padding: '0px 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <Typography className={classes.header} display="block">Received</Typography>
@@ -81,18 +99,15 @@ function PaymentHistory(props) {
                         </Button>
                     </Box>
                 </Grid>
-                <Grid item xs={12} style={{ padding: '10px 14px' }}>
-                    <DetailedInvoiceCard individual />
-                </Grid>
-                <Grid item xs={12} style={{ padding: '10px 14px' }}>
-                    <DetailedInvoiceCard individual />
-                </Grid>
-                <Grid item xs={12} style={{ padding: '10px 14px' }}>
-                    <DetailedInvoiceCard individual />
-                </Grid>
-                <Grid item xs={12} style={{ padding: '10px 14px' }}>
-                    <DetailedInvoiceCard individual />
-                </Grid>
+                {ledger && ledger.length > 0 ?
+                    ledger.map((invoice, i) => (
+                        invoice.dueAmount <=0 ? (
+                            <Grid key={i} item xs={12} style={{ padding: '10px 14px' }}>
+                                <DetailedInvoiceCard individual date={moment().format('ll')} invoice="inv/21-12/21" name={invoice.customerName} phone={invoice.mobileNumber} total={invoice.totalAmount} mark={() => openMarkDialog()} />
+                            </Grid>
+                        ) : null
+                    )) : null
+                }
             </Grid>
             <FullScreenDialog title="Filter" value={filter} onClick={handleFilterOpen} onClose={handleFilterClose}>
                 <FilterSelect onApply={handleFilterApply} />
@@ -115,6 +130,7 @@ function PaymentHistory(props) {
                                 KeyboardButtonProps={{
                                     'aria-label': 'Payment Date',
                                 }}
+                                inputVariant="outlined"
                             />
                         </Grid>
                         <Grid item xs={12} style={{ marginTop: '20px' }}>
@@ -135,7 +151,7 @@ function PaymentHistory(props) {
                         <Grid item xs={12} style={{ marginTop: '20px' }}>
                             <TextField id="outlined-basic" label="Payment Details" variant="outlined" fullWidth />
                         </Grid>
-                        <Grid item xs={12} style={{margin:'30px 0px'}}>
+                        <Grid item xs={12} style={{ margin: '30px 0px' }}>
                             <Button className={classes.button} variant="contained" color="primary" fullWidth onClick={closeMarkDialog}>
                                 Update
                             </Button>
@@ -177,7 +193,7 @@ const useStyles = makeStyles(theme => ({
         color: '#35332B',
         padding: '20px 0px'
     },
-    button: {        
+    button: {
         height: '44px',
         fontSize: '16px',
         textTransform: 'none',
@@ -188,4 +204,4 @@ const useStyles = makeStyles(theme => ({
     }
 }))
 
-export default PaymentHistory
+export default PaymentHistory;

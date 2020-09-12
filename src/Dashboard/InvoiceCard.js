@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, CardContent, Grid, Divider, Typography, makeStyles } from '@material-ui/core';
+import { Card, CardContent, Grid, Typography, makeStyles, Box } from '@material-ui/core';
 
 const useStyles = makeStyles({
     root: {
@@ -53,18 +53,6 @@ const useStyles = makeStyles({
 export default function InvoiceCard(props) {
     const classes = useStyles();
 
-    const format = (number) => {
-        if (number < 1000) {
-            return Math.round(number);
-        } else if (number < 100000) {
-            return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-        } else if (number < 10000000) {
-            return (Math.round(number * 100/100000) / 100).toFixed(2) + ' L';
-        } else {
-            return (Math.round(number * 100/10000000) / 100).toFixed(2) + ' Cr';
-        }
-    };
-
     return (
         <Card elevation={2} className={classes.root}>
             <CardContent>
@@ -73,34 +61,34 @@ export default function InvoiceCard(props) {
                 </Typography>
                 <Grid container>
                     <Grid className={classes.item} item xs={4}>
-                        <Typography className={classes.title} gutterBottom>
-                            <p className={classes.number}>
-                                &#8377; {format(props.total)}
-                            </p>
-                            <p className={classes.name}>
+                        <Box className={classes.title}>
+                            <Typography className={classes.number}>
+                                &#8377; {props.total}
+                            </Typography>
+                            <Typography className={classes.name}>
                                 Total Amount
-                            </p>
-                        </Typography>
+                            </Typography>
+                        </Box>
                     </Grid>
                     <Grid className={classes.item} item xs={4}>
-                        <Typography className={classes.title} gutterBottom>
-                            <p className={classes.number}>
-                                &#8377; {format(props.received)}
-                            </p>
-                            <p className={classes.name}>
+                        <Box className={classes.title}>
+                            <Typography className={classes.number}>
+                                &#8377; {props.received}
+                            </Typography>
+                            <Typography className={classes.name}>
                                 Amount Received
-                            </p>
-                        </Typography>
+                            </Typography>
+                        </Box>
                     </Grid>
                     <Grid className={classes.item} item xs={4}>
-                        <Typography className={classes.title} gutterBottom>
-                            <p className={classes.number}>
-                                &#8377; {format(props.pending)}
-                            </p>
-                            <p className={classes.name}>
+                        <Box className={classes.title}>
+                            <Typography className={classes.number}>
+                                &#8377; {props.pending}
+                            </Typography>
+                            <Typography className={classes.name}>
                                 Amount Pending
-                            </p>
-                        </Typography>
+                            </Typography>
+                        </Box>
                     </Grid>
                 </Grid>
             </CardContent>
