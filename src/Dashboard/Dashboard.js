@@ -9,7 +9,7 @@ import FullScreenDialog from '../FullScreenDialog';
 import InvoiceCard from './InvoiceCard';
 import DetailedInvoiceCard from './DetailedInvoiceCard';
 import FreechargeIcon from '../FreechargeIcon';
-import { getAllCustomerLedger, getLedgerBalance, getMerchant } from '../shared/dataService';
+import { getAllCustomerLedger, getFilteredCustomerLedger, getLedgerBalance, getMerchant } from '../shared/dataService';
 import { useHistory } from 'react-router-dom';
 import { MERCHANT_LOGO, FREECHARGE_ID, MERCHANT_ID } from '../shared/constant';
 import moment from 'moment';
@@ -49,7 +49,7 @@ function Dashboard(props) {
 
   let params = queryString.parse(props.location.search);
   let { id, name } = params;
-  if(id) {
+  if (id) {
     sessionStorage.setItem(FREECHARGE_ID, id);
   }
   let history = useHistory();
@@ -68,14 +68,16 @@ function Dashboard(props) {
                 setLedger(data);
               }
             })
-            getAllCustomerLedger(data.merchantId)
-              .then(res => res.json())
-              .then(data => {
+          getAllCustomerLedger(data.merchantId)
+            .then(res => res.json())
+            .then(data => {
+              if (data.customerLedgerDetails) {
                 setCustomerLedger(data.customerLedgerDetails);
-                setState({ ...state, totalPage: Math.ceil(data.customerLedgerDetails.length / state.recordsPerPage)})
-              })
+                setState({ ...state, totalPage: Math.ceil(data.customerLedgerDetails.length / state.recordsPerPage) })
+              }
+            })
         } else {
-          
+
         }
       })
   }, [])
@@ -89,9 +91,24 @@ function Dashboard(props) {
   };
 
   const handleFilterApply = (options) => {
-    // apply filters
     setFilterOpen(false);
     console.log(options)
+    getFilteredCustomerLedger(
+      sessionStorage.getItem(MERCHANT_ID),
+      options.phone,
+      options.date.start,
+      options.date.end,
+      options.amount[0],
+      options.amount[1],
+      options.status
+    )
+      .then(res => res.json())
+      .then(data => {
+        if (data.customerLedgerDetails) {
+          setCustomerLedger(data.customerLedgerDetails);
+          setState({ ...state, totalPage: Math.ceil(data.customerLedgerDetails.length / state.recordsPerPage) })
+        }
+      })
   };
 
   const handleClose = () => {
@@ -153,7 +170,7 @@ function Dashboard(props) {
             <InvoiceCard header="MTD Issued invoice" total={ledger.mtdTotalAmount} received={ledger.mtdAmountReceived} pending={ledger.mtdAmountPending}></InvoiceCard>
           </Grid>
         </Grid>
-        <Box display="flex" flexDirection="row" justifyContent="space-between" style={{ marginTop: '20px' }}>
+        <Box display="flex" flexDirection="row" justifyContent="space-between" style={{ maxWidth: 420, margin: '20px auto 0px' }}>
           <Typography className={classes.detailedInvoiceHeader} display="inline">Detailed Invoice List</Typography>
           <Box>
             <Button aria-controls="simple-menu" aria-haspopup="true" onClick={handleSortOpen} style={{ textTransform: 'none', fontSize: '10px', height: '24px', padding: '5px 5px', marginRight: '5px' }} variant="outlined">
@@ -174,10 +191,12 @@ function Dashboard(props) {
             <Button onClick={handleFilterOpen} style={{ textTransform: 'none', fontSize: '10px', height: '24px', padding: '5px 5px' }} variant="outlined">
               <Tune style={{ marginRight: '5px', height: '15px' }} />
                         Filter
-                    </Button>
+            </Button>
           </Box>
         </Box>
-        <Typography className={classes.sub}>{customerLedger.length} records found</Typography>
+        <Box style={{ maxWidth: 420, margin: '0px auto' }}>
+          <Typography className={classes.sub}>{customerLedger ? customerLedger.length : 0} records found</Typography>
+        </Box>
         <Grid container spacing={3}>
           {
             customerLedger.map((invoice, index) => {

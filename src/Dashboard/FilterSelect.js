@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Grid from '@material-ui/core/Grid';
 import { KeyboardDatePicker } from '@material-ui/pickers';
 import { Typography, TextField, Slider, Select, Button, Box, FormControl, InputLabel, withStyles, makeStyles } from '@material-ui/core';
@@ -17,44 +17,55 @@ const ProSlider = withStyles({
   },
   thumb: {
     backgroundColor: '#2958C1',
-    '&:focus, &:hover, &$active': {
+    '&:focus, &:hover, &:active': {
       boxShadow: 'inherit',
     }
   }
 })(Slider);
 
-const paymentStatus = ['Pending', 'Received']
+const paymentStatus = [
+  {
+    name: 'Pending',
+    value: 'P'
+  },
+  {
+    name: 'Received',
+    value: 'R'
+  }
+]
 
 export default function FilterSelect(props) {
   const classes = useStyles();
 
-  const [date, setDate] = React.useState({
+  const [date, setDate] = useState({
     start: null,
     end: null
   });
+  const [amount, setAmount] = useState([0, 1000]);
+  const [status, setStatus] = useState("");
+  const [phone, setPhone] = useState("");
 
-  const handleDateStartChange = (val) => {
-    setDate({ ...date, start: val });
+  const handleDateStartChange = (event) => {
+    console.log(event.target.value)
+    setDate({ ...date, start: event.target.value });
   };
 
-  const handleDateEndChange = (val) => {
-    setDate({ ...date, end: val });
+  const handleDateEndChange = (event) => {
+    setDate({ ...date, end: event.target.value });
   };
 
-  const [amount, setAmount] = React.useState([0, 1000]);
 
   const handleAmountChange = (e, val) => {
     setAmount(val);
   };
 
-  const [status, setStatus] = React.useState("");
-
-  const handleStatusChange = (val) => {
-    setStatus(val);
+  const handleStatusChange = (event) => {
+    console.log(event.target.value)
+    setStatus(event.target.value);
   };
 
   const handleOnApply = () => {
-    props.onApply({ date, amount, status });
+    props.onApply({ date, amount, status, phone });
   };
 
   return (
@@ -65,40 +76,32 @@ export default function FilterSelect(props) {
           </Typography>
         <Grid container justify="space-between" style={{ marginTop: '-10px' }}>
           <Grid item xs={5}>
-            <KeyboardDatePicker
-              disableToolbar
-              variant="inline"
-              format="MM/dd/yyyy"
-              margin="none"
+            <Typography id="start-date" className={classes.header} gutterBottom style={{ marginTop: '20px' }}>
+              Start Date
+            </Typography>
+            <TextField
+              variant="outlined"
               fullWidth
+              type="date"
               id="start-date"
-              label="Start Date"
-              value={date.start}
               onChange={handleDateStartChange}
-              KeyboardButtonProps={{
-                'aria-label': 'change date',
-              }}
             />
           </Grid>
           <Grid item xs={1}>
-            <Typography style={{ textAlign: 'center', marginTop: '20px' }}>
+            <Typography style={{ textAlign: 'center', marginTop: '60px' }}>
               -
               </Typography>
           </Grid>
           <Grid item xs={5}>
-            <KeyboardDatePicker
-              disableToolbar
-              variant="inline"
-              format="MM/dd/yyyy"
-              margin="none"
+          <Typography id="end-date" className={classes.header} gutterBottom style={{ marginTop: '20px' }}>
+              End Date
+            </Typography>
+            <TextField
+              variant="outlined"
               fullWidth
+              type="date"
               id="end-date"
-              label="End Date"
-              value={date.end}
               onChange={handleDateEndChange}
-              KeyboardButtonProps={{
-                'aria-label': 'change date',
-              }}
             />
           </Grid>
         </Grid>
@@ -108,7 +111,7 @@ export default function FilterSelect(props) {
           <Typography id="phone-number" className={classes.header} gutterBottom style={{ marginTop: '20px' }}>
             Phone Number
           </Typography>
-          <TextField fullWidth aria-labelledby="phone-number" variant="outlined" />
+          <TextField fullWidth aria-labelledby="phone-number" variant="outlined" value={phone} onChange={e => setPhone(e.target.value)} />
         </Grid> : null
       }
       <Grid item xs={12}>
@@ -122,8 +125,9 @@ export default function FilterSelect(props) {
           value={amount}
           onChange={handleAmountChange}
           valueLabelDisplay="off"
-          min={50}
+          min={0}
           max={100000}
+          step={1000}
           aria-labelledby="range-slider"
           getAriaValueText={(val) => `INR ${val}`}
         />
@@ -136,18 +140,18 @@ export default function FilterSelect(props) {
           <FormControl required fullWidth variant="outlined">
             <Select
               native
-              value={status}
               onChange={handleStatusChange}
               color="primary"
+              value={status}
               inputProps={{
                 name: 'status',
                 id: 'outlined-age-native-simple',
               }}
             >
-              <option aria-label="None" value="" selected hidden />
+              <option aria-label="None" value="" hidden />
               {
                 paymentStatus.map((val) => {
-                  return <option value={val}>{val}</option>;
+                  return <option key={val.value} value={val.value}>{val.name}</option>;
                 })
               }
             </Select>

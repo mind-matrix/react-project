@@ -1,13 +1,13 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { CssBaseline } from '@material-ui/core';
 import PlaceHolderImage from './placeholder-image.png';
 
 const useStyles = makeStyles((theme) => ({
     root: {
-      display: 'block',
-      textAlign: 'left',
-      width: '100%'
+        display: 'block',
+        textAlign: 'left',
+        width: '100%'
     },
     previewContainer: {
         display: 'inline-block',
@@ -85,7 +85,14 @@ export default function ImageUpload(props) {
         file: null,
         preview: PlaceHolderImage
     });
-    
+
+    useEffect(() => {
+        console.log(props.img)
+        if (props.image) {
+            setState({ ...state, preview: props.image })
+        }
+    }, [])
+
 
     let input = document.createElement('input')
     input.type = 'file';
@@ -112,13 +119,13 @@ export default function ImageUpload(props) {
             <div className={classes.previewContainer}>
                 {
                     props.alt && state.preview === PlaceHolderImage ?
-                    <div onClick={uploadHandler} className={classes.altBox}>
-                        <span className={classes.altBoxText}>
-                            + Add logo
+                        <div onClick={uploadHandler} className={classes.altBox}>
+                            <span className={classes.altBoxText}>
+                                + Add logo
                         </span>
-                    </div>
-                    :
-                    <img className={classes.preview} onClick={uploadHandler} src={state.preview} alt={props.altText || 'Image Preview'} />
+                        </div>
+                        :
+                        <img className={classes.preview} onClick={uploadHandler} src={state.preview} alt={props.altText || 'Image Preview'} />
                 }
                 <div className={classes.hoverBox}>
                     Upload

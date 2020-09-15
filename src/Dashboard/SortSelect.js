@@ -1,6 +1,6 @@
 import React from 'react';
 import Grid from '@material-ui/core/Grid';
-import { Typography, Slider, Select, Button, Box, FormControl, InputLabel, withStyles, makeStyles } from '@material-ui/core';
+import { Typography, Slider, Select, Button, Box, FormControl, InputLabel, makeStyles } from '@material-ui/core';
 import ToggleOption from '../ToggleOption';
 
 const useStyles = makeStyles({
@@ -11,18 +11,6 @@ const useStyles = makeStyles({
     marginTop: '30px'
   }
 });
-
-const ProSlider = withStyles({
-  root: {
-    color: '#2958C1'
-  },
-  thumb: {
-    backgroundColor: '#2958C1',
-    '&:focus, &:hover, &$active': {
-      boxShadow: 'inherit',
-    }
-  }
-})(Slider);
 
 const paymentStatus = ['Pending', 'Received']
 

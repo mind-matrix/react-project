@@ -20,7 +20,9 @@ const useStyles = makeStyles((theme) => ({
     color: '#E2714D'
   },
   content: {
-    backgroundColor: '#ffffff'
+    backgroundColor: '#ffffff',
+    maxWidth: 480,
+    margin: '0px auto'
   }
 }));
 

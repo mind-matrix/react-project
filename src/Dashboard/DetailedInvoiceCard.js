@@ -28,7 +28,7 @@ export default function DetailedInvoiceCard(props) {
                                         </Box>
                                         :
                                         <Box>
-                                            <Typography className={classes.title + ' ' + classes.paidAmount} align="left">₹{props.due}</Typography>
+                                            <Typography className={classes.title + ' ' + classes.paidAmount} align="left">₹{props.total}</Typography>
                                             <Typography className={classes.paid} display="inline" gutterBottom>Received</Typography>
                                         </Box>
                                 }
@@ -36,12 +36,13 @@ export default function DetailedInvoiceCard(props) {
                             <Grid item xs={4}>
                                 {
                                     (props.due) ?
-                                        <Button variant="contained" className={classes.receiveButton} onClick={props.mark}>Mark Receive</Button>
+                                        <Button variant="contained" className={classes.receiveButton} onClick={props.mark}>Mark Received</Button>
                                         :
-                                        <Box>
-                                            <Typography variant="caption" className={classes.bank} align="right" display="block">YR142643</Typography>
-                                            <Typography variant="caption" className={classes.bank} align="right" display="block" gutterBottom>BANK 6644</Typography>
-                                        </Box>
+                                        // <Box>
+                                        //     <Typography variant="caption" className={classes.bank} align="right" display="block">YR142643</Typography>
+                                        //     <Typography variant="caption" className={classes.bank} align="right" display="block" gutterBottom>BANK 6644</Typography>
+                                        // </Box>
+                                        null
                                 }
                             </Grid>
                         </Grid>

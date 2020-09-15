@@ -15,7 +15,7 @@ import InvoiceInput from './InvoiceInput';
 import FullScreenDialog from '../FullScreenDialog';
 import AddItem from './AddItem';
 import AddCustomer from './AddCustomer';
-import { checkCustomerPhone, createInvoice, getInvoiceNo } from '../shared/dataService';
+import { checkCustomerPhone, createInvoice, getCustomerDetail, getInvoiceNo, getMer } from '../shared/dataService';
 import CreditNote from '../CreditNote/CreditNote';
 import ImageUpload from '../ImageUpload/ImageUpload';
 import { INVOICE_TYPE, MERCHANT_ID } from '../shared/constant';
@@ -37,10 +37,13 @@ const GenerateInvoice = () => {
   const history = useHistory();
   const [state, setState] = useState({
     inv: "",
+    merchantName: "",
     merchantCode: "",
     date: new Date(),
     customerId: null,
     customerPhone: null,
+    customerName: "",
+    customerCity: "",
     discountType: 'flat',
     discountValue: 0,
     totalDiscount: 0,
@@ -67,7 +70,7 @@ const GenerateInvoice = () => {
     setState({
       ...state,
       sameAsBillTo: e.target.checked,
-      shipTo: e.target.checked ? '' : state.shipTo
+      shipTo: e.target.checked ? state.billTo : state.shipTo
     });
   };
 
@@ -100,9 +103,9 @@ const GenerateInvoice = () => {
     setState({
       ...state,
       total: state.total + item.productQty * item.unitPrice,
-      gstTotal: (state.total + item.productQty * item.unitPrice) * state.gstPercent / 100
+      gstTotal: (state.total + item.productQty * item.unitPrice - state.totalDiscount) * state.gstPercent / 100
     });
-    setBalance(state.total + item.productQty * item.unitPrice + (state.total + item.productQty * item.unitPrice) * state.gstPercent / 100 - state.totalDiscount - state.advance + state.otherBillAmount);
+    setBalance(state.total + item.productQty * item.unitPrice + (state.total + item.productQty * item.unitPrice - state.totalDiscount) * state.gstPercent / 100 - state.totalDiscount - state.advance + state.otherBillAmount);
   };
 
   const [addCustomer, setAddCustomerOpen] = React.useState(false);
@@ -125,7 +128,7 @@ const GenerateInvoice = () => {
   };
 
   const handleAddCustomerApply = (customer) => {
-    // add customer
+    setState({ ...state, customerId: customer.customerId, customerName: customer.customerName, customerCity: customer.city });
     setAddCustomerOpen(false);
   };
 
@@ -143,14 +146,26 @@ const GenerateInvoice = () => {
   };
 
   useEffect(() => {
-    getInvoiceNo(sessionStorage.getItem(MERCHANT_ID), INVOICE_TYPE.INVOICE)
+    getMer(sessionStorage.getItem(MERCHANT_ID))
       .then(res => res.json())
       .then(data => {
-        setState({
-          ...state,
-          inv: data.nextInvoiceNumber,
-          merchantCode: data.merchantCode
-        })
+        if (data.merchantId) {
+          setLogo(data.merchantLogo);
+          console.log(data.merchantLogo)
+          getInvoiceNo(data.merchantId, INVOICE_TYPE.INVOICE)
+            .then(response => response.json())
+            .then(collection => {
+              setState({
+                ...state,
+                inv: collection.nextInvoiceNumber,
+                merchantCode: collection.merchantCode,
+                merchantName: data.merchantName,
+                pan: data.merchantPan,
+                gst: data.merchantGstn,
+                invoiceFrom: `${data.merchantAddress1} ${data.merchantAddress2} ${data.merchantCity}`
+              })
+            })
+        }
       })
   }, [])
 
@@ -166,7 +181,14 @@ const GenerateInvoice = () => {
           if (Object.keys(data).length === 0) {
             setAddCustomerOpen(true);
           } else {
-            setState({ ...state, customerId: data.customerId })
+            setState({ ...state, customerId: data.customerId });
+            getCustomerDetail(data.customerId)
+              .then(res => res.json())
+              .then(data => {
+                if (data.customerId) {
+                  setState({ ...state, customerName: data.firstName + ' ' + data.lastName, customerCity: data.city });
+                }
+              })
           }
         })
     }
@@ -179,11 +201,11 @@ const GenerateInvoice = () => {
 
   const updateDiscount = (event) => {
     if (filter == 'flat') {
-      setState({ ...state, totalDiscount: event.target.value, discountValue: event.target.value });
-      setBalance(state.total - state.advance - event.target.value + state.gstTotal + state.otherBillAmount)
+      setState({ ...state, totalDiscount: event.target.value, discountValue: event.target.value, gstTotal: (state.total - event.target.value) * state.gstPercent / 100 });
+      setBalance(state.total - state.advance - event.target.value + (state.total - event.target.value) * state.gstPercent / 100 + state.otherBillAmount)
     } else if (filter == 'percent') {
-      setState({ ...state, totalDiscount: (state.total * event.target.value / 100), discountValue: event.target.value });
-      setBalance(state.total - state.advance - (state.total * event.target.value / 100) + state.gstTotal + state.otherBillAmount)
+      setState({ ...state, totalDiscount: (state.total * event.target.value / 100), discountValue: event.target.value, gstTotal: (state.total - (state.total * event.target.value / 100)) * state.gstPercent / 100 });
+      setBalance(state.total - state.advance - (state.total * event.target.value / 100) + (state.total - (state.total * event.target.value / 100)) * state.gstPercent / 100 + state.otherBillAmount)
     }
   }
 
@@ -192,19 +214,19 @@ const GenerateInvoice = () => {
       setFilter(name);
       setState({ ...state, discountType: name });
       if (name == 'flat') {
-        setState({ ...state, totalDiscount: state.discountValue });
-        setBalance(state.total - state.advance - state.discountValue + state.gstTotal + state.otherBillAmount)
+        setState({ ...state, totalDiscount: state.discountValue, gstTotal: (state.total - state.discountValue) * state.gstPercent / 100 });
+        setBalance(state.total - state.advance - state.discountValue + (state.total - state.discountValue) * state.gstPercent / 100 + state.otherBillAmount)
       } else if (name == 'percent') {
-        setState({ ...state, totalDiscount: state.total * state.discountValue / 100 });
-        setBalance(state.total - state.advance - state.total * state.discountValue / 100 + state.gstTotal + state.otherBillAmount)
+        setState({ ...state, totalDiscount: state.total * state.discountValue / 100, gstTotal: (state.total - (state.total * state.discountValue / 100)) * state.gstPercent / 100 });
+        setBalance(state.total - state.advance - state.total * state.discountValue / 100 + (state.total - (state.total * state.discountValue / 100)) * state.gstPercent / 100 + state.otherBillAmount)
       }
     }
     setAnchorEl(null);
   };
 
   const onGSTChange = (event) => {
-    setState({ ...state, gstPercent: event.target.value, gstTotal: state.total * event.target.value / 100 });
-    setBalance(state.total - state.advance - state.totalDiscount + state.total * event.target.value / 100 + state.otherBillAmount)
+    setState({ ...state, gstPercent: event.target.value, gstTotal: (state.total - state.totalDiscount) * event.target.value / 100 });
+    setBalance(state.total - state.advance - state.totalDiscount + (state.total - state.totalDiscount) * event.target.value / 100 + state.otherBillAmount)
   }
 
   const otherBillChange = (event) => {
@@ -234,7 +256,7 @@ const GenerateInvoice = () => {
     createInvoice(data)
       .then(res => res.json())
       .then(data => {
-        if(data.invoiceRefId) {
+        if (data.invoiceRefId) {
           window.alert('Invoice Generated succesfully');
           history.push('/dashboard');
         }
@@ -246,7 +268,7 @@ const GenerateInvoice = () => {
       <CssBaseline />
       <AppBar elevation={1} position="fixed" style={{ backgroundColor: 'white' }}>
         <Toolbar>
-          <IconButton edge="start" onClick={() => history.back()} aria-label="close">
+          <IconButton edge="start" onClick={() => window.history.back()} aria-label="close">
             <ArrowBackIcon />
           </IconButton>
           <Typography variant="h6" className={classes.title}>
@@ -301,12 +323,21 @@ const GenerateInvoice = () => {
             variant="outlined"
             fullWidth
             label="Customer Mobile Number"
-            style={{ marginBottom: 15 }}
+            style={{ marginBottom: 10 }}
             onBlur={checkPhoneNumber}
           />
+          {state.customerName ?
+            <Typography className={classes.customer}>
+              <PersonIcon className={classes.customerIcon} />
+              {state.customerName}
+              <Typography className={classes.customerPhone}>
+                {state.customerCity}
+              </Typography>
+            </Typography> : null
+          }
           <Grid container>
             <Grid item xs={4}>
-              <ImageUpload alt logo={(file) => setLogo(file)} />
+              <ImageUpload alt={logo} logo={(file) => setLogo(file)} image={logo}/>
             </Grid>
             <Grid item xs={8}>
               <Box pl={2} pb={2}>
@@ -548,7 +579,7 @@ const GenerateInvoice = () => {
         <AddCustomer onApply={handleAddCustomerApply} phone={state.customerPhone} />
       </FullScreenDialog>
       <FullScreenDialog title="Invoice Preview" header value={invoicePreview} onClick={invoicePreviewHandler} onClose={invoicePreviewClose}>
-        <CreditNote product={product} />
+        <CreditNote product={product} data={state} balance={balance} product={product} />
       </FullScreenDialog>
     </div>
   );
@@ -675,8 +706,8 @@ const useStyles = makeStyles((theme) => ({
   },
   customer: {
     color: '#2958C1',
-    fontSize: '16pt',
-    marginTop: '15px'
+    fontSize: '16px',
+    margin: '0px 0px 7px'
   },
   customerIcon: {
     verticalAlign: 'sub',
@@ -687,7 +718,7 @@ const useStyles = makeStyles((theme) => ({
     marginLeft: '15px',
     color: '#35332B',
     opacity: 0.7,
-    fontSize: '10pt'
+    fontSize: '10px'
   },
   productCard: {
     borderRadius: 10,

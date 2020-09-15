@@ -11,7 +11,7 @@ function PDFViewer(props) {
     const [url, setUrl] = useState(null);
 
     useEffect(() => {
-        if (props.location.pathname == '/inv') {
+        if (props.location.pathname === '/inv') {
             let params = queryString.parse(props.location.search);
             let { invoice } = params;
             console.log(invoice);

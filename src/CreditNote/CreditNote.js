@@ -1,5 +1,6 @@
 import React from 'react';
 import { CssBaseline, Grid, Typography, makeStyles, Divider, Box } from '@material-ui/core';
+import moment from 'moment';
 
 export default function CreditNote(props) {
 
@@ -32,15 +33,15 @@ export default function CreditNote(props) {
                     <Grid item xs={9}>
                         <Grid container justify="flex-start" alignItems="stretch" style={{ height: '100%' }}>
                             <Grid item xs={12}>
-                                <Typography style={{ textTransform: 'uppercase', fontSize: 12, fontWeight: 'bold' }}>CREDIT NOTE 123</Typography>
+                                <Typography style={{ textTransform: 'uppercase', fontSize: 12, fontWeight: 'bold' }}>{props.data.invoiceFrom}</Typography>
                             </Grid>
                             <Grid item xs={12}>
                                 <Grid container>
                                     <Grid item xs={6}>
-                                        <Typography style={{ fontSize: 12 }} align="left">INV/20-21/1</Typography>
+                                        <Typography style={{ fontSize: 12 }} align="left">{props.data.inv}</Typography>
                                     </Grid>
                                     <Grid item xs={6}>
-                                        <Typography style={{ fontSize: 12 }} align="right">01 Dec 19</Typography>
+                                        <Typography style={{ fontSize: 12 }} align="right">{moment(props.data.date).format('ll')}</Typography>
                                     </Grid>
                                 </Grid>
                             </Grid>
@@ -51,46 +52,32 @@ export default function CreditNote(props) {
                 <Grid container spacing={3}>
                     <Grid item xs={6}>
                         <Typography style={{ fontSize: 12, opacity: '0.7', marginBottom: 10 }}>Bill To</Typography>
-                        <Typography style={{ fontSize: 12, fontWeight: 'bold', marginBottom: 5 }}>ABC Consulting</Typography>
-                        <Typography style={{ fontSize: 10, opacity: '0.7' }}>493 HSR Layout</Typography>
-                        <Typography style={{ fontSize: 10, opacity: '0.7' }}>Bangalore, Karnataka</Typography>
+                        <Typography style={{ fontSize: 12, marginBottom: 5 }}>{props.data.billTo}</Typography>
                     </Grid>
                     <Grid item xs={6}>
                         <Typography style={{ fontSize: 12, opacity: '0.7', marginBottom: 10 }}>Bill From</Typography>
-                        <Typography style={{ fontSize: 12, fontWeight: 'bold', marginBottom: 5 }}>ABC Consulting</Typography>
-                        <Typography style={{ fontSize: 10, opacity: '0.7' }}>493 HSR Layout</Typography>
-                        <Typography style={{ fontSize: 10, opacity: '0.7' }}>Bangalore, Karnataka</Typography>
+                        <Typography style={{ fontSize: 12, marginBottom: 5 }}>{props.data.invoiceFrom}</Typography>
                     </Grid>
                 </Grid>
                 <Divider className={classes.divider} />
-                <Grid container spacing={3}>
-                    <Grid item xs={6} style={{ paddingBottom: 0, marginBottom: 0 }}>
-                        <Typography style={{ fontSize: 12, fontWeight: 'bold' }}>Product 1</Typography>
-                    </Grid>
-                    <Grid item xs={6} style={{ paddingBottom: 0, marginBottom: 0 }}>
-                        <Typography style={{ fontSize: 12, fontWeight: 'bold' }} align="right">₹5000</Typography>
-                    </Grid>
-                    <Grid item xs={6} style={{ paddingTop: 0, marginTop: 0 }}>
-                        <Typography style={{ fontSize: 10, opacity: '0.7' }}>Item Subtotal</Typography>
-                    </Grid>
-                    <Grid item xs={6} style={{ paddingTop: 0, marginTop: 0 }}>
-                        <Typography style={{ fontSize: 10, opacity: '0.7' }} align="right">5 X ₹1000</Typography>
-                    </Grid>
-                </Grid>
-                <Grid container spacing={3}>
-                    <Grid item xs={6} style={{ paddingBottom: 0, marginBottom: 0 }}>
-                        <Typography style={{ fontSize: 12, fontWeight: 'bold' }}>Product 2</Typography>
-                    </Grid>
-                    <Grid item xs={6} style={{ paddingBottom: 0, marginBottom: 0 }}>
-                        <Typography style={{ fontSize: 12, fontWeight: 'bold' }} align="right">₹5000</Typography>
-                    </Grid>
-                    <Grid item xs={6} style={{ paddingTop: 0, marginTop: 0 }}>
-                        <Typography style={{ fontSize: 10, opacity: '0.7' }}>Item Subtotal</Typography>
-                    </Grid>
-                    <Grid item xs={6} style={{ paddingTop: 0, marginTop: 0 }}>
-                        <Typography style={{ fontSize: 10, opacity: '0.7' }} align="right">5 X ₹1000</Typography>
-                    </Grid>
-                </Grid>
+                {props.product && props.product.length > 0 ?
+                    props.product.map((product, i) => (
+                        <Grid container key={i} spacing={3}>
+                            <Grid item xs={6} style={{ paddingBottom: 0, marginBottom: 0 }}>
+                                <Typography style={{ fontSize: 12, fontWeight: 'bold' }}>{product.productDescription}</Typography>
+                            </Grid>
+                            <Grid item xs={6} style={{ paddingBottom: 0, marginBottom: 0 }}>
+                                <Typography style={{ fontSize: 12, fontWeight: 'bold' }} align="right">₹{product.productQty * product.unitPrice}</Typography>
+                            </Grid>
+                            <Grid item xs={6} style={{ paddingTop: 0, marginTop: 0 }}>
+                                <Typography style={{ fontSize: 10, opacity: '0.7' }}>Item Subtotal</Typography>
+                            </Grid>
+                            <Grid item xs={6} style={{ paddingTop: 0, marginTop: 0 }}>
+                                <Typography style={{ fontSize: 10, opacity: '0.7' }} align="right">{`${product.productQty} x ₹${product.unitPrice}`}</Typography>
+                            </Grid>
+                        </Grid>
+                    )) : null
+                }
                 <Divider className={classes.divider} />
                 <Grid container>
                     <Grid item xs={4}></Grid>
@@ -100,37 +87,43 @@ export default function CreditNote(props) {
                                 <Typography style={{ fontSize: 12, opacity: '0.7' }}>Total Amount</Typography>
                             </Grid>
                             <Grid item xs={4}>
-                                <Typography style={{ fontSize: 12, fontWeight: 'bold' }} align="right">₹10000</Typography>
+                                <Typography style={{ fontSize: 12, fontWeight: 'bold' }} align="right">₹{props.data.total}</Typography>
                             </Grid>
                             <Grid item xs={8}>
                                 <Typography style={{ fontSize: 12, opacity: '0.7' }}>Advanced Paid</Typography>
                             </Grid>
                             <Grid item xs={4}>
-                                <Typography style={{ fontSize: 12 }} align="right">₹2000</Typography>
+                                <Typography style={{ fontSize: 12 }} align="right">₹{props.data.advance}</Typography>
+                            </Grid>
+                            <Grid item xs={8}>
+                                <Typography style={{ fontSize: 12, opacity: '0.7' }}>Discount</Typography>
+                            </Grid>
+                            <Grid item xs={4}>
+                                <Typography style={{ fontSize: 12 }} align="right">₹{props.data.totalDiscount}</Typography>
                             </Grid>
                             <Grid item xs={8}>
                                 <Typography style={{ fontSize: 12, opacity: '0.7' }}>GST %9</Typography>
                             </Grid>
                             <Grid item xs={4}>
-                                <Typography style={{ fontSize: 12 }} align="right">₹900</Typography>
+                                <Typography style={{ fontSize: 12 }} align="right">₹{props.data.gstTotal}</Typography>
                             </Grid>
                             <Grid item xs={8}>
-                                <Typography style={{ fontSize: 12, opacity: '0.7' }}>Shipping</Typography>
+                                <Typography style={{ fontSize: 12, opacity: '0.7' }}>{props.data.otherBill}</Typography>
                             </Grid>
                             <Grid item xs={4}>
-                                <Typography style={{ fontSize: 12 }} align="right">₹0</Typography>
+                                <Typography style={{ fontSize: 12 }} align="right">₹{props.data.otherBillAmount}</Typography>
                             </Grid>
                             <Grid item xs={8}>
                                 <Typography style={{ fontSize: 12, opacity: '0.7', marginTop: 7 }}>Balance Amount</Typography>
                             </Grid>
                             <Grid item xs={4}>
-                                <Typography style={{ fontSize: 14, fontWeight: 'bold', color: '#419945', marginTop: 5 }} align="right">₹10000</Typography>
+                                <Typography style={{ fontSize: 14, fontWeight: 'bold', color: '#419945', marginTop: 5 }} align="right">₹{props.balance}</Typography>
                             </Grid>
                         </Grid>
                     </Grid>
                 </Grid>
                 <Divider className={classes.divider} />
-                <Grid container>
+                {/* <Grid container>
                     <Grid item xs={12}>
                         <Box><Typography style={{ fontSize: 12, opacity: '0.7', marginBottom: 5 }}>Bank Details</Typography></Box>
                         <Box><Typography style={{ fontSize: 12, opacity: '0.7' }}>Bank Name: <b style={{ opacity: 1 }}>ICICI Bank</b></Typography></Box>
@@ -139,15 +132,16 @@ export default function CreditNote(props) {
                         <Box><Typography style={{ fontSize: 12, opacity: '0.7' }}>UPI: <b style={{ opacity: 1 }}>7845124754@ybl</b></Typography></Box>
                     </Grid>
                 </Grid>
-                <Divider className={classes.divider} />
+                <Divider className={classes.divider} /> */}
                 <Grid container>
                     <Grid item xs={12}>
-                        <Box><Typography style={{ fontSize: 12, opacity: '0.7' }}>PAN Number: <b style={{ opacity: 1 }}>HERW1234D</b></Typography></Box>
-                        <Box><Typography style={{ fontSize: 12, opacity: '0.7' }}>GST Number: <b style={{ opacity: 1 }}>HERW1234D</b></Typography></Box>
+                        <Box><Typography style={{ fontSize: 12, opacity: '0.7' }}>PAN Number: <b style={{ opacity: 1 }}>{props.data.pan}</b></Typography></Box>
+                        <Box><Typography style={{ fontSize: 12, opacity: '0.7' }}>GST Number: <b style={{ opacity: 1 }}>{props.data.gst}</b></Typography></Box>
                     </Grid>
                 </Grid>
                 <Divider className={classes.divider} />
                 <Typography style={{ fontSize: 12, opacity: '0.7' }}>Payment Terms/Note, if any</Typography>
+                <Typography style={{ fontSize: 12 }}>{props.data.notes}</Typography>
                 {/* <Grid container spacing={1}>
                     <Grid item xs={6}>
                         <Button className={classes.button} variant="contained" disableElevation fullWidth>

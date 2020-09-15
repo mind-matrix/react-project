@@ -57,29 +57,33 @@ function Invoice(props) {
 
   let params = queryString.parse(props.location.search);
 
-  let { merchantCode, storeCode, tillCode } = params;
+  let { merchantCode, storeCode, tillCode, invoice } = params;
 
   useEffect(() => {
-    axios.post(API_ENDPOINT+'/receipt/scan/scnrcpt', {
-      merchantCode,
-      storeCode,
-      tillCode
-    }, {
-      responseType: 'json',
-      headers: {
-        "Authorization": "Basic c2VydmljZXMtcGFyY2hpLWFwaTpwYXJjaGktc2VydmljZXMtYXBpMjAyMA=="
-      }
-    }).then(res => {
-      if (res.data.invoiceId != null) {
-        setInvoiceId(res.data.invoiceId);
-      }
-    })
+    if (invoice) {
+      setInvoiceId(invoice);
+    } else {
+      axios.post(API_ENDPOINT + '/receipt/scan/scnrcpt', {
+        merchantCode,
+        storeCode,
+        tillCode
+      }, {
+        responseType: 'json',
+        headers: {
+          "Authorization": "Basic c2VydmljZXMtcGFyY2hpLWFwaTpwYXJjaGktc2VydmljZXMtYXBpMjAyMA=="
+        }
+      }).then(res => {
+        if (res.data.invoiceId != null) {
+          setInvoiceId(res.data.invoiceId);
+        }
+      })
+    }
   }, [])
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (mobileNumber) {
-      axios.post(API_ENDPOINT+'/receipt/scan/showrcpt', {
+      axios.post(API_ENDPOINT + '/receipt/scan/showrcpt', {
         invoiceId,
         mobileNumber
       }, {

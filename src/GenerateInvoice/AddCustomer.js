@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Grid, Box, Select, Typography, TextField, Button, makeStyles } from '@material-ui/core';
 import { Autocomplete } from '@material-ui/lab';
-import { getCity } from '../shared/dataService';
+import { createUser, getCity, saveCustomer } from '../shared/dataService';
 
 const useStyles = makeStyles({
     header: {
@@ -21,7 +21,8 @@ export default function AddCustomer(props) {
     const [state, setState] = React.useState({
         customerName: null,
         city: '',
-        phoneNumber: props.phone
+        phoneNumber: props.phone,
+        customerId: null
     });
 
     const handleOnCityChange = (e) => {
@@ -29,7 +30,16 @@ export default function AddCustomer(props) {
     };
 
     const handleOnApply = () => {
-        props.onApply(state);
+        createUser(state.phoneNumber, 'C')
+            .then(res => res.json())
+            .then(data => {
+                if (data.customerId) {
+                    setState({ ...state, customerId: data.customerId });
+                    saveCustomer(data.customerId, state.customerName, state.city)
+                        .then(res => res.json())
+                        .then(data => data ? props.onApply(state) : null)
+                }
+            })
     };
 
     const getCityNamehandler = (event) => {
@@ -46,7 +56,7 @@ export default function AddCustomer(props) {
                 <Typography id="customer-number" className={classes.header} gutterBottom>
                     Customer Name
                 </Typography>
-                <TextField fullWidth aria-labelledby="customer-number" variant="outlined" />
+                <TextField fullWidth aria-labelledby="customer-number" variant="outlined" onChange={(e) => setState({...state, customerName: e.target.value})} />
             </Grid>
             <Grid item xs={12}>
                 <Grid container>
@@ -58,6 +68,7 @@ export default function AddCustomer(props) {
                             <Autocomplete
                                 id="cities"
                                 fullWidth
+                                onChange={(e, val) => setState({...state, city: val})}
                                 options={cities}
                                 getOptionLabel={(option) => option}
                                 renderInput={(params) => <TextField {...params} onChange={getCityNamehandler} variant="outlined" />}
