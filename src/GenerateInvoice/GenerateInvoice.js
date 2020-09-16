@@ -15,7 +15,7 @@ import InvoiceInput from './InvoiceInput';
 import FullScreenDialog from '../FullScreenDialog';
 import AddItem from './AddItem';
 import AddCustomer from './AddCustomer';
-import { checkCustomerPhone, createInvoice, getCustomerDetail, getInvoiceNo, getMer } from '../shared/dataService';
+import { checkCustomerPhone, createInvoice, getCustomerDetail, getInvoiceNo, getMer, saveMerchant, uploadFile } from '../shared/dataService';
 import CreditNote from '../CreditNote/CreditNote';
 import ImageUpload from '../ImageUpload/ImageUpload';
 import { INVOICE_TYPE, MERCHANT_ID } from '../shared/constant';
@@ -63,6 +63,7 @@ const GenerateInvoice = () => {
     gst: '',
     notes: ''
   });
+  const [logoChanged, setLogoChanged] = useState(false);
   const [balance, setBalance] = useState(0);
   const [product, setProduct] = useState([]);
   const [logo, setLogo] = useState(null);
@@ -73,11 +74,13 @@ const GenerateInvoice = () => {
       shipTo: e.target.checked ? state.billTo : state.shipTo
     });
   };
-
-  const [paymentMode, setPaymentMode] = React.useState('bank');
-  const [paymentLink, setPaymentLink] = React.useState(false);
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const [filter, setFilter] = React.useState('flat');
+  const [changes, setChanges] = useState({
+    merchantId: sessionStorage.getItem(MERCHANT_ID)
+  });
+  const [paymentMode, setPaymentMode] = useState('bank');
+  const [paymentLink, setPaymentLink] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [filter, setFilter] = useState('flat');
 
   const handlePaymentLink = (e) => {
     setPaymentLink(e.target.checked);
@@ -87,7 +90,7 @@ const GenerateInvoice = () => {
     setAnchorEl(event.currentTarget);
   };
 
-  const [addItem, setAddItemOpen] = React.useState(false);
+  const [addItem, setAddItemOpen] = useState(false);
 
   const handleAddItemOpen = () => {
     setAddItemOpen(true);
@@ -108,7 +111,7 @@ const GenerateInvoice = () => {
     setBalance(state.total + item.productQty * item.unitPrice + (state.total + item.productQty * item.unitPrice - state.totalDiscount) * state.gstPercent / 100 - state.totalDiscount - state.advance + state.otherBillAmount);
   };
 
-  const [addCustomer, setAddCustomerOpen] = React.useState(false);
+  const [addCustomer, setAddCustomerOpen] = useState(false);
   const [invoicePreview, setInvoicePreview] = useState(false);
 
   const handleAddCustomerOpen = () => {
@@ -127,8 +130,10 @@ const GenerateInvoice = () => {
     setAddCustomerOpen(false);
   };
 
-  const handleAddCustomerApply = (customer) => {
-    setState({ ...state, customerId: customer.customerId, customerName: customer.customerName, customerCity: customer.city });
+  const handleAddCustomerApply = (customer, id) => {
+    console.log(id)
+    console.log(customer)
+    setState({ ...state, customerId: id, customerName: customer.customerName, customerCity: customer.city, billTo: state.billTo + ' ' + customer.city });
     setAddCustomerOpen(false);
   };
 
@@ -155,15 +160,17 @@ const GenerateInvoice = () => {
           getInvoiceNo(data.merchantId, INVOICE_TYPE.INVOICE)
             .then(response => response.json())
             .then(collection => {
-              setState({
-                ...state,
-                inv: collection.nextInvoiceNumber,
-                merchantCode: collection.merchantCode,
-                merchantName: data.merchantName,
-                pan: data.merchantPan,
-                gst: data.merchantGstn,
-                invoiceFrom: `${data.merchantAddress1} ${data.merchantAddress2} ${data.merchantCity}`
-              })
+              if (collection.nextInvoiceNumber) {
+                setState({
+                  ...state,
+                  inv: collection.nextInvoiceNumber,
+                  merchantCode: collection.merchantCode,
+                  merchantName: data.merchantName,
+                  pan: data.merchantPan,
+                  gst: data.merchantGstn,
+                  invoiceFrom: `${data.merchantAddress1 ? data.merchantAddress1 : ''} ${data.merchantAddress2 ? data.merchantAddress2 : ''} ${data.merchantCity ? data.merchantCity : ''}`
+                })
+              }
             })
         }
       })
@@ -186,7 +193,7 @@ const GenerateInvoice = () => {
               .then(res => res.json())
               .then(data => {
                 if (data.customerId) {
-                  setState({ ...state, customerName: data.firstName + ' ' + data.lastName, customerCity: data.city });
+                  setState({ ...state, customerName: data.firstName + ' ' + data.lastName, customerCity: data.city, billTo: state.billTo + ' ' + data.city, customerId: data.customerId });
                 }
               })
           }
@@ -237,30 +244,44 @@ const GenerateInvoice = () => {
   const submit = () => {
     let data = {
       merchantCode: state.merchantCode,
+      shippingDetails: state.customerName + ' ' + state.shipTo,
       invoiceNumber: state.inv,
       customerId: state.customerId,
       balanceAmount: balance,
       discountAmount: state.totalDiscount,
-      discountPercentage: state.discountType == 'percent' ? state.discountValue : null,
+      discountPercentage: state.discountType == 'percent' ? state.discountValue : "0",
       advanceAmount: state.advance,
       gstPercentage: state.gstPercent,
       gstAmount: state.gstTotal,
       roundoffAmount: state.total,
       otherAmount: state.otherAmount,
       otherAmtDesc: state.otherAmtDesc,
-      paymentTerms: 'online',
       totalAmount: state.total,
       productList: product
     }
 
-    createInvoice(data)
-      .then(res => res.json())
-      .then(data => {
-        if (data.invoiceRefId) {
-          window.alert('Invoice Generated succesfully');
-          history.push('/dashboard');
-        }
-      })
+    if (Object.keys(changes).length > 0) {
+      saveMerchant(changes)
+        .then(res => res.json())
+        .then(data => console.log(data))
+    }
+
+    if(logoChanged) {
+      uploadFile(sessionStorage.getItem(MERCHANT_ID), 'logos/testdata', logo)
+        .then(res => res.json())
+        .then(data => console.log(data))
+    }
+
+    if (state.inv) {
+      createInvoice(data)
+        .then(res => res.json())
+        .then(data => {
+          if (data.invoiceRefId) {
+            window.alert('Invoice Generated succesfully');
+            history.push('/dashboard');
+          }
+        })
+    }
   }
 
   return (
@@ -326,30 +347,32 @@ const GenerateInvoice = () => {
             style={{ marginBottom: 10 }}
             onBlur={checkPhoneNumber}
           />
-          {state.customerName ?
-            <Typography className={classes.customer}>
+          {/* {state.customerName ?
+            <Box className={classes.customer}>
               <PersonIcon className={classes.customerIcon} />
               {state.customerName}
               <Typography className={classes.customerPhone}>
                 {state.customerCity}
               </Typography>
-            </Typography> : null
-          }
+            </Box> : null
+          } */}
           <Grid container>
             <Grid item xs={4}>
-              <ImageUpload alt={logo} logo={(file) => setLogo(file)} image={logo}/>
+              <ImageUpload alt logo={(file) => { setLogo(file); setLogoChanged(true) }} image={logo} />
             </Grid>
             <Grid item xs={8}>
               <Box pl={2} pb={2}>
-                <TextField fullWidth label="Invoice From" multiline rows={4} variant="outlined" value={state.invoiceFrom} onChange={e => setState({ ...state, invoiceFrom: e.target.value })}></TextField>
+                <TextField fullWidth label="Invoice From - Name" value={state.merchantName} variant="outlined" style={{ marginBottom: 10 }} onChange={e => { setState({ ...state, merchantName: e.target.value }); setChanges({ ...changes, merchantName: e.target.value }) }} />
+                <TextField fullWidth label="Invoice From - Address" multiline rows={2} variant="outlined" value={state.invoiceFrom} onChange={e => { setState({ ...state, invoiceFrom: e.target.value }); setChanges({ ...changes, merchantAddress1: e.target.value }) }}></TextField>
               </Box>
             </Grid>
             <Grid item xs={6}>
               <Box pr={1}>
-                <TextField fullWidth label="Bill To" multiline rows={4} variant="outlined" value={state.billTo} onChange={e => setState({ ...state, billTo: e.target.value })}></TextField>
+                <TextField fullWidth label="Customer Name" value={state.customerName} variant="outlined" style={{ margin: '10px 0px' }} />
+                <TextField fullWidth label="Customer Address" multiline rows={2} variant="outlined" value={state.billTo} onChange={e => setState({ ...state, billTo: e.target.value, shipTo: state.sameAsBillTo ? e.target.value : state.shipTo })}></TextField>
               </Box>
             </Grid>
-            <Grid item xs={6} style={{ marginTop: "-5px" }}>
+            <Grid item xs={6}>
               <Box pl={1}>
                 <Grid container>
                   <Grid item xs={12}>
@@ -366,7 +389,7 @@ const GenerateInvoice = () => {
                     />
                   </Grid>
                   <Grid item xs={12}>
-                    <TextField fullWidth label="Ship To" multiline rows={2} variant="outlined" value={state.shipTo} onChange={e => setState({ ...state, shipTo: e.target.value })} disabled={state.sameAsBillTo}></TextField>
+                    <TextField fullWidth label="Ship To" multiline rows={3} variant="outlined" value={state.shipTo} onChange={e => setState({ ...state, shipTo: e.target.value })} disabled={state.sameAsBillTo}></TextField>
                   </Grid>
                 </Grid>
               </Box>
@@ -516,7 +539,7 @@ const GenerateInvoice = () => {
                 required
                 fullWidth
                 value={state.pan}
-                onChange={(e) => setState({ ...state, pan: e.target.value })}
+                onChange={(e) => { setState({ ...state, pan: e.target.value }); setChanges({ ...changes, merchantPan: e.target.value }) }}
                 variant="outlined"
               />
             </Grid>
@@ -527,7 +550,7 @@ const GenerateInvoice = () => {
                 required
                 fullWidth
                 value={state.gst}
-                onChange={(e) => setState({ ...state, gst: e.target.value })}
+                onChange={(e) => { setState({ ...state, gst: e.target.value }); setChanges({ ...changes, merchantGstn: e.target.value }) }}
                 variant="outlined"
               />
             </Grid>
@@ -579,7 +602,7 @@ const GenerateInvoice = () => {
         <AddCustomer onApply={handleAddCustomerApply} phone={state.customerPhone} />
       </FullScreenDialog>
       <FullScreenDialog title="Invoice Preview" header value={invoicePreview} onClick={invoicePreviewHandler} onClose={invoicePreviewClose}>
-        <CreditNote product={product} data={state} balance={balance} product={product} />
+        <CreditNote product={product} data={state} balance={balance} product={product} logo={logo} />
       </FullScreenDialog>
     </div>
   );
@@ -707,7 +730,7 @@ const useStyles = makeStyles((theme) => ({
   customer: {
     color: '#2958C1',
     fontSize: '16px',
-    margin: '0px 0px 7px'
+    margin: '0px 0px 15px'
   },
   customerIcon: {
     verticalAlign: 'sub',

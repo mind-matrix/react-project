@@ -186,11 +186,11 @@ function Dashboard(props) {
             >
               <MenuItem onClick={handleClose}>Low to High</MenuItem>
               <MenuItem onClick={handleClose}>High to Low</MenuItem>
-              <MenuItem onClick={handleClose}>Time</MenuItem>
+              <MenuItem onClick={handleClose}>Invoice Date</MenuItem>
             </Menu>
             <Button onClick={handleFilterOpen} style={{ textTransform: 'none', fontSize: '10px', height: '24px', padding: '5px 5px' }} variant="outlined">
               <Tune style={{ marginRight: '5px', height: '15px' }} />
-                        Filter
+              Filter
             </Button>
           </Box>
         </Box>

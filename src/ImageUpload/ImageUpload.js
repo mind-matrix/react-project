@@ -87,11 +87,10 @@ export default function ImageUpload(props) {
     });
 
     useEffect(() => {
-        console.log(props.img)
         if (props.image) {
             setState({ ...state, preview: props.image })
         }
-    }, [])
+    }, [props.image])
 
 
     let input = document.createElement('input')

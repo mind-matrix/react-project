@@ -122,8 +122,8 @@ function PaymentHistory(props) {
                 </Toolbar>
             </AppBar>
             <Grid container>
-                <Grid item xs={12}>
-                    <Box style={{ padding: '0px 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Grid item xs={12} display="flex">
+                    <Box style={{ maxWidth: 448, margin: '0px auto', padding: '0px 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <Typography className={classes.header} display="block">Pending</Typography>
                     </Box>
                 </Grid>
@@ -132,7 +132,7 @@ function PaymentHistory(props) {
                         if (i < (state.page - 1) * state.recordsPerPage) return;
                         if (i > (state.page) * state.recordsPerPage - 1) return;
                         return <Grid key={i} item xs={12} style={{ padding: '10px 14px' }}>
-                                <DetailedInvoiceCard individual date={moment(invoice.invoiceDate).format('ll')} invoice={invoice.invoiceNumber} name={invoice.customerName} phone={invoice.mobileNumber} total={invoice.totalAmount} due={invoice.balanceAmount} mark={() => openMarkDialog()} />
+                                <DetailedInvoiceCard individual date={moment(invoice.invoiceDate).format('ll')} invoice={invoice.invoiceNumber} name={invoice.customerName} phone={invoice.mobileNumber} total={invoice.totalAmount} due={invoice.balanceAmount} invoiceRef={invoice.invoiceRefId} mark={() => openMarkDialog()} />
                             </Grid>
                     }) : null
                 }
@@ -152,7 +152,7 @@ function PaymentHistory(props) {
                     </Box>
                 </Grid>
                 <Grid item xs={12}>
-                    <Box style={{ padding: '0px 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Box style={{ maxWidth: 448, margin: '0px auto', padding: '0px 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <Typography className={classes.header} display="block">Received</Typography>
                         <Button onClick={handleFilterOpen} style={{ textTransform: 'none', fontSize: '10px', height: '24px', padding: '5px 5px' }} variant="outlined">
                             <Tune style={{ marginRight: '5px', height: '15px' }} />
@@ -165,7 +165,7 @@ function PaymentHistory(props) {
                         if (i < (state.receivePage - 1) * state.recordsPerPage) return;
                         if (i > (state.receivePage) * state.recordsPerPage - 1) return;
                         return <Grid key={i} item xs={12} style={{ padding: '10px 14px' }}>
-                                <DetailedInvoiceCard individual date={moment(invoice.invoiceDate).format('ll')} invoice={invoice.invoiceNumber} name={invoice.customerName} phone={invoice.mobileNumber} total={invoice.balanceAmount} />
+                                <DetailedInvoiceCard individual date={moment(invoice.invoiceDate).format('ll')} invoice={invoice.invoiceNumber} name={invoice.customerName} phone={invoice.mobileNumber} total={invoice.balanceAmount} invoiceRef={invoice.invoiceRefId} />
                             </Grid>
                     }) : null
                 }

@@ -37,7 +37,7 @@ export default function AddCustomer(props) {
                     setState({ ...state, customerId: data.customerId });
                     saveCustomer(data.customerId, state.customerName, state.city)
                         .then(res => res.json())
-                        .then(data => data ? props.onApply(state) : null)
+                        .then(data => data ? props.onApply(state, data) : null)
                 }
             })
     };

@@ -1,8 +1,11 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Grid, TextField, Toolbar, Box, Button, Typography, IconButton, AppBar, CssBaseline, makeStyles } from '@material-ui/core';
 import { ArrowBack as ArrowBackIcon } from '@material-ui/icons';
 
 import history from '../history';
+import { cancelInvoice, getInvoiceNo } from '../shared/dataService';
+import { INVOICE_TYPE, MERCHANT_ID } from '../shared/constant';
+import { useHistory } from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -49,12 +52,37 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function CancelInvoice(props) {
-
     const classes = useStyles();
+    let refId = props.location.query.refId;
+    const [message, setMessage] = useState("");
+    const [cancelId, setCancelId] = useState(null);
+    let history = useHistory();
+
+    useEffect(() => {
+        getInvoiceNo(sessionStorage.getItem(MERCHANT_ID), INVOICE_TYPE.CANCELLATION)
+            .then(res => res.json())
+            .then(data => {
+                if (data.nextInvoiceNumber) {
+                    setCancelId(data.nextInvoiceNumber);
+                }
+            })
+    }, [])
+
+    const submit = () => {
+        if (cancelId) {
+            cancelInvoice(refId, cancelId, message)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.invoiceCanRef) {
+                        window.alert('Invoice has been cancelled');
+                        history.push('/payment-history');
+                    }
+                })
+        }
+    }
 
     return (
         <div className={classes.root}>
-
             <CssBaseline />
             <AppBar elevation={1} position="absolute" style={{ backgroundColor: 'white' }}>
                 <Toolbar className={classes.toolbar}>
@@ -70,7 +98,7 @@ export default function CancelInvoice(props) {
             <main className={classes.content}>
                 <div className={classes.appBarSpacer} />
                 <Typography style={{ fontSize: '14px', padding: '10px', backgroundColor: '#F8F5E8' }}>
-                    You are about to cancel invoice <b>INV/20-21/1</b> dated <b>12th March 2020</b>
+                    You are about to cancel invoice <b>{props.location.query.invoice}</b> dated <b>{props.location.query.date}</b>
                 </Typography>
                 <div className={classes.spacer} />
                 <Box px={2}>
@@ -79,6 +107,8 @@ export default function CancelInvoice(props) {
                         multiline
                         required
                         fullWidth
+                        value={message}
+                        onChange={e => setMessage(e.target.value)}
                         rows={4}
                         variant="outlined"
                     />
@@ -90,7 +120,7 @@ export default function CancelInvoice(props) {
                             </Button>
                         </Grid>
                         <Grid item xs={6}>
-                            <Button className={classes.button} variant="contained" color="primary" disableElevation fullWidth>
+                            <Button className={classes.button} variant="contained" color="primary" disableElevation fullWidth onClick={submit}>
                                 Save &amp; Issue
                             </Button>
                         </Grid>

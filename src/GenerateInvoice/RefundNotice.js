@@ -1,8 +1,11 @@
-import React from 'react';
-import { Grid, FormControl, InputLabel, Select, Toolbar, Box, Button, Typography, IconButton, AppBar, CssBaseline, makeStyles } from '@material-ui/core';
+import React, { useEffect, useState } from 'react';
+import { Grid, FormControl, InputLabel, Select, Toolbar, Box, Button, Typography, IconButton, AppBar, CssBaseline, makeStyles, TextField } from '@material-ui/core';
 import { ArrowBack as ArrowBackIcon } from '@material-ui/icons';
 
 import history from '../history';
+import { INVOICE_TYPE, MERCHANT_ID } from '../shared/constant';
+import { getInvoiceNo, refundInvoice } from '../shared/dataService';
+import { useHistory } from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -55,12 +58,37 @@ const useStyles = makeStyles((theme) => ({
 export default function RefundNotice(props) {
 
     const classes = useStyles();
+    let refId = props.location.query.refId;
+    const [refundType, setRefundType] = useState("FR");
+    const [refundAmount, setRefundAmount] = useState(props.location.query.amount);
+    const [refundId, setRefundId] = useState(null);
+    const [message, setMessage] = useState("")
 
-    const [refundType, setRefundType] = React.useState(0);
+    let history = useHistory();
 
-    const handleSetRefundType = (e) => {
-        setRefundType(e.target.value);
-    };
+    useEffect(() => {
+        console.log(props.location.query.amount)
+        getInvoiceNo(sessionStorage.getItem(MERCHANT_ID), INVOICE_TYPE.REFUND)
+            .then(res => res.json())
+            .then(data => {
+                if (data.nextInvoiceNumber) {
+                    setRefundId(data.nextInvoiceNumber);
+                }
+            })
+    }, [])
+
+    const submit = () => {
+        if (refundId) {
+            refundInvoice(refId, refundId, refundAmount, refundType, message)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.invoiceRefundRef) {
+                        window.alert('Refund has been initiated');
+                        history.push('/payment-history');
+                    }
+                })
+        }
+    }
 
     return (
         <div className={classes.root}>
@@ -80,41 +108,60 @@ export default function RefundNotice(props) {
             <main className={classes.content}>
                 <div className={classes.appBarSpacer} />
                 <Typography style={{ padding: '10px', backgroundColor: '#F8F5E8' }}>
-                    You are about to process a refund against the Invoice <b>Invoice Number</b> dated <b>Invoice Date</b> paid on <b>Payment date </b> to <b>Customer Name</b>
+                    You are about to process a refund against the Invoice <b>{props.location.query.invoice}</b> dated <b>{props.location.query.date}</b> paid on <b>Payment date </b> to <b>{props.location.query.name}</b>
                 </Typography>
-                        <div className={classes.spacer} />
-                        <Box px={2}>
-                            <FormControl variant="outlined" fullWidth className={classes.formControl}>
-                                <InputLabel htmlFor="outlined-refund-type">Refund Type</InputLabel>
-                                <Select
-                                    native
-                                    value={refundType}
-                                    onChange={handleSetRefundType}
-                                    label="Refund Type"
-                                    color="primary"
-                                    inputProps={{
-                                        name: 'refundType',
-                                        id: 'outlined-refund-type',
-                                    }}
-                                >
-                                    <option aria-label="Full Type" value={0}>Full Refund</option>
-                                    <option aria-label="Another Type" value={1}>Half Type</option>
-                                </Select>
-                            </FormControl>
-                            <div className={classes.spacer} />
-                            <Grid container spacing={1}>
-                                <Grid item xs={6}>
-                                    <Button className={classes.button} variant="contained" disableElevation fullWidth>
-                                        Preview
+                <div className={classes.spacer} />
+                <Box px={2}>
+                    <Select
+                        native
+                        fullWidth
+                        variant="outlined"
+                        value={refundType}
+                        onChange={e => setRefundType(e.target.value)}
+                        color="primary"
+                        inputProps={{
+                            name: 'refundType',
+                            id: 'outlined-refund-type',
+                        }}
+                    >
+                        <option aria-label="Full Type" value="FR">Full Refund</option>
+                        <option aria-label="Another Type" value="PR">Partial Refund</option>
+                    </Select>
+                    {refundType === "PR" ?
+                        <TextField
+                            variant="outlined"
+                            fullWidth
+                            style={{ marginTop: 15 }}
+                            label="Refund Amount"
+                            value={refundAmount}
+                            onChange={e => setRefundAmount(e.target.value)}
+                        /> : null
+                    }
+                    <TextField
+                        label="Refund Invoice Subject/Message"
+                        multiline
+                        required
+                        fullWidth
+                        style={{ marginTop: 15 }}
+                        value={message}
+                        onChange={e => setMessage(e.target.value)}
+                        rows={4}
+                        variant="outlined"
+                    />
+                    <div className={classes.spacer} />
+                    <Grid container spacing={1}>
+                        <Grid item xs={6}>
+                            <Button className={classes.button} variant="contained" disableElevation fullWidth>
+                                Preview
                             </Button>
-                                </Grid>
-                                <Grid item xs={6}>
-                                    <Button className={classes.button} variant="contained" color="primary" disableElevation fullWidth>
-                                        Save &amp; Issue
+                        </Grid>
+                        <Grid item xs={6}>
+                            <Button className={classes.button} variant="contained" color="primary" disableElevation fullWidth onClick={submit}>
+                                Save &amp; Issue
                             </Button>
-                                </Grid>
-                            </Grid>
-                        </Box>
+                        </Grid>
+                    </Grid>
+                </Box>
             </main>
         </div>
     );

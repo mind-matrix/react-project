@@ -13,3 +13,6 @@ export const MERCHANT_ID = 'merchant-id';
 export const MERCHANT_LOGO = 'merchant-logo';
 export const CUSTOMER_NAME = 'customer-name';
 export const CUSTOMER_NUMBER = 'customer-number';
+export const FILE_TYPE = {
+    
+}

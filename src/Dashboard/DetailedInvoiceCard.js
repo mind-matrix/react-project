@@ -6,6 +6,33 @@ import { Link } from 'react-router-dom';
 export default function DetailedInvoiceCard(props) {
     const classes = useStyles();
 
+    const sendReminder = (name, due) => {
+        if(navigator.canShare) {
+            navigator.share({
+                title: "Parchi",
+                text: `Dear ${name}, your payment of ₹${due} is pending. Kindly make the payment at earliest. You may check the history of your pending invoices on Parchi app`
+            })
+        }
+    }
+
+    const sendReminderHistory = (name, due, link) => {
+        if(navigator.canShare) {
+            navigator.share({
+                title: "Parchi",
+                text: `Dear ${name}, your payment of ₹${due} is pending. Refer the invoice for more details and payment instructions <<Invoice URL>>`
+            })
+        }
+    }
+
+    const sendAcknowledge = (amount, date) => {
+        if(navigator.canShare) {
+            navigator.share({
+                title: "Parchi",
+                text: `Thank you, we acknowledge receipt of ₹${amount} against Invoice dated ${date}`
+            })
+        }
+    }
+
     return (
         <Card elevation={4} className={classes.root}>
             <CardContent style={{ padding: 0 }}>
@@ -71,7 +98,7 @@ export default function DetailedInvoiceCard(props) {
                                         </Box>
                                         :
                                         <Box>
-                                            <Typography className={classes.title + ' ' + classes.paidAmount} align="left">₹{props.due}</Typography>
+                                            <Typography className={classes.title + ' ' + classes.paidAmount} align="left">₹0</Typography>
                                             <Typography className={classes.paid} display="inline" gutterBottom><Check className={classes.iconMiddle} />Paid</Typography>
                                         </Box>
                                 }
@@ -85,11 +112,11 @@ export default function DetailedInvoiceCard(props) {
                             props.due ?
                                 <Grid style={{ borderTop: '1px solid rgba(53, 51, 43, 0.1)' }} container alignItems="center">
                                     <Grid item xs={4} className={classes.link}>
-                                        <Link to='/cancelInvoice' style={{ textDecoration: 'none' }}>
+                                        <Link to={{ pathname: '/cancelInvoice', query: { refId: props.invoiceRef, invoice: props.invoice, date: props.date } }} style={{ textDecoration: 'none' }}>
                                             <Typography className={classes.linkText}>Cancel Invoice</Typography>
                                         </Link>
                                     </Grid>
-                                    <Grid item xs={4} className={classes.link}>
+                                    <Grid item xs={4} className={classes.link} onClick={() => sendReminder(props.name, props.due)}>
                                         <Typography>Send Reminder</Typography>
                                     </Grid>
                                     <Grid item xs={4} className={classes.link}>
@@ -99,7 +126,7 @@ export default function DetailedInvoiceCard(props) {
                                 :
                                 <Grid style={{ borderTop: '1px solid rgba(53, 51, 43, 0.1)' }} container alignItems="center">
                                     <Grid item xs={4} className={classes.link}>
-                                        <Link to='/refundNotice' style={{ textDecoration: 'none' }}>
+                                        <Link to={{ pathname: '/refundNotice', query: { refId: props.invoiceRef, invoice: props.invoice, date: props.date, amount: props.total, name: props.name } }} style={{ textDecoration: 'none' }}>
                                             <Typography className={classes.linkText}>Process Refund</Typography>
                                         </Link>
                                     </Grid>
@@ -120,7 +147,10 @@ export default function DetailedInvoiceCard(props) {
                             </Grid>
                             <Grid item xs={6} className={classes.link}>
                                 {
-                                    (props.due) ? <Typography>Send Reminder</Typography> : <Typography>Acknowledge Payment</Typography>
+                                    (props.due) ?
+                                        <Typography onClick={() => sendReminder(props.name, props.due)}>Send Reminder</Typography>
+                                        :
+                                        <Typography onClick={() => sendAcknowledge(props.total, props.date)}>Acknowledge Payment</Typography>
                                 }
                             </Grid>
                         </Grid>

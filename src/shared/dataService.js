@@ -176,3 +176,58 @@ export const paymentHistory = (id, phone, status) => {
 
     return response;
 }
+
+export const cancelInvoice = (ref, canId, message) => {
+    const response = fetch(`${API_ENDPOINT}/${RECEIPT}/invoice/can`, {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify({
+            invoiceRefId: ref,
+            merchantCanId: canId,
+            canReason: message
+        })
+    })
+
+    return response;
+}
+
+export const refundInvoice = (ref, refundId, amount, type, message) => {
+    const response = fetch(`${API_ENDPOINT}/${RECEIPT}/invoice/ref`, {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify({
+            invoiceRefId: ref,
+            merchantRefundId: refundId,
+            refundAmount: amount,
+            refundType: type,
+            refundReason: message
+        })
+    })
+
+    return response;
+}
+
+export const saveMerchant = (data) => {
+    const response = fetch(`${API_ENDPOINT}/${ADMIN}/savemer`, {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify(data)
+    })
+    return response;
+}
+
+export const uploadFile = (merchant, location, file) => {    
+    const formData = new FormData();
+    formData.append('merchantId', merchant);
+    formData.append('location', location);
+    formData.append('file', file, file.name);
+    const response = fetch(`${API_ENDPOINT}/${USER}/uplds3bkt`, {
+        method: 'POST',
+        headers: {
+            'Authorization': 'Basic c2VydmljZXMtcGFyY2hpLWFwaTpwYXJjaGktc2VydmljZXMtYXBpMjAyMA=='
+        },
+        body: formData,
+        redirect: 'follow'
+    })
+    return response;
+}
