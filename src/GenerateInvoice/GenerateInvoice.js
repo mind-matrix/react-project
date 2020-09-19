@@ -18,7 +18,7 @@ import AddCustomer from './AddCustomer';
 import { checkCustomerPhone, createInvoice, getCustomerDetail, getInvoiceNo, getMer, saveMerchant, uploadFile } from '../shared/dataService';
 import CreditNote from '../CreditNote/CreditNote';
 import ImageUpload from '../ImageUpload/ImageUpload';
-import { INVOICE_TYPE, MERCHANT_ID } from '../shared/constant';
+import { ASSETS, INVOICE_TYPE, MERCHANT_ID } from '../shared/constant';
 import { useHistory } from 'react-router-dom';
 
 const drawerWidth = 240;
@@ -71,7 +71,7 @@ const GenerateInvoice = () => {
     setState({
       ...state,
       sameAsBillTo: e.target.checked,
-      shipTo: e.target.checked ? state.billTo : state.shipTo
+      shipTo: e.target.checked ? state.customerName + ' ' + state.billTo : state.shipTo
     });
   };
   const [changes, setChanges] = useState({
@@ -81,6 +81,7 @@ const GenerateInvoice = () => {
   const [paymentLink, setPaymentLink] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const [filter, setFilter] = useState('flat');
+  const [disabledButton, setDisabledButton] = useState(false);
 
   const handlePaymentLink = (e) => {
     setPaymentLink(e.target.checked);
@@ -131,8 +132,6 @@ const GenerateInvoice = () => {
   };
 
   const handleAddCustomerApply = (customer, id) => {
-    console.log(id)
-    console.log(customer)
     setState({ ...state, customerId: id, customerName: customer.customerName, customerCity: customer.city, billTo: state.billTo + ' ' + customer.city });
     setAddCustomerOpen(false);
   };
@@ -177,7 +176,7 @@ const GenerateInvoice = () => {
   }, [])
 
   const checkPhoneNumber = (event) => {
-    if (event.target.value.length == 10) {
+    if (event.target.value.length === 10) {
       setState({
         ...state,
         customerPhone: event.target.value
@@ -193,7 +192,7 @@ const GenerateInvoice = () => {
               .then(res => res.json())
               .then(data => {
                 if (data.customerId) {
-                  setState({ ...state, customerName: data.firstName + ' ' + data.lastName, customerCity: data.city, billTo: state.billTo + ' ' + data.city, customerId: data.customerId });
+                  setState({ ...state, customerName: data.firstName + (data.lastName ? ' '+ data.lastName : ''), customerCity: data.city, billTo: state.billTo + ' ' + data.city, customerId: data.customerId });
                 }
               })
           }
@@ -207,23 +206,23 @@ const GenerateInvoice = () => {
   }
 
   const updateDiscount = (event) => {
-    if (filter == 'flat') {
+    if (filter === 'flat') {
       setState({ ...state, totalDiscount: event.target.value, discountValue: event.target.value, gstTotal: (state.total - event.target.value) * state.gstPercent / 100 });
       setBalance(state.total - state.advance - event.target.value + (state.total - event.target.value) * state.gstPercent / 100 + state.otherBillAmount)
-    } else if (filter == 'percent') {
+    } else if (filter === 'percent') {
       setState({ ...state, totalDiscount: (state.total * event.target.value / 100), discountValue: event.target.value, gstTotal: (state.total - (state.total * event.target.value / 100)) * state.gstPercent / 100 });
       setBalance(state.total - state.advance - (state.total * event.target.value / 100) + (state.total - (state.total * event.target.value / 100)) * state.gstPercent / 100 + state.otherBillAmount)
     }
   }
 
   const filterCloseHandler = (name) => {
-    if (typeof name == 'string') {
+    if (typeof name === 'string') {
       setFilter(name);
       setState({ ...state, discountType: name });
-      if (name == 'flat') {
+      if (name === 'flat') {
         setState({ ...state, totalDiscount: state.discountValue, gstTotal: (state.total - state.discountValue) * state.gstPercent / 100 });
         setBalance(state.total - state.advance - state.discountValue + (state.total - state.discountValue) * state.gstPercent / 100 + state.otherBillAmount)
-      } else if (name == 'percent') {
+      } else if (name === 'percent') {
         setState({ ...state, totalDiscount: state.total * state.discountValue / 100, gstTotal: (state.total - (state.total * state.discountValue / 100)) * state.gstPercent / 100 });
         setBalance(state.total - state.advance - state.total * state.discountValue / 100 + (state.total - (state.total * state.discountValue / 100)) * state.gstPercent / 100 + state.otherBillAmount)
       }
@@ -242,6 +241,7 @@ const GenerateInvoice = () => {
   }
 
   const submit = () => {
+    setDisabledButton(true);
     let data = {
       merchantCode: state.merchantCode,
       shippingDetails: state.customerName + ' ' + state.shipTo,
@@ -249,7 +249,7 @@ const GenerateInvoice = () => {
       customerId: state.customerId,
       balanceAmount: balance,
       discountAmount: state.totalDiscount,
-      discountPercentage: state.discountType == 'percent' ? state.discountValue : "0",
+      discountPercentage: state.discountType === 'percent' ? state.discountValue : "0",
       advanceAmount: state.advance,
       gstPercentage: state.gstPercent,
       gstAmount: state.gstTotal,
@@ -260,7 +260,7 @@ const GenerateInvoice = () => {
       productList: product
     }
 
-    if (Object.keys(changes).length > 0) {
+    if (Object.keys(changes).length > 1) {
       saveMerchant(changes)
         .then(res => res.json())
         .then(data => console.log(data))
@@ -269,7 +269,16 @@ const GenerateInvoice = () => {
     if(logoChanged) {
       uploadFile(sessionStorage.getItem(MERCHANT_ID), 'logos/testdata', logo)
         .then(res => res.json())
-        .then(data => console.log(data))
+        .then(data => {
+          if(data.locationUrl) {
+            saveMerchant({
+              merchantId: sessionStorage.getItem(MERCHANT_ID),
+              merchantLogo: data.locationUrl
+            })
+              .then(res => res.json())
+              .then(data => data)
+          }
+        })
     }
 
     if (state.inv) {
@@ -279,6 +288,8 @@ const GenerateInvoice = () => {
           if (data.invoiceRefId) {
             window.alert('Invoice Generated succesfully');
             history.push('/dashboard');
+          } else {
+            setDisabledButton(false);
           }
         })
     }
@@ -454,12 +465,12 @@ const GenerateInvoice = () => {
             </Grid>
           </Grid>
           <Grid container justify="space-between" alignItems="center" className={classes.elaboration}>
-            <Grid item xs={9} style={{ textAlign: 'left', fontSize: 14 }}>
+            <Grid item xs={9} style={{ display: 'flex', alignItems: 'center', flexDirection: 'row', textAlign: 'left', fontSize: 14 }}>
               Discount
-              <Button aria-controls="simple-menu" aria-haspopup="true" onClick={handleSortOpen} style={{ textTransform: 'none', fontSize: '10px', height: '24px', padding: '5px 5px', margin: '0px 5px' }} variant="outlined">
+              <Box aria-controls="simple-menu" aria-haspopup="true" onClick={handleSortOpen} className={classes.extraButton} style={{marginLeft: 10}}>
                 {filter}
                 <ArrowDropDown />
-              </Button>
+              </Box>
               <Menu
                 id="simple-menu"
                 anchorEl={anchorEl}
@@ -588,7 +599,7 @@ const GenerateInvoice = () => {
               </Button>
             </Grid>
             <Grid item xs={6}>
-              <Button className={classes.button} variant="contained" color="primary" variant="contained" fullWidth onClick={submit}>
+              <Button className={classes.button} variant="contained" color="primary" variant="contained" fullWidth onClick={submit} disabled={disabledButton}>
                 Save &amp; Issue
               </Button>
             </Grid>
@@ -770,6 +781,22 @@ const useStyles = makeStyles((theme) => ({
     marginLeft: '5px',
     '& input': {
       padding: '5px'
+    }
+  },
+  extraButton: {
+    textTransform: 'none',
+    fontSize: '10px',
+    height: '24px',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    background: 'white',
+    border: '0.5px solid #aaaaaa',
+    borderRadius: 4,
+    outline: 'none',
+    padding: '0px 5px',
+    '&:focus, &:hover, &:active': {
+      outline: 'none'
     }
   }
 }));

@@ -38,12 +38,12 @@ export default function FilterSelect(props) {
   const classes = useStyles();
 
   const [date, setDate] = useState({
-    start: null,
-    end: null
+    start: undefined,
+    end: undefined
   });
-  const [amount, setAmount] = useState([0, 1000]);
-  const [status, setStatus] = useState("");
-  const [phone, setPhone] = useState("");
+  const [amount, setAmount] = useState([0, 50000]);
+  const [status, setStatus] = useState(undefined);
+  const [phone, setPhone] = useState(undefined);
 
   const handleDateStartChange = (event) => {
     console.log(event.target.value)
@@ -67,6 +67,10 @@ export default function FilterSelect(props) {
   const handleOnApply = () => {
     props.onApply({ date, amount, status, phone });
   };
+
+  const resetFilter = () => {
+    props.reset();
+  }
 
   return (
     <Grid container style={{ maxWidth: 420 }} justify="space-around">
@@ -166,6 +170,12 @@ export default function FilterSelect(props) {
           onClick={handleOnApply}
           style={{ marginTop: '20px', textTransform: 'none', backgroundColor: '#E2714D', height: '44px' }}
         >Apply</Button>
+        <Button
+          fullWidth
+          disableElevation
+          onClick={resetFilter}
+          style={{ marginTop: '10px', textTransform: 'none', height: '44px' }}
+        >Reset</Button>
       </Grid>
     </Grid>
   );

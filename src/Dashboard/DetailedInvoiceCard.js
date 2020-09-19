@@ -7,7 +7,7 @@ export default function DetailedInvoiceCard(props) {
     const classes = useStyles();
 
     const sendReminder = (name, due) => {
-        if(navigator.canShare) {
+        if (navigator.canShare) {
             navigator.share({
                 title: "Parchi",
                 text: `Dear ${name}, your payment of ₹${due} is pending. Kindly make the payment at earliest. You may check the history of your pending invoices on Parchi app`
@@ -16,7 +16,7 @@ export default function DetailedInvoiceCard(props) {
     }
 
     const sendReminderHistory = (name, due, link) => {
-        if(navigator.canShare) {
+        if (navigator.canShare) {
             navigator.share({
                 title: "Parchi",
                 text: `Dear ${name}, your payment of ₹${due} is pending. Refer the invoice for more details and payment instructions <<Invoice URL>>`
@@ -25,7 +25,7 @@ export default function DetailedInvoiceCard(props) {
     }
 
     const sendAcknowledge = (amount, date) => {
-        if(navigator.canShare) {
+        if (navigator.canShare) {
             navigator.share({
                 title: "Parchi",
                 text: `Thank you, we acknowledge receipt of ₹${amount} against Invoice dated ${date}`
@@ -49,12 +49,12 @@ export default function DetailedInvoiceCard(props) {
                             <Grid item xs={3}>
                                 {
                                     (props.due) ?
-                                        <Box>
+                                        <Box className={classes.box}>
                                             <Typography className={classes.title + ' ' + classes.dueAmount} align="left">₹{props.due}</Typography>
                                             <Typography className={classes.due} display="inline" gutterBottom>Due</Typography>
                                         </Box>
                                         :
-                                        <Box>
+                                        <Box className={classes.box}>
                                             <Typography className={classes.title + ' ' + classes.paidAmount} align="left">₹{props.total}</Typography>
                                             <Typography className={classes.paid} display="inline" gutterBottom>Received</Typography>
                                         </Box>
@@ -63,7 +63,7 @@ export default function DetailedInvoiceCard(props) {
                             <Grid item xs={4}>
                                 {
                                     (props.due) ?
-                                        <Button variant="contained" className={classes.receiveButton} onClick={props.mark}>Mark Received</Button>
+                                        <Button variant="contained" color="primary" className={classes.receiveButton} onClick={props.mark}>Mark Received</Button>
                                         :
                                         // <Box>
                                         //     <Typography variant="caption" className={classes.bank} align="right" display="block">YR142643</Typography>
@@ -94,11 +94,11 @@ export default function DetailedInvoiceCard(props) {
                                     (props.due) ?
                                         <Box>
                                             <Typography className={classes.title + ' ' + classes.dueAmount} align="left">₹{props.due}</Typography>
-                                            <Typography className={classes.due} display="inline" gutterBottom>Due</Typography>
+                                            <Typography className={classes.due} style={{marginLeft:14}} display="inline" gutterBottom>Due</Typography>
                                         </Box>
                                         :
                                         <Box>
-                                            <Typography className={classes.title + ' ' + classes.paidAmount} align="left">₹0</Typography>
+                                            <Typography className={classes.title + ' ' + classes.paidAmount} align="left">{props.receive}</Typography>
                                             <Typography className={classes.paid} display="inline" gutterBottom><Check className={classes.iconMiddle} />Paid</Typography>
                                         </Box>
                                 }
@@ -116,11 +116,13 @@ export default function DetailedInvoiceCard(props) {
                                             <Typography className={classes.linkText}>Cancel Invoice</Typography>
                                         </Link>
                                     </Grid>
-                                    <Grid item xs={4} className={classes.link} onClick={() => sendReminder(props.name, props.due)}>
+                                    <Grid item xs={4} className={classes.link} onClick={() => sendReminderHistory(props.name, props.due, props.link)}>
                                         <Typography>Send Reminder</Typography>
                                     </Grid>
                                     <Grid item xs={4} className={classes.link}>
-                                        <Typography>View Invoice</Typography>
+                                        <Link to={{ pathname: '/pdf', state: { url: props.url } }} style={{ textDecoration: 'none' }}>
+                                            <Typography className={classes.linkText}>View Invoice</Typography>
+                                        </Link>
                                     </Grid>
                                 </Grid>
                                 :
@@ -134,7 +136,9 @@ export default function DetailedInvoiceCard(props) {
                                         <Typography>Payment Details</Typography>
                                     </Grid>
                                     <Grid item xs={4} className={classes.link}>
-                                        <Typography>View Invoice</Typography>
+                                        <Link to={{ pathname: '/pdf', state: { url: props.url } }} style={{ textDecoration: 'none' }}>
+                                            <Typography className={classes.linkText}>View Invoice</Typography>
+                                        </Link>
                                     </Grid>
                                 </Grid>
                         )
@@ -205,7 +209,6 @@ const useStyles = makeStyles({
         fontSize: '10px',
         color: 'white',
         lineHeight: '13px',
-        marginLeft: '14px',
         textAlign: 'left',
         marginTop: '-5px'
     },
@@ -222,7 +225,6 @@ const useStyles = makeStyles({
         fontSize: '10px',
         color: 'white',
         lineHeight: '13px',
-        marginLeft: '14px',
         textAlign: 'left'
     },
     bank: {
@@ -254,7 +256,6 @@ const useStyles = makeStyles({
     receiveButton: {
         fontSize: '12px',
         textTransform: 'none',
-        backgroundColor: '#419945',
         color: '#FFFFFF',
         maxWidth: '360px',
         padding: '5px 8px',
@@ -262,5 +263,11 @@ const useStyles = makeStyles({
         '&:hover': {
             backgroundColor: '#E2714E'
         }
+    },
+    box: {
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center'
     }
 });

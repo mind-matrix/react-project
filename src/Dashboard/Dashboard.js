@@ -9,7 +9,7 @@ import FullScreenDialog from '../FullScreenDialog';
 import InvoiceCard from './InvoiceCard';
 import DetailedInvoiceCard from './DetailedInvoiceCard';
 import FreechargeIcon from '../FreechargeIcon';
-import { getAllCustomerLedger, getFilteredCustomerLedger, getLedgerBalance, getMerchant } from '../shared/dataService';
+import { getAllCustomerLedger, getFilteredCustomerLedger, getLedgerBalance, getMerchant, saveMerchant } from '../shared/dataService';
 import { useHistory } from 'react-router-dom';
 import { MERCHANT_LOGO, FREECHARGE_ID, MERCHANT_ID } from '../shared/constant';
 import moment from 'moment';
@@ -77,7 +77,17 @@ function Dashboard(props) {
               }
             })
         } else {
-
+          saveMerchant({
+            freechargeId: id,
+            merchantName: name
+          })
+            .then(res => res.json())
+            .then(data => {
+              if (data.merchantId != null) {
+                sessionStorage.setItem(MERCHANT_ID, data.merchantId);
+                sessionStorage.setItem(MERCHANT_LOGO, data.merchantLogo)
+              }
+            })
         }
       })
   }, [])
@@ -90,9 +100,21 @@ function Dashboard(props) {
     setFilterOpen(false);
   };
 
+  const resetFilter = () => {
+    setFilterOpen(false);
+    getAllCustomerLedger(sessionStorage.getItem(MERCHANT_ID))
+      .then(res => res.json())
+      .then(data => {
+        if (data.customerLedgerDetails) {
+          setCustomerLedger(data.customerLedgerDetails);
+          setState({ ...state, totalPage: Math.ceil(data.customerLedgerDetails.length / state.recordsPerPage) })
+        }
+      })
+
+  }
+
   const handleFilterApply = (options) => {
     setFilterOpen(false);
-    console.log(options)
     getFilteredCustomerLedger(
       sessionStorage.getItem(MERCHANT_ID),
       options.phone,
@@ -114,6 +136,19 @@ function Dashboard(props) {
   const handleClose = () => {
     setAnchorEl(null);
   };
+
+  const sortInvoice = (sort) => {
+    if(sort === 'l2h') {
+      setCustomerLedger(customerLedger.sort((a, b)=> b.dueAmt - a.dueAmt || a.receivedAmt - b.receivedAmt ));
+    } else if(sort === 'h2l') {
+      setCustomerLedger(customerLedger.sort((a, b)=> a.dueAmt - b.dueAmt || b.receivedAmt - a.receivedAmt ));
+    } else if (sort === 'date') {
+      setCustomerLedger(customerLedger.sort((a, b)=> new Date(b.lastInvoiceDate) - new Date(a.lastInvoiceDate)))
+    }
+
+    handleSortClose();
+    handleClose();
+  }
 
   const handleSortOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -172,11 +207,11 @@ function Dashboard(props) {
         </Grid>
         <Box display="flex" flexDirection="row" justifyContent="space-between" style={{ maxWidth: 420, margin: '20px auto 0px' }}>
           <Typography className={classes.detailedInvoiceHeader} display="inline">Detailed Invoice List</Typography>
-          <Box>
-            <Button aria-controls="simple-menu" aria-haspopup="true" onClick={handleSortOpen} style={{ textTransform: 'none', fontSize: '10px', height: '24px', padding: '5px 5px', marginRight: '5px' }} variant="outlined">
+          <Box display='flex' justifyContent='flex-end' flexDirection='row'>
+            <Box className={classes.extraButton} aria-controls="simple-menu" aria-haspopup="true" onClick={handleSortOpen} style={{ marginRight: '5px' }}>
               Sort by
               <ArrowDropDown />
-            </Button>
+            </Box>
             <Menu
               id="simple-menu"
               anchorEl={anchorEl}
@@ -184,14 +219,14 @@ function Dashboard(props) {
               open={Boolean(anchorEl)}
               onClose={handleClose}
             >
-              <MenuItem onClick={handleClose}>Low to High</MenuItem>
-              <MenuItem onClick={handleClose}>High to Low</MenuItem>
-              <MenuItem onClick={handleClose}>Invoice Date</MenuItem>
+              <MenuItem onClick={() => sortInvoice('l2h')}>Low to High</MenuItem>
+              <MenuItem onClick={() => sortInvoice('h2l')}>High to Low</MenuItem>
+              <MenuItem onClick={() => sortInvoice('date')}>Invoice Date</MenuItem>
             </Menu>
-            <Button onClick={handleFilterOpen} style={{ textTransform: 'none', fontSize: '10px', height: '24px', padding: '5px 5px' }} variant="outlined">
+            <Box onClick={handleFilterOpen} className={classes.extraButton}>
               <Tune style={{ marginRight: '5px', height: '15px' }} />
               Filter
-            </Button>
+            </Box>
           </Box>
         </Box>
         <Box style={{ maxWidth: 420, margin: '0px auto' }}>
@@ -203,29 +238,31 @@ function Dashboard(props) {
               if (index < (state.page - 1) * state.recordsPerPage) return;
               if (index > (state.page) * state.recordsPerPage - 1) return;
               return <Grid item style={{ padding: '10px 14px' }} key={index} xs={12}>
-                <DetailedInvoiceCard date={moment().format('ll')} name={invoice.customerName} phone={invoice.mobileNumber} total={invoice.totalAmount} due={invoice.dueAmount}></DetailedInvoiceCard>
+                <DetailedInvoiceCard date={moment(invoice.lastInvoiceDate).format('ll')} name={invoice.customerName} phone={invoice.mobileNumber} receive={invoice.receivedAmt} total={invoice.totalAmount} due={invoice.dueAmt}></DetailedInvoiceCard>
               </Grid>
             })
           }
-          <Grid item xs={12}>
-            <Box maxWidth={200} style={{ width: 'fit-content', margin: '0 auto' }}>
-              <Typography>
-                <Button onClick={prevPage} style={{ padding: '5px 5px', minWidth: 0 }} variant="outlined">
-                  <ChevronLeft style={{ verticalAlign: 'middle', fontSize: '10pt' }} />
-                </Button>
-                <span style={{ padding: '5px 10px', fontSize: '10pt' }}>
-                  {state.page}/{state.totalPage}
-                </span>
-                <Button onClick={nextPage} style={{ padding: '5px 5px', minWidth: 0 }} variant="outlined">
-                  <ChevronRight style={{ verticalAlign: 'middle', fontSize: '10pt' }} />
-                </Button>
-              </Typography>
-            </Box>
-          </Grid>
+          {state.totalPage ?
+            <Grid item xs={12}>
+              <Box maxWidth={200} style={{ width: 'fit-content', margin: '0 auto' }}>
+                <Typography>
+                  <Button onClick={prevPage} style={{ padding: '5px 5px', minWidth: 0 }} variant="outlined">
+                    <ChevronLeft style={{ verticalAlign: 'middle', fontSize: '10pt' }} />
+                  </Button>
+                  <span style={{ padding: '5px 10px', fontSize: '10pt' }}>
+                    {state.page}/{state.totalPage}
+                  </span>
+                  <Button onClick={nextPage} style={{ padding: '5px 5px', minWidth: 0 }} variant="outlined">
+                    <ChevronRight style={{ verticalAlign: 'middle', fontSize: '10pt' }} />
+                  </Button>
+                </Typography>
+              </Box>
+            </Grid> : null
+          }
         </Grid>
       </main>
       <FullScreenDialog title="Filter" value={filter} onClick={handleFilterOpen} onClose={handleFilterClose}>
-        <FilterSelect onApply={handleFilterApply} dashboard />
+        <FilterSelect onApply={handleFilterApply} reset={resetFilter} dashboard />
       </FullScreenDialog>
     </div>
   )
@@ -344,6 +381,22 @@ const useStyles = makeStyles((theme) => ({
   },
   dialogTitle: {
     color: '#ffffff'
+  },
+  extraButton: {
+    textTransform: 'none',
+    fontSize: '10px',
+    height: '24px',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    background: 'white',
+    border: '0.5px solid #aaaaaa',
+    borderRadius: 4,
+    outline: 'none',
+    padding: '0px 5px',
+    '&:focus, &:hover, &:active': {
+      outline: 'none'
+    }
   }
 }));
 

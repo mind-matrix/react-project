@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Grid, TextField, Toolbar, Box, Button, Typography, IconButton, AppBar, CssBaseline, makeStyles } from '@material-ui/core';
 import { ArrowBack as ArrowBackIcon } from '@material-ui/icons';
-
-import history from '../history';
-import { cancelInvoice, getInvoiceNo } from '../shared/dataService';
-import { INVOICE_TYPE, MERCHANT_ID } from '../shared/constant';
+import { cancelInvoice, getCustomerDetail, getInvoice, getInvoiceNo, getMer } from '../shared/dataService';
+import { INVOICE_TYPE, MERCHANT_ID, MERCHANT_LOGO } from '../shared/constant';
 import { useHistory } from 'react-router-dom';
+import FullScreenDialog from '../FullScreenDialog';
+import InvoiceView from '../CreditNote/InvoiceView';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -56,6 +56,9 @@ export default function CancelInvoice(props) {
     let refId = props.location.query.refId;
     const [message, setMessage] = useState("");
     const [cancelId, setCancelId] = useState(null);
+    const [invoiceData, setInvoiceData] = useState({});
+    const [invoicePreview, setInvoicePreview] = useState(false);
+    const [disabledButton, setDisabledButton] = useState(false);
     let history = useHistory();
 
     useEffect(() => {
@@ -66,9 +69,51 @@ export default function CancelInvoice(props) {
                     setCancelId(data.nextInvoiceNumber);
                 }
             })
+
+        getInvoice(props.location.query.refId)
+            .then(res => res.json())
+            .then(collection => {
+                if (collection[0].merchantId) {
+                    let dataForInvoice = collection[0];
+                    getMer(sessionStorage.getItem(MERCHANT_ID))
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.merchantId) {
+                                let merchantData = {
+                                    ...dataForInvoice,
+                                    merchantName: data.merchantName,
+                                    merchantAddress: `${data.merchantAddress1 ? data.merchantAddress1 : ''} ${data.merchantAddress2 ? data.merchantAddress2 : ''} ${data.merchantCity ? data.merchantCity : ''}`,
+                                    pan: data.merchantPan,
+                                    gst: data.merchantGstn,
+                                    ...invoiceData
+                                }
+                                getCustomerDetail(dataForInvoice.customerId)
+                                    .then(res => res.json())
+                                    .then(customer => {
+                                        if (customer.customerId) {
+                                            setInvoiceData({
+                                                ...merchantData,
+                                                customerName: customer.firstName + (customer.lastName ? ' ' + customer.lastName : ''),
+                                                customerCity: customer.city
+                                            })
+                                        }
+                                    })
+                            }
+                        })
+                }
+            })
     }, [])
 
+    const invoicePreviewHandler = () => {
+        setInvoicePreview(true);
+    }
+
+    const invoicePreviewClose = () => {
+        setInvoicePreview(false);
+    }
+
     const submit = () => {
+        setDisabledButton(true);
         if (cancelId) {
             cancelInvoice(refId, cancelId, message)
                 .then(res => res.json())
@@ -76,6 +121,8 @@ export default function CancelInvoice(props) {
                     if (data.invoiceCanRef) {
                         window.alert('Invoice has been cancelled');
                         history.push('/payment-history');
+                    } else {
+                        setDisabledButton(false);
                     }
                 })
         }
@@ -86,7 +133,7 @@ export default function CancelInvoice(props) {
             <CssBaseline />
             <AppBar elevation={1} position="absolute" style={{ backgroundColor: 'white' }}>
                 <Toolbar className={classes.toolbar}>
-                    <IconButton edge="start" onClick={() => history.back()} aria-label="close">
+                    <IconButton edge="start" onClick={() => history.push('/payment-history')} aria-label="close">
                         <ArrowBackIcon />
                     </IconButton>
                     <Typography variant="h6" className={classes.title} align="center">
@@ -115,18 +162,21 @@ export default function CancelInvoice(props) {
                     <div className={classes.spacer} />
                     <Grid container spacing={1}>
                         <Grid item xs={6}>
-                            <Button className={classes.button} variant="contained" disableElevation fullWidth>
+                            <Button className={classes.button} variant="contained" onClick={invoicePreviewHandler} disableElevation fullWidth>
                                 Preview
                             </Button>
                         </Grid>
                         <Grid item xs={6}>
-                            <Button className={classes.button} variant="contained" color="primary" disableElevation fullWidth onClick={submit}>
+                            <Button className={classes.button} variant="contained" color="primary" disableElevation fullWidth onClick={submit} disabled={disabledButton}>
                                 Save &amp; Issue
                             </Button>
                         </Grid>
                     </Grid>
                 </Box>
             </main>
+            <FullScreenDialog title="Cancel Invoice Preview" header value={invoicePreview} onClick={invoicePreviewHandler} onClose={invoicePreviewClose}>
+                <InvoiceView data={invoiceData} logo={sessionStorage.getItem(MERCHANT_LOGO)} />
+            </FullScreenDialog>
         </div>
     );
 }

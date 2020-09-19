@@ -1,4 +1,4 @@
-import { API_ENDPOINT, RECEIPT, ADMIN, CUSTOMER, USER } from './constant';
+import { API_ENDPOINT, RECEIPT, ADMIN, CUSTOMER, USER, MERCHANT_ID } from './constant';
 
 const headers = {
     'Authorization': 'Basic c2VydmljZXMtcGFyY2hpLWFwaTpwYXJjaGktc2VydmljZXMtYXBpMjAyMA==',
@@ -114,9 +114,7 @@ export const getAllCustomerLedger = (merchantId) => {
         method: 'POST',
         headers: headers,
         body: JSON.stringify({
-            merchantId: merchantId,
-            dateFrom: new Date(Date.now() - 2592e6).toISOString().substring(0, 10),
-            dateTo: new Date().toISOString().substring(0, 10)
+            merchantId: merchantId
         })
     })
 
@@ -163,15 +161,11 @@ export const showUrl = (id) => {
     return response;
 }
 
-export const paymentHistory = (id, phone, status) => {
+export const paymentHistory = (data) => {
     const response = fetch(`${API_ENDPOINT}/${RECEIPT}/invoice/pyhstry`, {
         method: 'POST',
         headers: headers,
-        body: JSON.stringify({
-            merchantId: id,
-            customerPhone: phone,
-            paymentStatus: status
-        })
+        body: JSON.stringify(data)
     })
 
     return response;
@@ -197,7 +191,7 @@ export const refundInvoice = (ref, refundId, amount, type, message) => {
         headers: headers,
         body: JSON.stringify({
             invoiceRefId: ref,
-            merchantRefundId: refundId,
+            merchantRefId: refundId,
             refundAmount: amount,
             refundType: type,
             refundReason: message
@@ -228,6 +222,18 @@ export const uploadFile = (merchant, location, file) => {
         },
         body: formData,
         redirect: 'follow'
+    })
+    return response;
+}
+
+export const getInvoice = (id) => {
+    const response = fetch(`${API_ENDPOINT}/${RECEIPT}/invoice/get`, {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify({
+            merchantId: sessionStorage.getItem(MERCHANT_ID),
+            invoiceRefId: id
+        })
     })
     return response;
 }

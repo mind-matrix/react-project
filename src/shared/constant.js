@@ -1,4 +1,5 @@
 export const API_ENDPOINT = "https://test.getparchi.com/papi";
+export const ASSETS = "https://parchi-container.s3.ap-south-1.amazonaws.com";
 export const RECEIPT = "receipt";
 export const ADMIN = "admin";
 export const CUSTOMER = "cust";
