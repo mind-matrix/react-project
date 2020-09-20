@@ -11,7 +11,7 @@ import Box from '@material-ui/core/Box';
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Container from '@material-ui/core/Container';
-import AppIcon from '../AppIcon';
+import AppIcon from '../Common/AppIcon';
 import axios from 'axios';
 import { API_ENDPOINT } from '../shared/constant';
 

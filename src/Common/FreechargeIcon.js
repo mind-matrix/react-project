@@ -1,5 +1,5 @@
 import React from 'react';
-import freechargeIcon from './freecharge.png';
+import freechargeIcon from '../Assets/freecharge.png';
 
 export default function FreechargeIcon(props) {
     return (

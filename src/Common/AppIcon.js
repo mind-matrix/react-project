@@ -1,5 +1,5 @@
 import React from 'react';
-import Icon from './icon.svg';
+import Icon from '../Assets/icon.svg';
 
 export default function AppIcon(props) {
     return (

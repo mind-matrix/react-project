@@ -1,5 +1,5 @@
 import React from 'react';
-import WaveSVG from './wave.svg';
+import WaveSVG from '../Assets/wave.svg';
 import './Wave.css';
 
 export default function Wave() {

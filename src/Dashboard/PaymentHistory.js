@@ -3,7 +3,7 @@ import { CssBaseline, AppBar, Toolbar, Typography, makeStyles, Box, Grid, Button
 import { ArrowBack, Tune } from '@material-ui/icons';
 import { Link } from 'react-router-dom';
 import DetailedInvoiceCard from './DetailedInvoiceCard';
-import FullScreenDialog from '../FullScreenDialog';
+import FullScreenDialog from '../Common/FullScreenDialog';
 import FilterSelect from './FilterSelect';
 import { ChevronLeft, ChevronRight } from '@material-ui/icons';
 import { KeyboardDatePicker } from '@material-ui/pickers';
@@ -102,6 +102,9 @@ function PaymentHistory(props) {
                 if (data.paymentInfoList) {
                     setReceive(data.paymentInfoList);
                     setState({ ...state, totalReceivePage: Math.ceil(data.paymentInfoList.length / state.recordsPerPage) })
+                } else {
+                    setReceive([]);
+                    setState({ ...state, totalReceivePage: 1 })
                 }
             })
         setFilterOpen(false);

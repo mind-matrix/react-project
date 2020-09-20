@@ -21,7 +21,6 @@ import RefundNotice from './GenerateInvoice/RefundNotice';
 import Invoice from './Invoice/Invoice';
 import PDFViewer from './PDFViewer/PDFViewer';
 import ReceiptView from './ReceiptView/ReceiptView';
-import history from './history';
 import PaymentHistory from './Dashboard/PaymentHistory';
 import CreditNote from './CreditNote/CreditNote';
 import moment from 'moment';

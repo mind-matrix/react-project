@@ -1,7 +1,7 @@
 import React from 'react';
 import Grid from '@material-ui/core/Grid';
 import { Typography, Slider, Select, Button, Box, FormControl, InputLabel, makeStyles } from '@material-ui/core';
-import ToggleOption from '../ToggleOption';
+import ToggleOption from '../Common/ToggleOption';
 
 const useStyles = makeStyles({
   header: {

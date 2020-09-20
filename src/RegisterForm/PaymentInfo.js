@@ -8,7 +8,7 @@ import TextField from '@material-ui/core/TextField';
 import Container from '@material-ui/core/Container';
 import Box from '@material-ui/core/Box';
 import grey from '@material-ui/core/colors/grey';
-import ToggleOption from '../ToggleOption';
+import ToggleOption from '../Common/ToggleOption';
 
 export default function PaymentInfo() {
     

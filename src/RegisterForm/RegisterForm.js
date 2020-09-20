@@ -6,11 +6,11 @@ import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
-import AppIcon from '../AppIcon';
+import AppIcon from '../Common/AppIcon';
 import RegisterFormStepper from './RegisterFormStepper';
 import { CssBaseline, Icon } from '@material-ui/core';
 
-import FreechargeIcon from '../FreechargeIcon';
+import FreechargeIcon from '../Common/FreechargeIcon';
 
 import { withRouter } from 'react-router-dom';
 

@@ -12,7 +12,7 @@ import { green } from '@material-ui/core/colors';
 import { ArrowBack as ArrowBackIcon, Person as PersonIcon, Add as AddIcon, ArrowDropDown } from '@material-ui/icons';
 import CustomerSelectInput from './CustomerSelectInput';
 import InvoiceInput from './InvoiceInput';
-import FullScreenDialog from '../FullScreenDialog';
+import FullScreenDialog from '../Common/FullScreenDialog';
 import AddItem from './AddItem';
 import AddCustomer from './AddCustomer';
 import { checkCustomerPhone, createInvoice, getCustomerDetail, getInvoiceNo, getMer, saveMerchant, uploadFile } from '../shared/dataService';

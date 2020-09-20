@@ -4,7 +4,7 @@ import { ArrowBack as ArrowBackIcon } from '@material-ui/icons';
 import { cancelInvoice, getCustomerDetail, getInvoice, getInvoiceNo, getMer } from '../shared/dataService';
 import { INVOICE_TYPE, MERCHANT_ID, MERCHANT_LOGO } from '../shared/constant';
 import { useHistory } from 'react-router-dom';
-import FullScreenDialog from '../FullScreenDialog';
+import FullScreenDialog from '../Common/FullScreenDialog';
 import InvoiceView from '../CreditNote/InvoiceView';
 
 const useStyles = makeStyles((theme) => ({

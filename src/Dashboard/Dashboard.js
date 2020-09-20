@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import AppIcon from '../AppIcon';
+import AppIcon from '../Common/AppIcon';
 import { CssBaseline, AppBar, Toolbar, Icon, Typography, Grid, Button, Box, Slide, Menu, MenuItem } from '@material-ui/core';
 import { ArrowDropDown, Tune, ChevronLeft, ChevronRight } from '@material-ui/icons';
 import FilterSelect from './FilterSelect';
 import SortSelect from './SortSelect';
-import FullScreenDialog from '../FullScreenDialog';
+import FullScreenDialog from '../Common/FullScreenDialog';
 import InvoiceCard from './InvoiceCard';
 import DetailedInvoiceCard from './DetailedInvoiceCard';
-import FreechargeIcon from '../FreechargeIcon';
+import FreechargeIcon from '../Common/FreechargeIcon';
 import { getAllCustomerLedger, getFilteredCustomerLedger, getLedgerBalance, getMerchant, saveMerchant } from '../shared/dataService';
 import { useHistory } from 'react-router-dom';
 import { MERCHANT_LOGO, FREECHARGE_ID, MERCHANT_ID } from '../shared/constant';
@@ -129,6 +129,9 @@ function Dashboard(props) {
         if (data.customerLedgerDetails) {
           setCustomerLedger(data.customerLedgerDetails);
           setState({ ...state, totalPage: Math.ceil(data.customerLedgerDetails.length / state.recordsPerPage) })
+        } else {
+          setCustomerLedger([]);
+          setState({ ...state, totalPage: 1 })
         }
       })
   };

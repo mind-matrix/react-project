@@ -10,7 +10,7 @@ import {
 import shoppingCart from './shopping-online.png';
 import dummyBarcode from './dummy-barcode.png';
 
-import AppIcon from '../AppIcon';
+import AppIcon from '../Common/AppIcon';
 
 import Rate0 from './sad-0.svg';
 import Rate1 from './sad-1.svg';
