@@ -33,6 +33,16 @@ export default function DetailedInvoiceCard(props) {
         }
     }
 
+    const formatAmount = (amount) => {
+        if (amount < 100000) {
+            return amount.toFixed(2);
+        } else if (amount >= 100000 && amount < 10000000) {
+            return (amount / 100000).toFixed(2) + 'L'
+        } else if (amount >= 10000000 && amount < 1000000000) {
+            return (amount / 10000000).toFixed(2) + 'Cr'
+        }
+    }
+
     return (
         <Card elevation={4} className={classes.root}>
             <CardContent style={{ padding: 0 }}>
@@ -75,36 +85,38 @@ export default function DetailedInvoiceCard(props) {
                         </Grid>
                     </Box>
                     :
-                    <Box style={{ padding: '16px', paddingBottom: '5px' }}>
-                        <Typography className={classes.date}>
-                            <CalendarToday className={classes.icon} />
-                            {props.date}
-                        </Typography>
-                        <Grid container>
-                            <Grid item xs={5}>
-                                <Typography className={classes.title} align="left">{props.name}</Typography>
-                                <Typography className={classes.sub} align="left" gutterBottom>{props.phone}</Typography>
+                    ( !props.history ?
+                        <Box style={{ padding: '16px', paddingBottom: '5px' }}>
+                            <Typography className={classes.date}>
+                                <CalendarToday className={classes.icon} />
+                                {props.date}
+                            </Typography>
+                            <Grid container>
+                                <Grid item xs={5}>
+                                    <Typography className={classes.title} align="left">{props.name}</Typography>
+                                    <Typography className={classes.sub} align="left" gutterBottom>{props.phone}</Typography>
+                                </Grid>
+                                <Grid item xs={4}>
+                                    <Typography className={classes.title} align="left">₹{formatAmount(props.total)}</Typography>
+                                    <Typography className={classes.sub} align="left" gutterBottom>Total</Typography>
+                                </Grid>
+                                <Grid item xs={3}>
+                                    {
+                                        (props.due) ?
+                                            <Box>
+                                                <Typography className={classes.title + ' ' + classes.dueAmount} align="left">₹{formatAmount(props.due)}</Typography>
+                                                <Typography className={classes.due} style={{ marginLeft: 14 }} display="inline" gutterBottom>Due</Typography>
+                                            </Box>
+                                            :
+                                            <Box>
+                                                <Typography className={classes.title + ' ' + classes.paidAmount} align="left">{formatAmount(props.receive)}</Typography>
+                                                <Typography className={classes.paid} display="inline" gutterBottom><Check className={classes.iconMiddle} />Paid</Typography>
+                                            </Box>
+                                    }
+                                </Grid>
                             </Grid>
-                            <Grid item xs={4}>
-                                <Typography className={classes.title} align="left">₹{props.total}</Typography>
-                                <Typography className={classes.sub} align="left" gutterBottom>Total</Typography>
-                            </Grid>
-                            <Grid item xs={3}>
-                                {
-                                    (props.due) ?
-                                        <Box>
-                                            <Typography className={classes.title + ' ' + classes.dueAmount} align="left">₹{props.due}</Typography>
-                                            <Typography className={classes.due} style={{marginLeft:14}} display="inline" gutterBottom>Due</Typography>
-                                        </Box>
-                                        :
-                                        <Box>
-                                            <Typography className={classes.title + ' ' + classes.paidAmount} align="left">{props.receive}</Typography>
-                                            <Typography className={classes.paid} display="inline" gutterBottom><Check className={classes.iconMiddle} />Paid</Typography>
-                                        </Box>
-                                }
-                            </Grid>
-                        </Grid>
-                    </Box>
+                        </Box> : null
+                    )
                 }
                 {
                     props.individual ?
@@ -128,12 +140,14 @@ export default function DetailedInvoiceCard(props) {
                                 :
                                 <Grid style={{ borderTop: '1px solid rgba(53, 51, 43, 0.1)' }} container alignItems="center">
                                     <Grid item xs={4} className={classes.link}>
-                                        <Link to={{ pathname: '/refundNotice', query: { refId: props.invoiceRef, invoice: props.invoice, date: props.date, amount: props.total, name: props.name } }} style={{ textDecoration: 'none' }}>
+                                        <Link to={{ pathname: '/refundNotice', query: { refId: props.invoiceRef, invoice: props.invoice, date: props.date, paymentDate: props.paymentDate, amount: props.total, name: props.name } }} style={{ textDecoration: 'none' }}>
                                             <Typography className={classes.linkText}>Process Refund</Typography>
                                         </Link>
                                     </Grid>
                                     <Grid item xs={4} className={classes.link}>
-                                        <Typography>Payment Details</Typography>
+                                        <Link to={{ pathname: '/payment-details', state: { invoice: props.invoiceRef } }} style={{ textDecoration: 'none' }}>
+                                            <Typography className={classes.linkText}>Payment History</Typography>
+                                        </Link>
                                     </Grid>
                                     <Grid item xs={4} className={classes.link}>
                                         <Link to={{ pathname: '/pdf', state: { url: props.url } }} style={{ textDecoration: 'none' }}>
@@ -143,21 +157,51 @@ export default function DetailedInvoiceCard(props) {
                                 </Grid>
                         )
                         :
-                        <Grid style={{ borderTop: '1px solid rgba(53, 51, 43, 0.1)' }} container alignItems="center">
-                            <Grid item xs={6} className={classes.link}>
-                                <Link to={{ pathname: '/payment-history', query: { name: props.name, phone: props.phone } }} style={{ textDecoration: 'none' }}>
-                                    <Typography className={classes.linkText}>Payment History</Typography>
-                                </Link>
+                        ( !props.history ?
+                            <Grid style={{ borderTop: '1px solid rgba(53, 51, 43, 0.1)' }} container alignItems="center">
+                                <Grid item xs={6} className={classes.link}>
+                                    <Link to={{ pathname: '/payment-history', query: { name: props.name, phone: props.phone } }} style={{ textDecoration: 'none' }}>
+                                        <Typography className={classes.linkText}>Payment History</Typography>
+                                    </Link>
+                                </Grid>
+                                <Grid item xs={6} className={classes.link}>
+                                    {
+                                        (props.due) ?
+                                            <Typography onClick={() => sendReminder(props.name, props.due)}>Send Reminder</Typography>
+                                            :
+                                            <Typography onClick={() => sendAcknowledge(props.total, props.date)}>Acknowledge Payment</Typography>
+                                    }
+                                </Grid>
+                            </Grid> : null)
+                }
+                {props.history ?
+                    <Box style={{ padding: '16px' }}>
+                        <Grid container>
+                            <Grid item xs={5}>
+                                <Typography className={classes.title}>
+                                    <CalendarToday className={classes.icon} />
+                                    {props.date}
+                                </Typography>
+                                <Typography className={classes.sub} style={{marginLeft: 20}} align="left">{props.invoice}</Typography>
                             </Grid>
-                            <Grid item xs={6} className={classes.link}>
-                                {
-                                    (props.due) ?
-                                        <Typography onClick={() => sendReminder(props.name, props.due)}>Send Reminder</Typography>
-                                        :
-                                        <Typography onClick={() => sendAcknowledge(props.total, props.date)}>Acknowledge Payment</Typography>
-                                }
-                            </Grid>
+                            <Grid item xs={3}></Grid>
+                            { props.receive ?
+                                <Grid item xs={4}>
+                                    <Typography className={classes.title} style={{ color: "#419945", textAlign: 'right' }}>
+                                        ₹{props.amount}
+                                    </Typography>
+                                    <Typography className={classes.sub} style={{ textAlign: 'right', marginRight: 10 }}>{props.paymentMode}</Typography>
+                                </Grid>
+                                :
+                                <Grid item xs={4}>
+                                    <Typography className={classes.title} style={{ color: "#E87716", textAlign: 'right' }}>
+                                        ₹{props.amount}
+                                    </Typography>
+                                    <Typography className={classes.sub} style={{ textAlign: 'right', marginRight: 10 }}></Typography>
+                                </Grid>
+                            }
                         </Grid>
+                    </Box> : null
                 }
             </CardContent>
         </Card>

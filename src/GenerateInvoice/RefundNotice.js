@@ -6,6 +6,7 @@ import { getCustomerDetail, getInvoice, getInvoiceNo, getMer, refundInvoice } fr
 import { useHistory } from 'react-router-dom';
 import FullScreenDialog from '../Common/FullScreenDialog';
 import InvoiceView from '../CreditNote/InvoiceView';
+import Message from '../Common/Message';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -62,10 +63,13 @@ export default function RefundNotice(props) {
     const [refundType, setRefundType] = useState("FR");
     const [refundAmount, setRefundAmount] = useState(props.location.query.amount);
     const [refundId, setRefundId] = useState(null);
-    const [message, setMessage] = useState("");
+    const [message, setMessage] = useState(`Refund notice against the Invoice ${props.location.query.invoice} dated ${props.location.query.date} paid on ${props.location.query.paymentDate} by ${props.location.query.name}`);
     const [invoiceData, setInvoiceData] = useState({});
     const [invoicePreview, setInvoicePreview] = useState(false);
     const [disabledButton, setDisabledButton] = useState(false);
+    const [messageSuccess, setMessageSuccess] = useState(null);
+    const [messageOpen, setMessageOpen] = useState(false);
+    const [dialogMessage, setDialogMessage] = useState("");
 
     let history = useHistory();
 
@@ -127,12 +131,23 @@ export default function RefundNotice(props) {
                 .then(res => res.json())
                 .then(data => {
                     if (data.invoiceRefundRef) {
-                        window.alert('Refund has been initiated');
-                        history.push('/payment-history');
+                        setMessageOpen(true);
+                        setMessageSuccess(true);
+                        setDialogMessage("Refund notice successfully generated")
                     } else {
+                        setMessageOpen(true);
+                        setMessageSuccess(false);
+                        setDialogMessage("Error in generating refund invoice, kindly try after sometime")
                         setDisabledButton(false);
                     }
                 })
+        }
+    }
+
+    const handleDialogClose = () => {
+        setMessageOpen(false);
+        if(messageSuccess) {
+            history.push('/payment-history');
         }
     }
 
@@ -154,7 +169,7 @@ export default function RefundNotice(props) {
             <main className={classes.content}>
                 <div className={classes.appBarSpacer} />
                 <Typography style={{ padding: '10px', backgroundColor: '#F8F5E8' }}>
-                    You are about to process a refund against the Invoice <b>{props.location.query.invoice}</b> dated <b>{props.location.query.date}</b> paid on <b>Payment date </b> to <b>{props.location.query.name}</b>
+                    You are about to process a refund against the Invoice <b>{props.location.query.invoice}</b> dated <b>{props.location.query.date}</b> paid on <b>{props.location.query.paymentDate} </b> by <b>{props.location.query.name}</b>
                 </Typography>
                 <div className={classes.spacer} />
                 <Box px={2}>
@@ -210,8 +225,9 @@ export default function RefundNotice(props) {
                 </Box>
             </main>
             <FullScreenDialog title="Refund Invoice Preview" header value={invoicePreview} onClick={invoicePreviewHandler} onClose={invoicePreviewClose}>
-                <InvoiceView data={invoiceData} logo={sessionStorage.getItem(MERCHANT_LOGO)} />
+                <InvoiceView data={invoiceData} logo={sessionStorage.getItem(MERCHANT_LOGO)} message={message} invoice={refundId}/>
             </FullScreenDialog>
+            {messageSuccess != null ? <Message success={messageSuccess} open={messageOpen} handleClose={handleDialogClose} message={dialogMessage}/> : null}
         </div>
     );
 }

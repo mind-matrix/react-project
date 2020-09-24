@@ -20,6 +20,7 @@ export default function AddCustomer(props) {
 
     const [state, setState] = React.useState({
         customerName: null,
+        customerEmail: '',
         city: '',
         phoneNumber: props.phone,
         customerId: null
@@ -57,6 +58,12 @@ export default function AddCustomer(props) {
                     Customer Name
                 </Typography>
                 <TextField fullWidth aria-labelledby="customer-number" variant="outlined" onChange={(e) => setState({...state, customerName: e.target.value})} />
+            </Grid>
+            <Grid item xs={12}>
+                <Typography id="customer-number" className={classes.header} gutterBottom>
+                    Customer Email
+                </Typography>
+                <TextField fullWidth aria-labelledby="customer-email" type="email" variant="outlined" onChange={(e) => setState({...state, customerEmail: e.target.value})} />
             </Grid>
             <Grid item xs={12}>
                 <Grid container>

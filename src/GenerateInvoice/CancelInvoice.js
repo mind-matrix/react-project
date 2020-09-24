@@ -6,6 +6,7 @@ import { INVOICE_TYPE, MERCHANT_ID, MERCHANT_LOGO } from '../shared/constant';
 import { useHistory } from 'react-router-dom';
 import FullScreenDialog from '../Common/FullScreenDialog';
 import InvoiceView from '../CreditNote/InvoiceView';
+import Message from '../Common/Message';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -54,11 +55,15 @@ const useStyles = makeStyles((theme) => ({
 export default function CancelInvoice(props) {
     const classes = useStyles();
     let refId = props.location.query.refId;
-    const [message, setMessage] = useState("");
+    const [message, setMessage] = useState(`Cancelling invoice ${props.location.query.invoice} dated ${props.location.query.date}`);
     const [cancelId, setCancelId] = useState(null);
     const [invoiceData, setInvoiceData] = useState({});
     const [invoicePreview, setInvoicePreview] = useState(false);
     const [disabledButton, setDisabledButton] = useState(false);
+    const [messageSuccess, setMessageSuccess] = useState(null);
+    const [messageOpen, setMessageOpen] = useState(false);
+    const [dialogMessage, setDialogMessage] = useState("");
+
     let history = useHistory();
 
     useEffect(() => {
@@ -119,12 +124,23 @@ export default function CancelInvoice(props) {
                 .then(res => res.json())
                 .then(data => {
                     if (data.invoiceCanRef) {
-                        window.alert('Invoice has been cancelled');
-                        history.push('/payment-history');
+                        setMessageOpen(true);
+                        setMessageSuccess(true);
+                        setDialogMessage("Your invoice is successfully cancelled")
                     } else {
+                        setMessageOpen(true);
+                        setMessageSuccess(false);
+                        setDialogMessage("Error in cancelling invoice, kindly try after sometime")
                         setDisabledButton(false);
                     }
                 })
+        }
+    }
+
+    const handleDialogClose = () => {
+        setMessageOpen(false);
+        if(messageSuccess) {
+            history.push('/payment-history');
         }
     }
 
@@ -175,8 +191,9 @@ export default function CancelInvoice(props) {
                 </Box>
             </main>
             <FullScreenDialog title="Cancel Invoice Preview" header value={invoicePreview} onClick={invoicePreviewHandler} onClose={invoicePreviewClose}>
-                <InvoiceView data={invoiceData} logo={sessionStorage.getItem(MERCHANT_LOGO)} />
+                <InvoiceView data={invoiceData} logo={sessionStorage.getItem(MERCHANT_LOGO)} message={message} invoice={cancelId}/>
             </FullScreenDialog>
+            {messageSuccess != null ? <Message success={messageSuccess} open={messageOpen} handleClose={handleDialogClose} message={dialogMessage}/> : null}
         </div>
     );
 }

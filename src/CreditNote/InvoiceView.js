@@ -25,9 +25,9 @@ export default function InvoiceView(props) {
             <Box className={classes.page}>
                 <Grid container spacing={2}>
                     <Grid item xs={3}>
-                        <div className={classes.logo} style={{ backgroundColor: props.logo ? 'white' : 'rgba(65, 65, 65, 0.05)'}}>
+                        <div className={classes.logo} style={{ backgroundColor: props.logo ? 'white' : 'rgba(65, 65, 65, 0.05)' }}>
                             {props.logo ?
-                                <img src={props.logo} style={{width: 'auto', height: '100%'}} />
+                                <img src={props.logo} style={{ width: 'auto', height: '100%' }} />
                                 :
                                 <div className={classes.logoAltText}>Logo</div>
                             }
@@ -35,13 +35,18 @@ export default function InvoiceView(props) {
                     </Grid>
                     <Grid item xs={9}>
                         <Grid container justify="flex-start" alignItems="stretch" style={{ height: '100%' }}>
-                            <Grid item xs={12}>
-                                <Typography style={{ textTransform: 'uppercase', fontSize: 12, fontWeight: 'bold' }}>{props.data.merchantName}</Typography>
+                            <Grid item xs={12} style={{ display: 'flex' }} justify="space-between">
+                                <Box style={{ width: '60%' }}>
+                                    <Typography style={{ textTransform: 'uppercase', fontSize: 12, fontWeight: 'bold' }} align="left">{props.data.merchantName}</Typography>
+                                </Box>
+                                <Box style={{ width: '40%' }}>
+                                    <Typography style={{ fontSize: 12 }} align="right">{props.data.invoiceNumber}</Typography>
+                                </Box>
                             </Grid>
                             <Grid item xs={12}>
                                 <Grid container>
                                     <Grid item xs={6}>
-                                        <Typography style={{ fontSize: 12 }} align="left">{props.data.invoiceNumber}</Typography>
+                                        <Typography style={{ fontSize: 12 }} align="left">{props.invoice}</Typography>
                                     </Grid>
                                     <Grid item xs={6}>
                                         <Typography style={{ fontSize: 12 }} align="right">{moment(props.data.invoiceDate).format('ll')}</Typography>
@@ -60,8 +65,15 @@ export default function InvoiceView(props) {
                     </Grid>
                     <Grid item xs={6}>
                         <Typography style={{ fontSize: 12, opacity: '0.7', marginBottom: 10 }}>Bill From</Typography>
-                        <Typography style={{ fontSize: 12, fontWeight: 'bold'}}>{props.data.merchantName}</Typography>
+                        <Typography style={{ fontSize: 12, fontWeight: 'bold' }}>{props.data.merchantName}</Typography>
                         <Typography style={{ fontSize: 12, marginBottom: 5 }}>{props.data.merchantAddress}</Typography>
+                    </Grid>
+                </Grid>
+                <Divider className={classes.divider} />
+                <Grid container>
+                    <Grid item xs={12}>
+                        <Typography display="block" style={{ fontSize: 12, opacity: '0.7', marginBottom: 5 }}>Subject</Typography>
+                        <Typography display="block" style={{ fontSize: 12 }}>{props.message}</Typography>
                     </Grid>
                 </Grid>
                 <Divider className={classes.divider} />
@@ -107,7 +119,7 @@ export default function InvoiceView(props) {
                                 <Typography style={{ fontSize: 12 }} align="right">₹{props.data.discountAmount}</Typography>
                             </Grid>
                             <Grid item xs={8}>
-            <Typography style={{ fontSize: 12, opacity: '0.7' }}>GST %{props.data.gstPercentage}</Typography>
+                                <Typography style={{ fontSize: 12, opacity: '0.7' }}>GST %{props.data.gstPercentage}</Typography>
                             </Grid>
                             <Grid item xs={4}>
                                 <Typography style={{ fontSize: 12 }} align="right">₹{props.data.gstAmount}</Typography>

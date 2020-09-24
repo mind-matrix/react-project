@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import AppIcon from '../Common/AppIcon';
-import { CssBaseline, AppBar, Toolbar, Icon, Typography, Grid, Button, Box, Slide, Menu, MenuItem } from '@material-ui/core';
+import { CssBaseline, AppBar, Toolbar, Icon, Typography, Grid, Button, Box, Slide, Menu, MenuItem, Paper } from '@material-ui/core';
 import { ArrowDropDown, Tune, ChevronLeft, ChevronRight } from '@material-ui/icons';
 import FilterSelect from './FilterSelect';
 import SortSelect from './SortSelect';
@@ -36,16 +36,16 @@ function Dashboard(props) {
   });
 
   const [customerLedger, setCustomerLedger] = useState([])
-  const [state, setState] = React.useState({
+  const [state, setState] = useState({
     recordsPerPage: 10,
     page: 1,
     totalPage: 1,
     sortBy: null
   });
-  const [filter, setFilterOpen] = React.useState(false);
-  const [sort, setSortOpen] = React.useState(false);
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const [selectedIndex, setSelectedIndex] = React.useState(1);
+  const [filter, setFilterOpen] = useState(false);
+  const [sort, setSortOpen] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [selectedIndex, setSelectedIndex] = useState(1);
 
   let params = queryString.parse(props.location.search);
   let { id, name } = params;
@@ -141,12 +141,12 @@ function Dashboard(props) {
   };
 
   const sortInvoice = (sort) => {
-    if(sort === 'l2h') {
-      setCustomerLedger(customerLedger.sort((a, b)=> b.dueAmt - a.dueAmt || a.receivedAmt - b.receivedAmt ));
-    } else if(sort === 'h2l') {
-      setCustomerLedger(customerLedger.sort((a, b)=> a.dueAmt - b.dueAmt || b.receivedAmt - a.receivedAmt ));
+    if (sort === 'l2h') {
+      setCustomerLedger(customerLedger.sort((a, b) => b.dueAmt - a.dueAmt || a.receivedAmt - b.receivedAmt));
+    } else if (sort === 'h2l') {
+      setCustomerLedger(customerLedger.sort((a, b) => a.dueAmt - b.dueAmt || b.receivedAmt - a.receivedAmt));
     } else if (sort === 'date') {
-      setCustomerLedger(customerLedger.sort((a, b)=> new Date(b.lastInvoiceDate) - new Date(a.lastInvoiceDate)))
+      setCustomerLedger(customerLedger.sort((a, b) => new Date(b.lastInvoiceDate) - new Date(a.lastInvoiceDate)))
     }
 
     handleSortClose();
@@ -236,7 +236,7 @@ function Dashboard(props) {
           <Typography className={classes.sub}>{customerLedger ? customerLedger.length : 0} records found</Typography>
         </Box>
         <Grid container spacing={3}>
-          {
+          {customerLedger && customerLedger.length > 0 ?
             customerLedger.map((invoice, index) => {
               if (index < (state.page - 1) * state.recordsPerPage) return;
               if (index > (state.page) * state.recordsPerPage - 1) return;
@@ -244,11 +244,17 @@ function Dashboard(props) {
                 <DetailedInvoiceCard date={moment(invoice.lastInvoiceDate).format('ll')} name={invoice.customerName} phone={invoice.mobileNumber} receive={invoice.receivedAmt} total={invoice.totalAmount} due={invoice.dueAmt}></DetailedInvoiceCard>
               </Grid>
             })
+            :
+            <Box style={{ display: 'flex', padding: '0px 14px', width: '100%' }}>
+              <Paper elevation={2} style={{ margin: '10px auto', padding: '20px 10px', width: '100%' }}>
+                <Typography style={{ fontSize: 10, opacity: '70%' }} align="center">You are yet to paid for your first invoice</Typography>
+              </Paper>
+            </Box>
           }
-          {state.totalPage ?
+          {state.totalPage && customerLedger && customerLedger.length > 0 ?
             <Grid item xs={12}>
               <Box maxWidth={200} style={{ width: 'fit-content', margin: '0 auto' }}>
-                <Typography>
+                <Typography align="center">
                   <Button onClick={prevPage} style={{ padding: '5px 5px', minWidth: 0 }} variant="outlined">
                     <ChevronLeft style={{ verticalAlign: 'middle', fontSize: '10pt' }} />
                   </Button>

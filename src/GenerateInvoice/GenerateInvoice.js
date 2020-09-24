@@ -20,6 +20,7 @@ import CreditNote from '../CreditNote/CreditNote';
 import ImageUpload from '../ImageUpload/ImageUpload';
 import { ASSETS, INVOICE_TYPE, MERCHANT_ID } from '../shared/constant';
 import { useHistory } from 'react-router-dom';
+import Message from '../Common/Message';
 
 const drawerWidth = 240;
 
@@ -82,6 +83,9 @@ const GenerateInvoice = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [filter, setFilter] = useState('flat');
   const [disabledButton, setDisabledButton] = useState(false);
+  const [messageSuccess, setMessageSuccess] = useState(null);
+  const [messageOpen, setMessageOpen] = useState(false);
+  const [dialogMessage, setDialogMessage] = useState("");
 
   const handlePaymentLink = (e) => {
     setPaymentLink(e.target.checked);
@@ -132,7 +136,7 @@ const GenerateInvoice = () => {
   };
 
   const handleAddCustomerApply = (customer, id) => {
-    setState({ ...state, customerId: id, customerName: customer.customerName, customerCity: customer.city, billTo: state.billTo + ' ' + customer.city });
+    setState({ ...state, customerId: id, customerName: customer.customerName, customerCity: customer.city, billTo: customer.city });
     setAddCustomerOpen(false);
   };
 
@@ -141,7 +145,7 @@ const GenerateInvoice = () => {
   };
 
   const handleDateChange = (val) => {
-    setState({ date: val });
+    setState({ ...state, date: val });
   };
 
   const handleCustomerChange = (number) => {
@@ -192,7 +196,7 @@ const GenerateInvoice = () => {
               .then(res => res.json())
               .then(data => {
                 if (data.customerId) {
-                  setState({ ...state, customerName: data.firstName + (data.lastName ? ' '+ data.lastName : ''), customerCity: data.city, billTo: state.billTo + ' ' + data.city, customerId: data.customerId });
+                  setState({ ...state, customerName: data.firstName + (data.lastName ? ' ' + data.lastName : ''), customerCity: data.city, billTo: state.billTo + ' ' + data.city, customerId: data.customerId });
                 }
               })
           }
@@ -244,7 +248,7 @@ const GenerateInvoice = () => {
     setDisabledButton(true);
     let data = {
       merchantCode: state.merchantCode,
-      shippingDetails: state.customerName + ' ' + state.shipTo,
+      shippingDetails: state.shipTo,
       invoiceNumber: state.inv,
       customerId: state.customerId,
       balanceAmount: balance,
@@ -266,11 +270,11 @@ const GenerateInvoice = () => {
         .then(data => console.log(data))
     }
 
-    if(logoChanged) {
+    if (logoChanged) {
       uploadFile(sessionStorage.getItem(MERCHANT_ID), 'logos/testdata', logo)
         .then(res => res.json())
         .then(data => {
-          if(data.locationUrl) {
+          if (data.locationUrl) {
             saveMerchant({
               merchantId: sessionStorage.getItem(MERCHANT_ID),
               merchantLogo: data.locationUrl
@@ -286,12 +290,23 @@ const GenerateInvoice = () => {
         .then(res => res.json())
         .then(data => {
           if (data.invoiceRefId) {
-            window.alert('Invoice Generated succesfully');
-            history.push('/dashboard');
+            setMessageOpen(true);
+            setMessageSuccess(true);
+            setDialogMessage("Congratulations! Your invoice has been successfully generated")
           } else {
+            setMessageOpen(true);
+            setMessageSuccess(false);
+            setDialogMessage("Error in generating invoice, kindly try after sometime")
             setDisabledButton(false);
           }
         })
+    }
+  }
+
+  const handleDialogClose = () => {
+    setMessageOpen(false);
+    if (messageSuccess) {
+      history.push('/dashboard');
     }
   }
 
@@ -310,21 +325,19 @@ const GenerateInvoice = () => {
         </Toolbar>
       </AppBar>
       <div className={classes.appBarSpacer} />
-      <Grid style={{ padding: '10px', backgroundColor: '#F8F5E8' }} container spacing={2}>
-        <Grid item xs={6}>
+      <Grid style={{ padding: '10px', backgroundColor: '#F8F5E8' }} container>
+        <Grid item xs={6} style={{ padding: "0px 5px" }}>
           <Typography style={{ display: 'inline', marginRight: '10px' }}>
             Inv No.
             </Typography>
           <TextField value={state.inv} style={{ verticalAlign: 'middle', backgroundColor: '#ffffff' }} variant="outlined" size="small" disabled />
         </Grid>
-        <Grid item xs={6}>
+        <Grid item xs={6} style={{ padding: "0px 5px" }}>
           <Typography style={{ display: 'inline', marginRight: '10px' }}>
             Date
             </Typography>
           <KeyboardDatePicker
-            disableToolbar
-            variant="inline"
-            format="DD MMM YY"
+            format="DD/MM/yyyy"
             value={state.date}
             maxDate={new Date()}
             onChange={handleDateChange}
@@ -335,9 +348,8 @@ const GenerateInvoice = () => {
           />
         </Grid>
       </Grid>
-      <main className={classes.content}>
-        <div className={classes.spacer} />
-        <Grid container style={{ maxWidth: 480, margin: '0 auto' }}>
+      <Grid container style={{ marginTop: 10, padding: '15px 14px' }}>
+        <Grid item xs={12}>
           {/* <CustomerSelectInput customers={state.customers} onAddCustomer={handleAddCustomerOpen} onChange={handleCustomerChange} />
           {
             state.selectedCustomer ?
@@ -358,7 +370,10 @@ const GenerateInvoice = () => {
             style={{ marginBottom: 10 }}
             onBlur={checkPhoneNumber}
           />
-          {/* {state.customerName ?
+        </Grid>
+      </Grid>
+      <Divider style={{ width: '100%' }} />
+      {/* {state.customerName ?
             <Box className={classes.customer}>
               <PersonIcon className={classes.customerIcon} />
               {state.customerName}
@@ -367,46 +382,53 @@ const GenerateInvoice = () => {
               </Typography>
             </Box> : null
           } */}
+      <Grid container style={{ padding: '15px 14px' }}>
+        <Grid item xs={12}>
+          <Typography style={{ opacity: 0.7, fontSize: 16, fontWeight: 500, marginBottom: 15 }}>Invoice From</Typography>
+        </Grid>
+        <Grid item xs={4} style={{ paddingRight: 5 }}>
+          <ImageUpload alt logo={(file) => { setLogo(file); setLogoChanged(true) }} image={logo} />
+        </Grid>
+        <Grid item xs={8}>
+          <Box pl={2} pb={2} style={{ paddingLeft: 5 }}>
+            <TextField fullWidth label="Name" value={state.merchantName} variant="outlined" style={{ marginBottom: 10 }} onChange={e => { setState({ ...state, merchantName: e.target.value }); setChanges({ ...changes, merchantName: e.target.value }) }} />
+            <TextField fullWidth label="Address" multiline rows={2} variant="outlined" value={state.invoiceFrom} onChange={e => { setState({ ...state, invoiceFrom: e.target.value }); setChanges({ ...changes, merchantAddress1: e.target.value }) }}></TextField>
+          </Box>
+        </Grid>
+      </Grid>
+      <Divider style={{ width: '100%' }} />
+      <Grid container style={{ padding: '15px 14px' }}>
+        <Grid item xs={12}>
+          <Typography style={{ opacity: 0.7, fontSize: 16, fontWeight: 500, marginBottom: 15 }}>Invoice To</Typography>
+        </Grid>
+        <Grid item xs={6} style={{ paddingRight: 5 }}>
+          <TextField fullWidth label="Name" value={state.customerName} variant="outlined" style={{ margin: '10px 0px' }} />
+          <TextField fullWidth label="Address" multiline rows={2} variant="outlined" value={state.billTo} onChange={e => setState({ ...state, billTo: e.target.value, shipTo: state.sameAsBillTo ? e.target.value : state.shipTo })}></TextField>
+        </Grid>
+        <Grid item xs={6} style={{ paddingLeft: 5 }}>
           <Grid container>
-            <Grid item xs={4}>
-              <ImageUpload alt logo={(file) => { setLogo(file); setLogoChanged(true) }} image={logo} />
+            <Grid item xs={12}>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={state.sameAsBillTo}
+                    onChange={handleChecked}
+                    name="sameAsBill"
+                    color="primary"
+                  />
+                }
+                label="Same as bill to"
+              />
             </Grid>
-            <Grid item xs={8}>
-              <Box pl={2} pb={2}>
-                <TextField fullWidth label="Invoice From - Name" value={state.merchantName} variant="outlined" style={{ marginBottom: 10 }} onChange={e => { setState({ ...state, merchantName: e.target.value }); setChanges({ ...changes, merchantName: e.target.value }) }} />
-                <TextField fullWidth label="Invoice From - Address" multiline rows={2} variant="outlined" value={state.invoiceFrom} onChange={e => { setState({ ...state, invoiceFrom: e.target.value }); setChanges({ ...changes, merchantAddress1: e.target.value }) }}></TextField>
-              </Box>
-            </Grid>
-            <Grid item xs={6}>
-              <Box pr={1}>
-                <TextField fullWidth label="Customer Name" value={state.customerName} variant="outlined" style={{ margin: '10px 0px' }} />
-                <TextField fullWidth label="Customer Address" multiline rows={2} variant="outlined" value={state.billTo} onChange={e => setState({ ...state, billTo: e.target.value, shipTo: state.sameAsBillTo ? e.target.value : state.shipTo })}></TextField>
-              </Box>
-            </Grid>
-            <Grid item xs={6}>
-              <Box pl={1}>
-                <Grid container>
-                  <Grid item xs={12}>
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          checked={state.sameAsBillTo}
-                          onChange={handleChecked}
-                          name="sameAsBill"
-                          color="primary"
-                        />
-                      }
-                      label="Same as bill to"
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <TextField fullWidth label="Ship To" multiline rows={3} variant="outlined" value={state.shipTo} onChange={e => setState({ ...state, shipTo: e.target.value })} disabled={state.sameAsBillTo}></TextField>
-                  </Grid>
-                </Grid>
-              </Box>
+            <Grid item xs={12}>
+              <TextField fullWidth label="Ship To" multiline rows={3} variant="outlined" value={state.shipTo} onChange={e => setState({ ...state, shipTo: e.target.value })} disabled={state.sameAsBillTo}></TextField>
             </Grid>
           </Grid>
-          <Divider style={{ width: '100%', marginTop: '15px' }} />
+        </Grid>
+      </Grid>
+      <Divider style={{ width: '100%', marginTop: '15px' }} />
+      <Grid container style={{ padding: '15px 14px' }}>
+        <Grid item xs={12} style={{ display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
           <Card className={classes.productCard}>
             {product.length ?
               <CardContent>
@@ -433,179 +455,171 @@ const GenerateInvoice = () => {
               </CardContent> : null
             }
           </Card>
-          <Button onClick={handleAddItemOpen} variant="outlined" style={{ fontWeight: 'bold', textTransform: 'none', fontSize: 16, margin: '10px auto', paddingTop: '10px', paddingBottom: '10px' }}>
+          <Button onClick={handleAddItemOpen} variant="outlined" style={{ fontWeight: 'bold', textTransform: 'none', fontSize: 16, margin: '10px auto 0px', paddingTop: '10px', paddingBottom: '10px' }}>
             <AddIcon />
             Add Item
           </Button>
-          <Divider style={{ width: '100%', marginTop: '15px' }} />
-          <Grid container justify="space-between" className={classes.elaboration}>
-            <Grid item xs={6} style={{ textAlign: 'left', fontSize: '16px' }}>
-              Total Amount
-            </Grid>
-            <Grid item xs={6} style={{ textAlign: 'right', fontWeight: 'bolder', fontSize: '16px' }}>
-              ₹{state.total}
-            </Grid>
-          </Grid>
-          <Grid container justify="space-between" alignItems="center" className={classes.elaboration}>
-            <Grid item xs={9} style={{ textAlign: 'left', fontSize: 14 }}>
-              Advance Paid
-            </Grid>
-            <Grid item xs={3} style={{ textAlign: 'right', fontSize: 14 }}>
-              <TextField
-                color="secondary"
-                required
-                fullWidth
-                type="number"
-                className={classes.amountBox}
-                variant="outlined"
-                value={state.advance}
-                onChange={updateAdvance}
-                size="small"
-              />
-            </Grid>
-          </Grid>
-          <Grid container justify="space-between" alignItems="center" className={classes.elaboration}>
-            <Grid item xs={9} style={{ display: 'flex', alignItems: 'center', flexDirection: 'row', textAlign: 'left', fontSize: 14 }}>
-              Discount
-              <Box aria-controls="simple-menu" aria-haspopup="true" onClick={handleSortOpen} className={classes.extraButton} style={{marginLeft: 10}}>
-                {filter}
-                <ArrowDropDown />
-              </Box>
-              <Menu
-                id="simple-menu"
-                anchorEl={anchorEl}
-                keepMounted
-                open={Boolean(anchorEl)}
-                onClose={filterCloseHandler}
-              >
-                <MenuItem onClick={() => filterCloseHandler("flat")}>Flat(₹)</MenuItem>
-                <MenuItem onClick={() => filterCloseHandler("percent")}>Percent(%)</MenuItem>
-              </Menu>
-            </Grid>
-            <Grid item xs={3} style={{ textAlign: 'right', fontSize: 14 }}>
-              <TextField
-                color="secondary"
-                required
-                fullWidth
-                type="number"
-                className={classes.amountBox}
-                variant="outlined"
-                value={state.discountValue}
-                onChange={updateDiscount}
-                size="small"
-              />
-            </Grid>
-          </Grid>
-          <Grid container justify="space-between" alignItems="center" className={classes.elaboration}>
-            <Grid item xs={6} style={{ textAlign: 'left', fontSize: '14px', display: 'flex', alignItems: 'center' }}>
-              GST (%)
-              <TextField name="gstPercent" className={classes.gstPercent} value={state.gstPercent} onChange={onGSTChange} variant="outlined"></TextField>
-            </Grid>
-            <Grid item xs={6} style={{ textAlign: 'right', fontSize: '16px' }}>
-              ₹{state.gstTotal}
-            </Grid>
-          </Grid>
-          <Divider style={{ width: '100%', marginTop: '15px' }} />
-          <Grid container justify="space-between" alignItems="center">
-            <Grid item xs={4} style={{ textAlign: 'left', fontSize: '14px', paddingTop: '10px' }}>
-              <TextField
-                color="secondary"
-                required
-                fullWidth
-                variant="outlined"
-                value={state.otherBill}
-                onChange={e => setState({ ...state, otherBill: e.target.value })}
-                size="small"
-              />
-            </Grid>
-            <Grid item xs={5}></Grid>
-            <Grid item xs={3} style={{ textAlign: 'right', fontSize: 14, paddingTop: '10px' }}>
-              <TextField
-                color="secondary"
-                required
-                fullWidth
-                type="number"
-                variant="outlined"
-                className={classes.amountBox}
-                value={state.otherBillAmount}
-                onChange={otherBillChange}
-                size="small"
-              />
-            </Grid>
-          </Grid>
-          <Grid container justify="space-between">
-            <Grid item xs={6} style={{ textAlign: 'left', fontSize: '16px', fontWeight: 'bold', paddingTop: '10px' }}>
-              Balance Amount
-            </Grid>
-            <Grid item xs={6} style={{ textAlign: 'right', fontSize: '16px', color: '#419945', fontWeight: 'bold', paddingTop: '10px' }}>
-              ₹{balance}
-            </Grid>
-          </Grid>
-          <Divider style={{ width: '100%', marginTop: '15px', marginBottom: '15px' }} />
-          <Grid container spacing={1}>
-            <Grid item xs={6}>
-              <TextField
-                label="PAN Number"
-                color="secondary"
-                required
-                fullWidth
-                value={state.pan}
-                onChange={(e) => { setState({ ...state, pan: e.target.value }); setChanges({ ...changes, merchantPan: e.target.value }) }}
-                variant="outlined"
-              />
-            </Grid>
-            <Grid item xs={6}>
-              <TextField
-                label="GST Number"
-                color="secondary"
-                required
-                fullWidth
-                value={state.gst}
-                onChange={(e) => { setState({ ...state, gst: e.target.value }); setChanges({ ...changes, merchantGstn: e.target.value }) }}
-                variant="outlined"
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                style={{ paddingTop: '10px' }}
-                label="Payment terms/Notes, if any"
-                color="secondary"
-                multiline
-                required
-                fullWidth
-                rows={4}
-                value={state.notes}
-                onChange={(e) => setState({ ...state, notes: e.target.value })}
-                variant="outlined"
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <FormControl component="fieldset">
-                <FormLabel style={{ textAlign: 'left', marginTop: '30px' }} component="legend">Payment Mode</FormLabel>
-                <RadioGroup aria-label="mode" name="mode" value={paymentMode} onChange={handlePaymentModeChange}>
-                  <Grid container>
-                    <Grid item xs='auto'>
-                      <FormControlLabel value="bank" control={<GreenRadio />} label="Payment Link" />
-                    </Grid>
-                  </Grid>
-                </RadioGroup>
-              </FormControl>
-            </Grid>
-          </Grid>
-          <Grid container spacing={1}>
-            <Grid item xs={6}>
-              <Button className={classes.button} onClick={invoicePreviewHandler} variant="contained" variant="contained" fullWidth>
-                Preview
-              </Button>
-            </Grid>
-            <Grid item xs={6}>
-              <Button className={classes.button} variant="contained" color="primary" variant="contained" fullWidth onClick={submit} disabled={disabledButton}>
-                Save &amp; Issue
-              </Button>
-            </Grid>
-          </Grid>
         </Grid>
-      </main>
+      </Grid>
+      <Divider style={{ width: '100%', marginTop: '15px', marginBottom: 5 }} />
+      <Grid container justify="space-between" className={classes.elaboration} spacing={1}>
+        <Grid item xs={6} style={{ display: 'flex', alignItems: 'center', flexDirection: 'row', textAlign: 'left', fontSize: '16px', opacity: 0.7, fontWeight: 500, marginBottom: 5 }}>
+          Total Amount
+        </Grid>
+        <Grid item xs={6} style={{ textAlign: 'right', fontWeight: 600, fontSize: '16px', marginBottom: 5 }}>
+          ₹{state.total}
+        </Grid>
+        <Grid item xs={9} style={{ display: 'flex', alignItems: 'center', flexDirection: 'row', textAlign: 'left', fontSize: 14, opacity: 0.7, fontWeight: 500 }}>
+          Advance Paid
+        </Grid>
+        <Grid item xs={3} style={{ textAlign: 'right', fontSize: 14 }}>
+          <TextField
+            color="secondary"
+            required
+            fullWidth
+            type="number"
+            className={classes.amountBox}
+            variant="outlined"
+            value={state.advance}
+            onChange={updateAdvance}
+            size="small"
+          />
+        </Grid>
+        <Grid item xs={9} style={{ display: 'flex', alignItems: 'center', flexDirection: 'row', textAlign: 'left', fontSize: 14, opacity: 0.7, fontWeight: 500 }}>
+          Discount
+          <Box aria-controls="simple-menu" aria-haspopup="true" onClick={handleSortOpen} className={classes.extraButton} style={{ marginLeft: 10, backgroundColor: 'white' }}>
+            {filter}
+            <ArrowDropDown />
+          </Box>
+          <Menu
+            id="simple-menu"
+            anchorEl={anchorEl}
+            keepMounted
+            open={Boolean(anchorEl)}
+            onClose={filterCloseHandler}
+          >
+            <MenuItem onClick={() => filterCloseHandler("flat")}>Flat(₹)</MenuItem>
+            <MenuItem onClick={() => filterCloseHandler("percent")}>Percent(%)</MenuItem>
+          </Menu>
+        </Grid>
+        <Grid item xs={3} style={{ textAlign: 'right', fontSize: 14 }}>
+          <TextField
+            color="secondary"
+            required
+            fullWidth
+            type="number"
+            className={classes.amountBox}
+            variant="outlined"
+            value={state.discountValue}
+            onChange={updateDiscount}
+            size="small"
+          />
+        </Grid>
+        <Grid item xs={6} style={{ textAlign: 'left', fontSize: '14px', display: 'flex', alignItems: 'center', opacity: 0.7, fontWeight: 500, marginTop: 5 }}>
+          GST (%)
+          <TextField name="gstPercent" className={classes.gstPercent} value={state.gstPercent} onChange={onGSTChange} variant="outlined"></TextField>
+        </Grid>
+        <Grid item xs={6} style={{ textAlign: 'right', fontSize: '16px', marginTop: 5 }}>
+          ₹{state.gstTotal}
+        </Grid>
+      </Grid>
+      <Divider style={{ width: '100%', marginBottom: 5 }} />
+      <Grid container justify="space-between" alignItems="center" className={classes.elaboration} spacing={1}>
+        <Grid item xs={4} style={{ textAlign: 'left', fontSize: '14px', paddingTop: '10px', opacity: 0.7, fontWeight: 500 }}>
+          <TextField
+            color="secondary"
+            required
+            fullWidth
+            variant="outlined"
+            value={state.otherBill}
+            onChange={e => setState({ ...state, otherBill: e.target.value })}
+            size="small"
+          />
+        </Grid>
+        <Grid item xs={5}></Grid>
+        <Grid item xs={3} style={{ textAlign: 'right', fontSize: 14, paddingTop: '10px' }}>
+          <TextField
+            color="secondary"
+            required
+            fullWidth
+            type="number"
+            variant="outlined"
+            className={classes.amountBox}
+            value={state.otherBillAmount}
+            onChange={otherBillChange}
+            size="small"
+          />
+        </Grid>
+        <Grid item xs={6} style={{ textAlign: 'left', fontSize: '16px', fontWeight: 'bold', paddingTop: '10px' }}>
+          Balance Amount
+            </Grid>
+        <Grid item xs={6} style={{ textAlign: 'right', fontSize: '16px', color: '#419945', fontWeight: 'bold', paddingTop: '10px' }}>
+          ₹{balance}
+        </Grid>
+      </Grid>
+      <Divider style={{ width: '100%', marginTop: 5}} />
+      <Grid container spacing={1} style={{padding: '30px 14px 15px'}}>
+        <Grid item xs={6}>
+          <TextField
+            label="PAN Number"
+            color="secondary"
+            required
+            fullWidth
+            value={state.pan}
+            onChange={(e) => { setState({ ...state, pan: e.target.value }); setChanges({ ...changes, merchantPan: e.target.value }) }}
+            variant="outlined"
+          />
+        </Grid>
+        <Grid item xs={6}>
+          <TextField
+            label="GST Number"
+            color="secondary"
+            required
+            fullWidth
+            value={state.gst}
+            onChange={(e) => { setState({ ...state, gst: e.target.value }); setChanges({ ...changes, merchantGstn: e.target.value }) }}
+            variant="outlined"
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <TextField
+            style={{ paddingTop: '10px' }}
+            label="Payment terms/Notes, if any"
+            color="secondary"
+            multiline
+            required
+            fullWidth
+            rows={4}
+            value={state.notes}
+            onChange={(e) => setState({ ...state, notes: e.target.value })}
+            variant="outlined"
+          />
+        </Grid>
+        <Grid item xs={12} style={{marginTop: 30}}>
+          <FormControl component="fieldset">
+            <FormLabel style={{ textAlign: 'left', fontSize: 12 }} component="legend">Payment Mode</FormLabel>
+            <RadioGroup aria-label="mode" name="mode" value={paymentMode} onChange={handlePaymentModeChange}>
+              <Grid container>
+                <Grid item xs='auto'>
+                  <FormControlLabel value="bank" control={<GreenRadio />} label="Payment Link" style={{fontSize: 14, fontWeight: 500}} />
+                </Grid>
+              </Grid>
+            </RadioGroup>
+          </FormControl>
+        </Grid>
+      </Grid>
+      <Grid container spacing={1} style={{padding: '10px 14px 50px'}}>
+        <Grid item xs={6}>
+          <Button className={classes.button} onClick={invoicePreviewHandler} variant="contained" variant="contained" fullWidth>
+            Preview
+              </Button>
+        </Grid>
+        <Grid item xs={6}>
+          <Button className={classes.button} variant="contained" color="primary" variant="contained" fullWidth onClick={submit} disabled={disabledButton}>
+            Save &amp; Issue
+              </Button>
+        </Grid>
+      </Grid>
       <FullScreenDialog title="Add Item" value={addItem} onClick={handleAddItemOpen} onClose={handleAddItemClose}>
         <AddItem onApply={handleAddItemApply} />
       </FullScreenDialog>
@@ -615,6 +629,7 @@ const GenerateInvoice = () => {
       <FullScreenDialog title="Invoice Preview" header value={invoicePreview} onClick={invoicePreviewHandler} onClose={invoicePreviewClose}>
         <CreditNote product={product} data={state} balance={balance} product={product} logo={logo} />
       </FullScreenDialog>
+      {messageSuccess != null ? <Message success={messageSuccess} open={messageOpen} handleClose={handleDialogClose} message={dialogMessage} /> : null}
     </div>
   );
 }
@@ -721,9 +736,7 @@ const useStyles = makeStyles((theme) => ({
   content: {
     flexGrow: 1,
     overflow: 'auto',
-    paddingBottom: '100px',
-    paddingLeft: '15px',
-    paddingRight: '15px'
+    paddingBottom: '100px'
   },
   container: {
     paddingTop: theme.spacing(4),
@@ -754,13 +767,14 @@ const useStyles = makeStyles((theme) => ({
     opacity: 0.7,
     fontSize: '10px'
   },
+  elaboration:{
+    padding: '15px 14px',
+    backgroundColor: '#f5f5f5'
+  },
   productCard: {
     borderRadius: 10,
     width: '100%',
     margin: 10
-  },
-  elaboration: {
-    margin: '5px'
   },
   button: {
     height: '56px',

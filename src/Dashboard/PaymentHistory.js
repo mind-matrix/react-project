@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { CssBaseline, AppBar, Toolbar, Typography, makeStyles, Box, Grid, Button, Dialog, DialogTitle, DialogContent, Select, FormControl, InputLabel, TextField } from '@material-ui/core'
+import { CssBaseline, AppBar, Toolbar, Typography, makeStyles, Box, Grid, Button, Dialog, DialogTitle, DialogContent, Select, FormControl, InputLabel, TextField, Paper } from '@material-ui/core'
 import { ArrowBack, Tune } from '@material-ui/icons';
 import { Link } from 'react-router-dom';
 import DetailedInvoiceCard from './DetailedInvoiceCard';
@@ -7,7 +7,7 @@ import FullScreenDialog from '../Common/FullScreenDialog';
 import FilterSelect from './FilterSelect';
 import { ChevronLeft, ChevronRight } from '@material-ui/icons';
 import { KeyboardDatePicker } from '@material-ui/pickers';
-import { paymentHistory } from '../shared/dataService';
+import { markInvoice, paymentHistory } from '../shared/dataService';
 import { CUSTOMER_NAME, CUSTOMER_NUMBER, MERCHANT_ID } from '../shared/constant';
 import moment from 'moment';
 
@@ -24,8 +24,10 @@ function PaymentHistory(props) {
     const [receive, setReceive] = useState([]);
     const [filter, setFilterOpen] = useState(false);
     const [openMark, setOpenMark] = useState(false);
+    const [selectedinvoice, setSelectedinvoice] = useState(null);
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [mode, setMode] = useState('');
+    const [message, setMessage] = useState("")
     const [state, setState] = React.useState({
         recordsPerPage: 5,
         page: 1,
@@ -63,6 +65,47 @@ function PaymentHistory(props) {
             })
     }, [])
 
+    const markReceive = () => {
+        markInvoice(selectedinvoice, mode, message, moment(selectedDate).format('YYYY-MM-DD'))
+            .then(res => res.json())
+            .then(data => {
+                if (data.invoicePayRef) {
+                    paymentHistory({
+                        merchantId: sessionStorage.getItem(MERCHANT_ID),
+                        customerPhone: phone,
+                        paymentStatus: "P"
+                    })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.paymentInfoList) {
+                                setPending(data.paymentInfoList);
+                                setState({ ...state, totalPage: Math.ceil(data.paymentInfoList.length / state.recordsPerPage) })
+                            } else {
+                                setPending([]);
+                            }
+                        })
+
+                    paymentHistory({
+                        merchantId: sessionStorage.getItem(MERCHANT_ID),
+                        customerPhone: phone,
+                        paymentStatus: "R"
+                    })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.paymentInfoList) {
+                                setReceive(data.paymentInfoList);
+                                setState({ ...state, totalReceivePage: Math.ceil(data.paymentInfoList.length / state.recordsPerPage) })
+                            } else {
+                                setReceive([]);
+                            }
+                        })
+                    setOpenMark(false);
+                } else {
+                    setOpenMark(false);
+                }
+            })
+    }
+
     const modeChangeHandler = (event) => {
         setMode(event.target.value)
     }
@@ -71,7 +114,8 @@ function PaymentHistory(props) {
         setSelectedDate(date)
     }
 
-    const openMarkDialog = () => {
+    const openMarkDialog = (id) => {
+        setSelectedinvoice(id);
         setOpenMark(true);
     }
 
@@ -86,6 +130,22 @@ function PaymentHistory(props) {
     const handleFilterClose = () => {
         setFilterOpen(false);
     };
+
+    const resetFilter = () => {
+        setFilterOpen(false);
+        paymentHistory({
+            merchantId: sessionStorage.getItem(MERCHANT_ID),
+            customerPhone: phone,
+            paymentStatus: "R"
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.paymentInfoList) {
+                    setReceive(data.paymentInfoList);
+                    setState({ ...state, totalReceivePage: Math.ceil(data.paymentInfoList.length / state.recordsPerPage) })
+                }
+            })
+    }
 
     const handleFilterApply = (options) => {
         paymentHistory({
@@ -160,14 +220,20 @@ function PaymentHistory(props) {
                         if (i < (state.page - 1) * state.recordsPerPage) return;
                         if (i > (state.page) * state.recordsPerPage - 1) return;
                         return <Grid key={i} item xs={12} style={{ padding: '10px 14px' }}>
-                            <DetailedInvoiceCard individual date={moment(invoice.invoiceDate).format('ll')} invoice={invoice.invoiceNumber} name={invoice.customerName} phone={invoice.mobileNumber} total={invoice.totalAmount} due={invoice.balanceAmount} invoiceRef={invoice.invoiceRefId} url={invoice.invoiceUrl} mark={() => openMarkDialog()} />
+                            <DetailedInvoiceCard individual date={moment(invoice.invoiceDate).format('ll')} invoice={invoice.invoiceNumber} name={invoice.customerName} phone={invoice.mobileNumber} total={invoice.totalAmount} due={invoice.balanceAmount} invoiceRef={invoice.invoiceRefId} url={invoice.invoiceUrl} mark={() => openMarkDialog(invoice.invoiceRefId)} />
                         </Grid>
-                    }) : null
+                    })
+                    :
+                    <Box style={{ display: 'flex', padding: '0px 14px', width: '100%' }}>
+                        <Paper elevation={2} style={{ margin: '10px auto', padding: '20px 10px', width: '100%' }}>
+                            <Typography style={{ fontSize: 10, opacity: '70%' }} align="center">No invoices pending for payment</Typography>
+                        </Paper>
+                    </Box>
                 }
-                {state.totalPage ?
+                {state.totalPage && pending && pending.length > 0 ?
                     <Grid item xs={12}>
                         <Box maxWidth={200} style={{ width: 'fit-content', margin: '0 auto' }}>
-                            <Typography>
+                            <Typography align="center">
                                 <Button onClick={prevPage} style={{ padding: '5px 5px', minWidth: 0 }} variant="outlined">
                                     <ChevronLeft style={{ verticalAlign: 'middle', fontSize: '10pt' }} />
                                 </Button>
@@ -195,14 +261,20 @@ function PaymentHistory(props) {
                         if (i < (state.receivePage - 1) * state.recordsPerPage) return;
                         if (i > (state.receivePage) * state.recordsPerPage - 1) return;
                         return <Grid key={i} item xs={12} style={{ padding: '10px 14px' }}>
-                            <DetailedInvoiceCard individual date={moment(invoice.invoiceDate).format('ll')} invoice={invoice.invoiceNumber} name={invoice.customerName} phone={invoice.mobileNumber} total={invoice.balanceAmount} invoiceRef={invoice.invoiceRefId} url={invoice.invoiceUrl} />
+                            <DetailedInvoiceCard individual date={moment(invoice.invoiceDate).format('ll')} paymentDate={moment(invoice.paymentDate).format('ll')} invoice={invoice.invoiceNumber} name={invoice.customerName} phone={invoice.mobileNumber} total={invoice.balanceAmount} invoiceRef={invoice.invoiceRefId} url={invoice.invoiceUrl} />
                         </Grid>
-                    }) : null
+                    })
+                    :
+                    <Box style={{ display: 'flex', padding: '0px 14px', width: '100%' }}>
+                        <Paper elevation={2} style={{ margin: '10px auto', padding: '20px 10px', width: '100%' }}>
+                            <Typography style={{ fontSize: 10, opacity: '70%' }} align="center">You are yet to paid for your first invoice</Typography>
+                        </Paper>
+                    </Box>
                 }
-                {state.totalReceivePage ?
+                {state.totalReceivePage && receive && receive.length > 0 ?
                     <Grid item xs={12}>
                         <Box maxWidth={200} style={{ width: 'fit-content', margin: '0 auto' }}>
-                            <Typography>
+                            <Typography align="center">
                                 <Button onClick={prevReceivePage} style={{ padding: '5px 5px', minWidth: 0 }} variant="outlined">
                                     <ChevronLeft style={{ verticalAlign: 'middle', fontSize: '10pt' }} />
                                 </Button>
@@ -218,7 +290,7 @@ function PaymentHistory(props) {
                 }
             </Grid>
             <FullScreenDialog title="Filter" value={filter} onClick={handleFilterOpen} onClose={handleFilterClose}>
-                <FilterSelect onApply={handleFilterApply} />
+                <FilterSelect onApply={handleFilterApply} reset={resetFilter} />
             </FullScreenDialog>
             <Dialog onClose={closeMarkDialog} aria-labelledby="mark-dialog" open={openMark}>
                 <DialogTitle className={classes.dialogTitle} id="mark-dialog" onClose={closeMarkDialog}>
@@ -251,16 +323,16 @@ function PaymentHistory(props) {
                                     label="Payment Mode"
                                 >
                                     <option aria-label="None" value="" hidden disabled></option>
-                                    <option value={10}>Online</option>
-                                    <option value={20}>Cash</option>
+                                    <option value="O">Online</option>
+                                    <option value="C">Cash</option>
                                 </Select>
                             </FormControl>
                         </Grid>
                         <Grid item xs={12} style={{ marginTop: '20px' }}>
-                            <TextField id="outlined-basic" label="Payment Details" variant="outlined" fullWidth />
+                            <TextField id="outlined-basic" label="Payment Details" value={message} variant="outlined" fullWidth onChange={e => setMessage(e.target.value)} />
                         </Grid>
                         <Grid item xs={12} style={{ margin: '30px 0px' }}>
-                            <Button className={classes.button} variant="contained" color="primary" fullWidth onClick={closeMarkDialog}>
+                            <Button className={classes.button} variant="contained" color="primary" fullWidth onClick={markReceive}>
                                 Update
                             </Button>
                         </Grid>

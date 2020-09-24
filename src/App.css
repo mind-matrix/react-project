@@ -4,6 +4,10 @@
   box-sizing: border-box;
 }
 
+input {
+  background-color: #ffffff !important;
+}
+
 #root {
   max-width: 480px;
   margin: 0px auto;

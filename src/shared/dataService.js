@@ -210,7 +210,7 @@ export const saveMerchant = (data) => {
     return response;
 }
 
-export const uploadFile = (merchant, location, file) => {    
+export const uploadFile = (merchant, location, file) => {
     const formData = new FormData();
     formData.append('merchantId', merchant);
     formData.append('location', location);
@@ -228,6 +228,33 @@ export const uploadFile = (merchant, location, file) => {
 
 export const getInvoice = (id) => {
     const response = fetch(`${API_ENDPOINT}/${RECEIPT}/invoice/get`, {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify({
+            merchantId: sessionStorage.getItem(MERCHANT_ID),
+            invoiceRefId: id
+        })
+    })
+    return response;
+}
+
+export const markInvoice = (id, type, message, date) => {
+    const response = fetch(`${API_ENDPOINT}/${RECEIPT}/invoice/mrkrevcd`, {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify({
+            merchantId: sessionStorage.getItem(MERCHANT_ID),
+            invoiceRefId: id,
+            paymentType: type,
+            paymentDetails: message,
+            paymentDate: date
+        })
+    })
+    return response;
+}
+
+export const invoiceHistory = (id) => {
+    const response = fetch(`${API_ENDPOINT}/${RECEIPT}/invoice/invhstry`, {
         method: 'POST',
         headers: headers,
         body: JSON.stringify({

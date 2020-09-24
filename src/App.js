@@ -24,6 +24,7 @@ import ReceiptView from './ReceiptView/ReceiptView';
 import PaymentHistory from './Dashboard/PaymentHistory';
 import CreditNote from './CreditNote/CreditNote';
 import moment from 'moment';
+import PaymentDetails from './Dashboard/PaymentDetails';
 
 const theme = createMuiTheme({
   palette: {
@@ -51,7 +52,8 @@ function App() {
                 <Route path="/register" exact component={RegisterForm} />
                 <Route path="/dashboard" exact component={Dashboard} />
                 <Route path="/generateInvoice" exact component={GenerateInvoice} />
-                <Route path="/payment-history" exact component={PaymentHistory} />
+                <Route path="/payment-history" exact component={PaymentHistory} />                
+                <Route path="/payment-details" exact component={PaymentDetails} />
                 <Route path="/invoice" exact component={Invoice} />
                 <Route path="/credit-note" exact component={CreditNote} />
                 <Route path="/receipt-view" exact component={ReceiptView} />
